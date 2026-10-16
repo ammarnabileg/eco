@@ -32,15 +32,23 @@ function formatAddress(address: HttpTypes.StoreCartAddress) {
   }
 
   if (address.address_2) {
-    ret += `, ${address.address_2}`
+    ret += `، ${address.address_2}`
   }
 
-  if (address.postal_code) {
-    ret += `, ${address.postal_code} ${address.city}`
+  if (address.city) {
+    ret += `، ${address.city}`
+  }
+
+  if (address.province) {
+    ret += `، ${address.province}`
   }
 
   if (address.country_code) {
-    ret += `, ${address.country_code.toUpperCase()}`
+    ret += `، ${
+      address.country_code === "kw"
+        ? "الكويت"
+        : address.country_code.toUpperCase()
+    }`
   }
 
   return ret
@@ -164,7 +172,7 @@ const Shipping: React.FC<ShippingProps> = ({
             }
           )}
         >
-          Delivery
+          التوصيل
           {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
             <CheckCircleSolid />
           )}
@@ -176,10 +184,10 @@ const Shipping: React.FC<ShippingProps> = ({
             <Text>
               <button
                 onClick={handleEdit}
-                className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+                className="text-laly-teal hover:text-laly-teal-d"
                 data-testid="edit-delivery-button"
               >
-                Edit
+                تعديل
               </button>
             </Text>
           )}
@@ -189,10 +197,10 @@ const Shipping: React.FC<ShippingProps> = ({
           <div className="grid">
             <div className="flex flex-col">
               <span className="font-medium txt-medium text-ui-fg-base">
-                Shipping method
+                طريقة التوصيل
               </span>
               <span className="mb-4 text-ui-fg-muted txt-medium">
-                How would you like you order delivered
+                كيف تريد استلام طلبك؟
               </span>
             </div>
             <div data-testid="delivery-options-container">
@@ -226,7 +234,7 @@ const Shipping: React.FC<ShippingProps> = ({
                           checked={showPickupOptions === PICKUP_OPTION_ON}
                         />
                         <span className="text-base-regular">
-                          Pick up your order
+                          استلام الطلب من المتجر
                         </span>
                       </div>
                       <span className="justify-self-end text-ui-fg-base">
@@ -260,7 +268,7 @@ const Shipping: React.FC<ShippingProps> = ({
                           {
                             "border-ui-border-interactive":
                               option.id === shippingMethodId,
-                            "hover:shadow-brders-none cursor-not-allowed":
+                            "hover:shadow-none cursor-not-allowed":
                               isDisabled,
                           }
                         )}
@@ -302,10 +310,10 @@ const Shipping: React.FC<ShippingProps> = ({
             <div className="grid">
               <div className="flex flex-col">
                 <span className="font-medium txt-medium text-ui-fg-base">
-                  Store
+                  المتجر
                 </span>
                 <span className="mb-4 text-ui-fg-muted txt-medium">
-                  Choose a store near you
+                  اختر أقرب متجر إليك
                 </span>
               </div>
               <div data-testid="delivery-options-container">
@@ -330,7 +338,7 @@ const Shipping: React.FC<ShippingProps> = ({
                             {
                               "border-ui-border-interactive":
                                 option.id === shippingMethodId,
-                              "hover:shadow-brders-none cursor-not-allowed":
+                              "hover:shadow-none cursor-not-allowed":
                                 option.insufficient_inventory,
                             }
                           )}
@@ -373,13 +381,13 @@ const Shipping: React.FC<ShippingProps> = ({
             />
             <Button
               size="large"
-              className="mt"
+              className="mt-6"
               onClick={handleSubmit}
               isLoading={isLoading}
               disabled={!cart.shipping_methods?.[0]}
               data-testid="submit-delivery-option-button"
             >
-              Continue to payment
+              متابعة إلى الدفع
             </Button>
           </div>
         </>
@@ -389,7 +397,7 @@ const Shipping: React.FC<ShippingProps> = ({
             {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
               <div className="flex flex-col w-1/3">
                 <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  Method
+                  طريقة التوصيل
                 </Text>
                 <Text className="txt-medium text-ui-fg-subtle">
                   {cart.shipping_methods!.at(-1)!.name}{" "}

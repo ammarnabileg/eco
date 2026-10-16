@@ -3,6 +3,8 @@
 import clsx from "clsx"
 import { useRefinementList } from "react-instantsearch"
 
+import FilterCard from "@modules/store/components/filter-card"
+
 type RefinementGroupProps = {
   attribute: string
   title: string
@@ -20,11 +22,8 @@ const RefinementGroup = ({ attribute, title }: RefinementGroupProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-3">
-      <span className="txt-compact-small-plus text-ui-fg-subtle">
-        {title}
-      </span>
-      <ul className="flex flex-col gap-y-2 pr-6">
+    <FilterCard title={title}>
+      <ul className="flex flex-col gap-y-2.5">
         {items.map((item) => (
           <li key={item.value}>
             <label className="flex cursor-pointer items-start gap-x-2">
@@ -32,25 +31,25 @@ const RefinementGroup = ({ attribute, title }: RefinementGroupProps) => {
                 type="checkbox"
                 checked={item.isRefined}
                 onChange={() => refine(item.value)}
-                className="mt-1 shrink-0 accent-ui-fg-interactive"
+                className="mt-0.5 w-4 h-4 shrink-0 accent-laly-teal"
                 data-testid={`refinement-${attribute}`}
               />
               <span
-                className={clsx("text-small-regular min-w-0 break-words", {
-                  "text-ui-fg-base": item.isRefined,
-                  "text-ui-fg-subtle": !item.isRefined,
+                className={clsx("text-[13px] min-w-0 break-words", {
+                  "text-laly-teal font-bold": item.isRefined,
+                  "text-laly-mut": !item.isRefined,
                 })}
               >
                 {item.label}
               </span>
-              <span className="text-small-regular shrink-0 text-ui-fg-muted">
+              <span className="text-xs shrink-0 text-laly-faint">
                 ({item.count})
               </span>
             </label>
           </li>
         ))}
       </ul>
-    </div>
+    </FilterCard>
   )
 }
 

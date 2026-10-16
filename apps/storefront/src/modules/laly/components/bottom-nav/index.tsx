@@ -17,6 +17,11 @@ export default function BottomNav({ cartCount }: { cartCount: number }) {
   const pathname = usePathname()
   const { countryCode } = useParams()
 
+  // Product and cart pages show their own action bar in this spot.
+  if (pathname.includes("/products/") || pathname.endsWith("/cart")) {
+    return null
+  }
+
   const isActive = (href: string) => {
     const full = `/${countryCode}${href === "/" ? "" : href}`
     return href === "/" ? pathname === full : pathname.startsWith(full)

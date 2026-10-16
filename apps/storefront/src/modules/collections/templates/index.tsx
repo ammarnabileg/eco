@@ -26,10 +26,10 @@ export default function CollectionTemplate({
   return (
     <div className="flex flex-col small:flex-row small:items-start py-6 content-container">
       <RefinementList sortBy={sort} hideOptionsPicker />
-      <div className="w-full">
-        <div className="mb-8 text-2xl-semi">
-          <h1>{collection.title}</h1>
-        </div>
+      <div className="w-full min-w-0">
+        <h1 className="mb-6 text-xl small:text-[28px] font-extrabold leading-tight text-laly-ink">
+          {collection.title}
+        </h1>
         <Suspense
           fallback={
             <SkeletonProductGrid

@@ -11,7 +11,7 @@ function CartMismatchBanner(props: {
 }) {
   const { customer, cart } = props
   const [isPending, setIsPending] = useState(false)
-  const [actionText, setActionText] = useState("Run transfer again")
+  const [actionText, setActionText] = useState("إعادة نقل السلة")
 
   if (!customer || !!cart.customer_id) {
     return
@@ -20,11 +20,11 @@ function CartMismatchBanner(props: {
   const handleSubmit = async () => {
     try {
       setIsPending(true)
-      setActionText("Transferring..")
+      setActionText("جاري النقل…")
 
       await transferCart()
     } catch {
-      setActionText("Run transfer again")
+      setActionText("إعادة نقل السلة")
       setIsPending(false)
     }
   }
@@ -33,8 +33,8 @@ function CartMismatchBanner(props: {
     <div className="flex items-center justify-center small:p-4 p-2 text-center bg-orange-300 small:gap-2 gap-1 text-sm mt-2 text-orange-800">
       <div className="flex flex-col small:flex-row small:gap-2 gap-1 items-center">
         <span className="flex items-center gap-1">
-          <ExclamationCircleSolid className="inline" />
-          Something went wrong when we tried to transfer your cart
+          <ExclamationCircleSolid className="inline shrink-0" />
+          حدث خطأ أثناء نقل سلتك إلى حسابك
         </span>
 
         <span>·</span>

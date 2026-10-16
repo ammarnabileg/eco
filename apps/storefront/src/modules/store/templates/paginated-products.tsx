@@ -1,7 +1,9 @@
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { OptionValueIds } from "@lib/util/product-option-filters"
-import ProductPreview from "@modules/products/components/product-preview"
+import ProductCard, {
+  PRODUCT_CARD_FIELDS,
+} from "@modules/laly/components/product-card"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
@@ -13,6 +15,7 @@ type PaginatedProductsParams = {
   category_id?: string[]
   id?: string[]
   order?: string
+  fields?: string
 }
 
 export default async function PaginatedProducts({
@@ -34,6 +37,7 @@ export default async function PaginatedProducts({
 }) {
   const queryParams: PaginatedProductsParams = {
     limit: 12,
+    fields: PRODUCT_CARD_FIELDS,
   }
 
   if (collectionId) {
@@ -70,16 +74,32 @@ export default async function PaginatedProducts({
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
+  if (!products.length) {
+    return (
+      <div
+        className="py-16 px-4 text-center bg-white border border-laly-line rounded-card"
+        data-testid="no-products"
+      >
+        <p className="text-base font-extrabold text-laly-ink">
+          لا توجد منتجات هنا حالياً.
+        </p>
+        <p className="mt-1 text-sm text-laly-mut">
+          تصفّح باقي الفئات أو عُد لاحقاً.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <>
       <ul
-        className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
+        className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-3 small:gap-4"
         data-testid="products-list"
       >
-        {products.map((p) => {
+        {products.map((p, index) => {
           return (
             <li key={p.id}>
-              <ProductPreview product={p} region={region} />
+              <ProductCard product={p} priority={index < 4} />
             </li>
           )
         })}

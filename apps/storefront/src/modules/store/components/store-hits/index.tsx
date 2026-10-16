@@ -6,11 +6,11 @@ import { useHits, useInstantSearch } from "react-instantsearch"
 
 import useSearchSettled from "@lib/hooks/use-search-settled"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { Text } from "@modules/common/components/ui"
-import Thumbnail from "@modules/products/components/thumbnail"
+import PlaceholderImage from "@modules/common/icons/placeholder-image"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
+import Image from "next/image"
 import SearchPagination from "./pagination"
-import HitPrice, { HitPricing } from "./price"
+import HitPrice, { HitPricing, getHitPricing } from "./price"
 
 type ProductHit = Hit<
   {
@@ -23,6 +23,71 @@ type ProductHit = Hit<
 type StoreHitsProps = {
   hitsPerPage: number
   currencyCode: string
+}
+
+const HitCard = ({
+  hit,
+  currencyCode,
+  priority,
+}: {
+  hit: ProductHit
+  currencyCode: string
+  priority: boolean
+}) => {
+  const href = `/products/${hit.handle}`
+  const discount = getHitPricing(hit, currencyCode)?.discount
+
+  return (
+    <article
+      className="group h-full flex flex-col bg-white border border-laly-line rounded-card p-3 small:p-3.5 transition-shadow hover:shadow-laly"
+      data-testid="product-wrapper"
+    >
+      <LocalizedClientLink
+        href={href}
+        className="relative block aspect-[4/3] rounded-[13px] bg-laly-bg overflow-hidden"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
+        {hit.thumbnail ? (
+          <Image
+            src={hit.thumbnail}
+            alt=""
+            fill
+            priority={priority}
+            sizes="(max-width: 1024px) 50vw, 280px"
+            className="object-contain p-3 transition-transform duration-300 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <PlaceholderImage size={24} />
+          </span>
+        )}
+        {discount && (
+          <span
+            dir="ltr"
+            className="absolute top-2.5 start-2.5 rounded-full bg-laly-red text-white text-[11px] font-extrabold px-2 py-0.5"
+          >
+            -{discount}%
+          </span>
+        )}
+      </LocalizedClientLink>
+
+      <div className="flex flex-col flex-1 pt-3">
+        <h3 className="text-[13.5px] small:text-sm font-bold leading-snug line-clamp-2 min-h-[2.6em]">
+          <LocalizedClientLink
+            href={href}
+            className="hover:text-laly-teal"
+            data-testid="product-title"
+          >
+            {hit.title}
+          </LocalizedClientLink>
+        </h3>
+        <div className="mt-auto pt-2">
+          <HitPrice hit={hit} currencyCode={currencyCode} />
+        </div>
+      </div>
+    </article>
+  )
 }
 
 const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
@@ -50,13 +115,20 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
 
   if (status === "error") {
     return (
-      <Text
-        className="py-16 text-center text-ui-fg-error"
+      <p
+        className="py-16 text-center text-sm font-bold text-laly-red"
         data-testid="products-error"
       >
-        Couldn&apos;t load products
-        {error?.message ? `: ${error.message}` : "."}
-      </Text>
+        تعذّر تحميل المنتجات
+        {error?.message ? (
+          <>
+            {": "}
+            <span dir="ltr">{error.message}</span>
+          </>
+        ) : (
+          "."
+        )}
+      </p>
     )
   }
 
@@ -65,37 +137,30 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
       {showSkeleton ? (
         <SkeletonProductGrid numberOfProducts={hitsPerPage} />
       ) : !items.length ? (
-        <Text
-          className="py-16 text-center text-ui-fg-subtle"
+        <div
+          className="py-16 px-4 text-center bg-white border border-laly-line rounded-card"
           data-testid="no-products"
         >
-          No products matched these filters.
-        </Text>
+          <p className="text-base font-extrabold text-laly-ink">
+            لا توجد منتجات مطابقة لهذه الفلاتر.
+          </p>
+          <p className="mt-1 text-sm text-laly-mut">
+            جرّب تعديل البحث أو إزالة بعض الفلاتر.
+          </p>
+        </div>
       ) : (
         <ul
-          className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
+          className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-3 small:gap-4"
           data-testid="products-list"
         >
-          {items.map((hit) =>
+          {items.map((hit, index) =>
             hit.handle ? (
               <li key={hit.objectID}>
-                <LocalizedClientLink
-                  href={`/products/${hit.handle}`}
-                  className="group"
-                >
-                  <div data-testid="product-wrapper">
-                    <Thumbnail thumbnail={hit.thumbnail} size="full" />
-                    <div className="flex txt-compact-medium mt-4 justify-between">
-                      <Text
-                        className="text-ui-fg-subtle"
-                        data-testid="product-title"
-                      >
-                        {hit.title}
-                      </Text>
-                      <HitPrice hit={hit} currencyCode={currencyCode} />
-                    </div>
-                  </div>
-                </LocalizedClientLink>
+                <HitCard
+                  hit={hit}
+                  currencyCode={currencyCode}
+                  priority={index < 4}
+                />
               </li>
             ) : null
           )}

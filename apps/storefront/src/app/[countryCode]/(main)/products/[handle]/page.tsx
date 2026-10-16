@@ -1,6 +1,9 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { getStoreContent } from "@lib/data/content"
+import { getActiveOffers, offerEndsByProduct } from "@lib/data/offers"
 import { listProducts } from "@lib/data/products"
+import { getDevice } from "@lib/util/device"
 import { getRegion } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
@@ -46,11 +49,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${product.title} | Medusa Store`,
-    description: `${product.title}`,
+    title: product.title,
+    description: product.description || product.title,
     openGraph: {
-      title: `${product.title} | Medusa Store`,
-      description: `${product.title}`,
+      title: `${product.title} | Laly`,
+      description: product.description || product.title,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
   }
@@ -69,12 +72,23 @@ export default async function ProductPage(props: Props) {
 
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
-    queryParams: { handle: params.handle },
+    queryParams: {
+      handle: params.handle,
+      fields:
+        "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+variants.sku,*variants.images,*variants.options,+metadata,+tags,*categories,*type",
+    },
   }).then(({ response }) => response.products[0])
 
   if (!pricedProduct) {
     notFound()
   }
+
+  const [device, content, offers] = await Promise.all([
+    getDevice(),
+    getStoreContent(),
+    getActiveOffers(),
+  ])
+  const offerEnds = await offerEndsByProduct(offers)
 
   const images = getImagesForVariant(pricedProduct, selectedVariantId)
 
@@ -84,6 +98,9 @@ export default async function ProductPage(props: Props) {
       region={region}
       countryCode={params.countryCode}
       images={images ?? []}
+      device={device}
+      badges={content.trust_badges}
+      offerEndsAt={offerEnds[pricedProduct.id]}
     />
   )
 }

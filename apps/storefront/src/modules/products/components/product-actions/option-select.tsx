@@ -19,37 +19,35 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   "data-testid": dataTestId,
   disabled,
 }) => {
-  const filteredOptions = (option.values ?? []).map((v) => v.value)
+  const values = (option.values ?? []).map((v) => v.value)
 
   return (
-    <div className="flex flex-col gap-y-3">
-      <span className="text-sm">Select {title}</span>
-      <div
-        className="flex flex-wrap justify-between gap-2"
-        data-testid={dataTestId}
-      >
-        {filteredOptions.map((v) => {
-          return (
-            <button
-              onClick={() => updateOption(option.id, v)}
-              key={v}
-              className={clx(
-                "border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 flex-1 ",
-                {
-                  "border-ui-border-interactive": v === current,
-                  "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":
-                    v !== current,
-                }
-              )}
-              disabled={disabled}
-              data-testid="option-button"
-            >
-              {v}
-            </button>
-          )
-        })}
+    <fieldset className="flex flex-col gap-y-2.5">
+      <legend className="text-sm font-bold mb-2.5">
+        {title}
+        {current && <span className="font-normal text-laly-mut">: {current}</span>}
+      </legend>
+      <div className="flex flex-wrap gap-2" data-testid={dataTestId}>
+        {values.map((v) => (
+          <button
+            type="button"
+            onClick={() => updateOption(option.id, v)}
+            key={v}
+            aria-pressed={v === current}
+            className={clx(
+              "min-w-[64px] h-10 px-4 rounded-btn border-[1.6px] text-sm font-bold transition-colors",
+              v === current
+                ? "border-laly-teal bg-laly-teal-faint text-laly-teal"
+                : "border-laly-line bg-white hover:border-laly-teal"
+            )}
+            disabled={disabled}
+            data-testid="option-button"
+          >
+            {v}
+          </button>
+        ))}
       </div>
-    </div>
+    </fieldset>
   )
 }
 

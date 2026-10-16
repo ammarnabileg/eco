@@ -2,16 +2,24 @@ import { HttpTypes } from "@medusajs/types"
 import Input from "@modules/common/components/input"
 import React, { useState } from "react"
 import CountrySelect from "../country-select"
+import GovernorateSelect from "../governorate-select"
+import PhoneInput from "../phone-input"
 
 const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
   const [formData, setFormData] = useState<Record<string, string>>({
     "billing_address.first_name": cart?.billing_address?.first_name || "",
     "billing_address.last_name": cart?.billing_address?.last_name || "",
     "billing_address.address_1": cart?.billing_address?.address_1 || "",
+    "billing_address.address_2": cart?.billing_address?.address_2 || "",
     "billing_address.company": cart?.billing_address?.company || "",
     "billing_address.postal_code": cart?.billing_address?.postal_code || "",
     "billing_address.city": cart?.billing_address?.city || "",
-    "billing_address.country_code": cart?.billing_address?.country_code || "",
+    "billing_address.country_code":
+      cart?.billing_address?.country_code ||
+      // Kuwait is the only country; preselect it when the region has one.
+      (cart?.region?.countries?.length === 1
+        ? cart.region.countries[0].iso_2 || ""
+        : ""),
     "billing_address.province": cart?.billing_address?.province || "",
     "billing_address.phone": cart?.billing_address?.phone || "",
   })
@@ -31,7 +39,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     <>
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="First name"
+          label="الاسم الأول"
           name="billing_address.first_name"
           autoComplete="given-name"
           value={formData["billing_address.first_name"]}
@@ -40,46 +48,13 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-first-name-input"
         />
         <Input
-          label="Last name"
+          label="اسم العائلة"
           name="billing_address.last_name"
           autoComplete="family-name"
           value={formData["billing_address.last_name"]}
           onChange={handleChange}
           required
           data-testid="billing-last-name-input"
-        />
-        <Input
-          label="Address"
-          name="billing_address.address_1"
-          autoComplete="address-line1"
-          value={formData["billing_address.address_1"]}
-          onChange={handleChange}
-          required
-          data-testid="billing-address-input"
-        />
-        <Input
-          label="Company"
-          name="billing_address.company"
-          value={formData["billing_address.company"]}
-          onChange={handleChange}
-          autoComplete="organization"
-          data-testid="billing-company-input"
-        />
-        <Input
-          label="Postal code"
-          name="billing_address.postal_code"
-          autoComplete="postal-code"
-          value={formData["billing_address.postal_code"]}
-          onChange={handleChange}
-          required
-          data-testid="billing-postal-input"
-        />
-        <Input
-          label="City"
-          name="billing_address.city"
-          autoComplete="address-level2"
-          value={formData["billing_address.city"]}
-          onChange={handleChange}
         />
         <CountrySelect
           name="billing_address.country_code"
@@ -90,21 +65,58 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           required
           data-testid="billing-country-select"
         />
-        <Input
-          label="State / Province"
+        <GovernorateSelect
           name="billing_address.province"
           autoComplete="address-level1"
           value={formData["billing_address.province"]}
           onChange={handleChange}
+          required
           data-testid="billing-province-input"
         />
         <Input
-          label="Phone"
+          label="المنطقة"
+          name="billing_address.city"
+          autoComplete="address-level2"
+          value={formData["billing_address.city"]}
+          onChange={handleChange}
+          required
+        />
+        <Input
+          label="القطعة، الشارع، الجادة"
+          name="billing_address.address_1"
+          autoComplete="address-line1"
+          value={formData["billing_address.address_1"]}
+          onChange={handleChange}
+          required
+          data-testid="billing-address-input"
+        />
+        <Input
+          label="المبنى، الدور، الشقة (اختياري)"
+          name="billing_address.address_2"
+          autoComplete="address-line2"
+          value={formData["billing_address.address_2"]}
+          onChange={handleChange}
+          data-testid="billing-address-2-input"
+        />
+        <PhoneInput
           name="billing_address.phone"
-          autoComplete="tel"
           value={formData["billing_address.phone"]}
           onChange={handleChange}
           data-testid="billing-phone-input"
+        />
+        {/* Kuwait has no postal codes and company isn't collected; keep the
+            keys in the submitted form so the address payload stays intact. */}
+        <input
+          type="hidden"
+          name="billing_address.company"
+          value={formData["billing_address.company"]}
+          data-testid="billing-company-input"
+        />
+        <input
+          type="hidden"
+          name="billing_address.postal_code"
+          value={formData["billing_address.postal_code"]}
+          data-testid="billing-postal-input"
         />
       </div>
     </>

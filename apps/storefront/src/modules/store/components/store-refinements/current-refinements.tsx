@@ -5,6 +5,7 @@ import { useClearRefinements, useCurrentRefinements } from "react-instantsearch"
 
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
 import { convertToLocale } from "@lib/util/money"
+import FilterCard from "@modules/store/components/filter-card"
 import {
   CATEGORY_ATTRIBUTE,
   LABELS_ATTRIBUTE,
@@ -34,7 +35,7 @@ function refinementLabel(refinement: Refinement, currencyCode: string) {
   }
 
   if (attribute === priceAttribute("on_sale", currencyCode)) {
-    return "On sale"
+    return "عروض"
   }
 
   if (attribute === priceAttribute("min_price", currencyCode)) {
@@ -45,16 +46,16 @@ function refinementLabel(refinement: Refinement, currencyCode: string) {
     })
 
     return operator === "<=" || operator === "<"
-      ? `Up to ${amount}`
-      : `From ${amount}`
+      ? `حتى ${amount}`
+      : `من ${amount}`
   }
 
   if (attribute === CATEGORY_ATTRIBUTE) {
-    return `Category: ${label}`
+    return `الفئة: ${label}`
   }
 
   if (attribute === LABELS_ATTRIBUTE) {
-    return `Label: ${label}`
+    return `الوسم: ${label}`
   }
 
   return label
@@ -76,23 +77,23 @@ const CurrentRefinements = ({ currencyCode }: { currencyCode: string }) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-3" data-testid="current-refinements">
-      <div className="flex items-center justify-between gap-x-2 pr-6">
-        <span className="txt-compact-small-plus text-ui-fg-subtle">
-          Applied filters
-        </span>
+    <FilterCard data-testid="current-refinements">
+      <div className="mb-3 flex items-center justify-between gap-x-2">
+        <h2 className="text-sm font-extrabold text-laly-ink">
+          الفلاتر المطبّقة
+        </h2>
         {canClearAll && (
           <button
             onClick={clearAll}
-            className="txt-compact-small-plus text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+            className="text-[13px] font-bold text-laly-teal hover:text-laly-teal-d"
             data-testid="clear-refinements"
           >
-            Clear all
+            مسح الكل
           </button>
         )}
       </div>
 
-      <ul className="flex flex-wrap gap-2 pr-6">
+      <ul className="flex flex-wrap gap-2">
         {refinements.map((refinement) => {
           const label = refinementLabel(refinement, currencyCode)
 
@@ -104,18 +105,18 @@ const CurrentRefinements = ({ currencyCode }: { currencyCode: string }) => {
             >
               <button
                 onClick={() => refine(refinement)}
-                aria-label={`Remove filter ${label}`}
-                className="border-ui-border-interactive text-ui-fg-base border text-small-regular h-8 rounded-rounded px-3 flex items-center gap-x-1.5 transition-colors duration-150 hover:bg-ui-bg-base-hover"
+                aria-label={`إزالة الفلتر ${label}`}
+                className="h-8 rounded-full bg-laly-teal-soft text-laly-teal text-xs font-bold px-3 flex items-center gap-x-1.5 transition-colors duration-150 hover:bg-laly-teal hover:text-white"
                 data-testid="remove-refinement"
               >
                 {label}
-                <XMarkMini className="text-ui-fg-muted" />
+                <XMarkMini />
               </button>
             </li>
           )
         })}
       </ul>
-    </div>
+    </FilterCard>
   )
 }
 

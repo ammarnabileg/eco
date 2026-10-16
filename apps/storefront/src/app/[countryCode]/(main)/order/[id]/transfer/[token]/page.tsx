@@ -10,25 +10,24 @@ export default async function TransferPage({
   const { id, token } = params
 
   return (
-    <div className="flex flex-col gap-y-4 items-start w-2/5 mx-auto mt-10 mb-20">
+    <div className="flex flex-col gap-y-4 items-start w-full max-w-xl px-4 mx-auto mt-10 mb-20">
       <TransferImage />
       <div className="flex flex-col gap-y-6">
         <Heading level="h1" className="text-xl text-zinc-900">
-          Transfer request for order {id}
+          طلب نقل الطلب <span dir="ltr">{id}</span>
         </Heading>
         <Text className="text-zinc-600">
-          You&#39;ve received a request to transfer ownership of your order ({id}).
-          If you agree to this request, you can approve the transfer by clicking
-          the button below.
+          وصلك طلب لنقل ملكية طلبك (<span dir="ltr">{id}</span>). إذا كنت
+          توافق على هذا الطلب، يمكنك قبول النقل بالضغط على الزر أدناه.
         </Text>
         <div className="w-full h-px bg-zinc-200" />
         <Text className="text-zinc-600">
-          If you accept, the new owner will take over all responsibilities and
-          permissions associated with this order.
+          عند القبول، سيتولى المالك الجديد جميع المسؤوليات والصلاحيات المرتبطة
+          بهذا الطلب.
         </Text>
         <Text className="text-zinc-600">
-          If you do not recognize this request or wish to retain ownership, no
-          further action is required.
+          إذا لم تتعرف على هذا الطلب أو كنت ترغب في الاحتفاظ بملكيته، فلا داعي
+          لأي إجراء.
         </Text>
         <div className="w-full h-px bg-zinc-200" />
         <TransferActions id={id} token={token} />

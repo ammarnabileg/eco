@@ -1,26 +1,34 @@
-import { ArrowUpRightMini } from "@medusajs/icons"
-import { Text } from "@modules/common/components/ui"
 import { Metadata } from "next"
 import Link from "next/link"
 
+import Icon from "@modules/laly/components/icon"
+
 export const metadata: Metadata = {
-  title: "404",
-  description: "Something went wrong",
+  title: "الصفحة غير موجودة",
+  description: "الصفحة التي تبحث عنها غير موجودة.",
 }
 
 export default function NotFound() {
   return (
-    <div className="flex flex-col gap-4 items-center justify-center min-h-[calc(100vh-64px)]">
-      <h1 className="text-2xl-semi text-ui-fg-base">Page not found</h1>
-      <p className="text-small-regular text-ui-fg-base">
-        The page you tried to access does not exist.
+    <div className="content-container flex flex-col gap-3 items-center justify-center text-center min-h-[calc(100vh-64px)] py-16">
+      <span
+        dir="ltr"
+        className="text-[64px] small:text-[88px] font-extrabold leading-none text-laly-teal"
+      >
+        404
+      </span>
+      <h1 className="text-xl small:text-[28px] font-extrabold text-laly-ink">
+        الصفحة غير موجودة
+      </h1>
+      <p className="max-w-md text-sm text-laly-mut leading-relaxed">
+        الصفحة التي تحاول الوصول إليها غير موجودة.
       </p>
-      <Link className="flex gap-x-1 items-center group" href="/">
-        <Text className="text-ui-fg-interactive">Go to frontpage</Text>
-        <ArrowUpRightMini
-          className="group-hover:rotate-45 ease-in-out duration-150"
-          color="var(--fg-interactive)"
-        />
+      <Link
+        href="/"
+        className="mt-3 h-11 px-6 inline-flex items-center gap-2 rounded-btn bg-laly-teal text-white text-sm font-bold hover:bg-laly-teal-d transition-colors"
+      >
+        العودة للرئيسية
+        <Icon name="arrowr" size={16} className="rtl:-scale-x-100" />
       </Link>
     </div>
   )

@@ -11,6 +11,10 @@ import CountrySelect from "@modules/checkout/components/country-select"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import Modal from "@modules/common/components/modal"
+import {
+  GovernorateSelect,
+  KuwaitPhoneInput,
+} from "@modules/account/components/kuwait-address-fields"
 
 const AddAddress = ({
   region,
@@ -44,94 +48,87 @@ const AddAddress = ({
     }
   }, [formState])
 
+  const countries = region.countries ?? []
+  const singleCountry = countries.length === 1 ? countries[0] : null
+
   return (
     <>
       <button
-        className="border border-ui-border-base rounded-rounded p-5 min-h-[220px] h-full w-full flex flex-col justify-between"
+        className="group bg-white border border-dashed border-laly-line hover:border-laly-teal hover:bg-laly-teal-faint rounded-card p-5 min-h-[220px] h-full w-full flex flex-col justify-between text-start transition-colors"
         onClick={open}
         data-testid="add-address-button"
       >
-        <span className="text-base-semi">New address</span>
-        <Plus />
+        <span className="text-base-semi text-laly-ink">إضافة عنوان جديد</span>
+        <span className="flex items-center justify-center w-10 h-10 rounded-full bg-laly-teal-soft text-laly-teal group-hover:bg-laly-teal group-hover:text-white transition-colors">
+          <Plus />
+        </span>
       </button>
 
       <Modal isOpen={state} close={close} data-testid="add-address-modal">
         <Modal.Title>
-          <Heading className="mb-2">Add address</Heading>
+          <Heading className="mb-2 text-laly-ink">إضافة عنوان</Heading>
         </Modal.Title>
         <form action={formAction}>
+          {/* Kuwait has no postal codes and the company field is not used. */}
+          <input type="hidden" name="company" value="" />
+          <input type="hidden" name="postal_code" value="" />
+          {singleCountry && (
+            <input
+              type="hidden"
+              name="country_code"
+              value={singleCountry.iso_2 ?? ""}
+            />
+          )}
           <Modal.Body>
-            <div className="flex flex-col gap-y-2">
+            <div className="flex flex-col gap-y-3">
               <div className="grid grid-cols-2 gap-x-2">
                 <Input
-                  label="First name"
+                  label="الاسم الأول"
                   name="first_name"
                   required
                   autoComplete="given-name"
                   data-testid="first-name-input"
                 />
                 <Input
-                  label="Last name"
+                  label="اسم العائلة"
                   name="last_name"
                   required
                   autoComplete="family-name"
                   data-testid="last-name-input"
                 />
               </div>
+              <GovernorateSelect data-testid="state-input" />
               <Input
-                label="Company"
-                name="company"
-                autoComplete="organization"
-                data-testid="company-input"
+                label="المنطقة"
+                name="city"
+                required
+                autoComplete="address-level2"
+                data-testid="city-input"
               />
               <Input
-                label="Address"
+                label="القطعة، الشارع، الجادة"
                 name="address_1"
                 required
                 autoComplete="address-line1"
                 data-testid="address-1-input"
               />
               <Input
-                label="Apartment, suite, etc."
+                label="المبنى، الدور، الشقة (اختياري)"
                 name="address_2"
                 autoComplete="address-line2"
                 data-testid="address-2-input"
               />
-              <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                <Input
-                  label="Postal code"
-                  name="postal_code"
+              {!singleCountry && (
+                <CountrySelect
+                  region={region}
+                  name="country_code"
+                  placeholder="الدولة"
                   required
-                  autoComplete="postal-code"
-                  data-testid="postal-code-input"
+                  autoComplete="country"
+                  data-testid="country-select"
                 />
-                <Input
-                  label="City"
-                  name="city"
-                  required
-                  autoComplete="locality"
-                  data-testid="city-input"
-                />
-              </div>
-              <Input
-                label="Province / State"
-                name="province"
-                autoComplete="address-level1"
-                data-testid="state-input"
-              />
-              <CountrySelect
-                region={region}
-                name="country_code"
-                required
-                autoComplete="country"
-                data-testid="country-select"
-              />
-              <Input
-                label="Phone"
-                name="phone"
-                autoComplete="phone"
-                data-testid="phone-input"
-              />
+              )}
+              <KuwaitPhoneInput data-testid="phone-input" />
             </div>
             {formState.error && (
               <div
@@ -151,9 +148,9 @@ const AddAddress = ({
                 className="h-10"
                 data-testid="cancel-button"
               >
-                Cancel
+                إلغاء
               </Button>
-              <SubmitButton data-testid="save-button">Save</SubmitButton>
+              <SubmitButton data-testid="save-button">حفظ</SubmitButton>
             </div>
           </Modal.Footer>
         </form>

@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import InteractiveLink from "@modules/common/components/interactive-link"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -39,6 +38,9 @@ export default function CategoryTemplate({
 
   getParents(category)
 
+  // Root first, so the trail reads from the top-level category down.
+  const trail = [...parents].reverse()
+
   return (
     <div
       className="flex flex-col small:flex-row small:items-start py-6 content-container"
@@ -49,40 +51,52 @@ export default function CategoryTemplate({
         data-testid="sort-by-container"
         hideOptionsPicker
       />
-      <div className="w-full">
-        <div className="flex flex-row mb-8 text-2xl-semi gap-4">
-          {parents &&
-            parents.map((parent) => (
-              <span key={parent.id} className="text-ui-fg-subtle">
+      <div className="w-full min-w-0">
+        {trail.length > 0 && (
+          <nav
+            aria-label="مسار التصفح"
+            className="mb-2 flex flex-wrap items-center gap-x-2 text-[13px] text-laly-mut"
+          >
+            {trail.map((parent) => (
+              <span key={parent.id} className="flex items-center gap-x-2">
                 <LocalizedClientLink
-                  className="mr-4 hover:text-black"
+                  className="hover:text-laly-teal"
                   href={`/categories/${parent.handle}`}
                   data-testid="sort-by-link"
                 >
                   {parent.name}
                 </LocalizedClientLink>
-                /
+                <span aria-hidden="true" className="text-laly-faint">
+                  /
+                </span>
               </span>
             ))}
-          <h1 data-testid="category-page-title">{category.name}</h1>
-        </div>
-        {category.description && (
-          <div className="mb-8 text-base-regular">
-            <p>{category.description}</p>
-          </div>
+          </nav>
         )}
-        {category.category_children && (
-          <div className="mb-8 text-base-large">
-            <ul className="grid grid-cols-1 gap-2">
-              {category.category_children?.map((c) => (
-                <li key={c.id}>
-                  <InteractiveLink href={`/categories/${c.handle}`}>
-                    {c.name}
-                  </InteractiveLink>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <h1
+          className="mb-4 text-xl small:text-[28px] font-extrabold leading-tight text-laly-ink"
+          data-testid="category-page-title"
+        >
+          {category.name}
+        </h1>
+        {category.description && (
+          <p className="mb-6 text-sm text-laly-mut leading-relaxed">
+            {category.description}
+          </p>
+        )}
+        {!!category.category_children?.length && (
+          <ul className="mb-6 flex flex-wrap gap-2">
+            {category.category_children.map((c) => (
+              <li key={c.id}>
+                <LocalizedClientLink
+                  href={`/categories/${c.handle}`}
+                  className="h-9 px-4 flex items-center rounded-full bg-white border border-laly-line text-[13px] font-bold text-laly-ink hover:border-laly-teal hover:text-laly-teal transition-colors"
+                >
+                  {c.name}
+                </LocalizedClientLink>
+              </li>
+            ))}
+          </ul>
         )}
         <Suspense
           fallback={

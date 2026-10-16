@@ -1,26 +1,25 @@
-import { Button, Heading, Text } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Icon from "@modules/laly/components/icon"
 
-const SignInPrompt = () => {
-  return (
-    <div className="bg-white flex items-center justify-between">
+const SignInPrompt = () => (
+  <div className="bg-laly-teal-faint border border-laly-teal-soft rounded-card p-4 flex items-center justify-between gap-3">
+    <div className="flex items-center gap-3">
+      <span className="w-10 h-10 rounded-full bg-white text-laly-teal flex items-center justify-center shrink-0">
+        <Icon name="user" size={20} />
+      </span>
       <div>
-        <Heading level="h2" className="txt-xlarge">
-          Already have an account?
-        </Heading>
-        <Text className="txt-medium text-ui-fg-subtle mt-2">
-          Sign in for a better experience.
-        </Text>
-      </div>
-      <div>
-        <LocalizedClientLink href="/account">
-          <Button variant="secondary" className="h-10" data-testid="sign-in-button">
-            Sign in
-          </Button>
-        </LocalizedClientLink>
+        <p className="text-sm font-bold">عندك حساب؟</p>
+        <p className="text-xs text-laly-mut">سجّل دخولك لتتابع طلباتك وتحفظ عناوينك.</p>
       </div>
     </div>
-  )
-}
+    <LocalizedClientLink
+      href="/account"
+      className="shrink-0 rounded-btn border-[1.6px] border-laly-teal text-laly-teal text-sm font-bold px-4 py-2 hover:bg-white"
+      data-testid="sign-in-button"
+    >
+      تسجيل الدخول
+    </LocalizedClientLink>
+  </div>
+)
 
 export default SignInPrompt

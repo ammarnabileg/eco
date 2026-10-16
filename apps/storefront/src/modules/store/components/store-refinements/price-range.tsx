@@ -5,18 +5,21 @@ import { useEffect, useState } from "react"
 import { useRange } from "react-instantsearch"
 
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
+import { convertToLocale } from "@lib/util/money"
+import FilterCard from "@modules/store/components/filter-card"
 
 function formatAmount(amount: number, currency: string) {
-    try {
-      return new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: currency.toUpperCase(),
-        maximumFractionDigits: 0,
-      }).format(amount)
-    } catch {
-      // An unrecognised currency code shouldn't take the sidebar down.
-      return `${Math.round(amount)} ${currency.toUpperCase()}`
-    }
+  try {
+    return convertToLocale({
+      amount,
+      currency_code: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    })
+  } catch {
+    // An unrecognised currency code shouldn't take the sidebar down.
+    return `${Math.round(amount)} ${currency.toUpperCase()}`
+  }
 }
 
 /**
@@ -39,6 +42,12 @@ const PriceRange = ({ currencyCode }: { currencyCode: string }) => {
   const to = Number.isFinite(start[1]) ? (start[1] as number) : max
 
   const [value, setValue] = useState<number[]>([from, to])
+  // Radix lays the track out LTR unless told otherwise; follow the page.
+  const [dir, setDir] = useState<"ltr" | "rtl">("rtl")
+
+  useEffect(() => {
+    setDir(document.documentElement.dir === "ltr" ? "ltr" : "rtl")
+  }, [])
 
   // Follow the refinement when it changes elsewhere — clearing all filters, or
   // a bound arriving from the URL on load.
@@ -52,12 +61,11 @@ const PriceRange = ({ currencyCode }: { currencyCode: string }) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4">
-      <span className="txt-compact-small-plus text-ui-fg-subtle">Price</span>
-
-      <div className="flex flex-col gap-y-3 pr-6">
+    <FilterCard title="السعر">
+      <div className="flex flex-col gap-y-3">
         <Slider.Root
           className="relative flex h-5 w-full touch-none select-none items-center"
+          dir={dir}
           value={value}
           min={min}
           max={max}
@@ -67,31 +75,31 @@ const PriceRange = ({ currencyCode }: { currencyCode: string }) => {
           // Only refine when the thumb is released, so dragging doesn't fire a
           // search per pixel.
           onValueCommit={(committed) => refine([committed[0], committed[1]])}
-          aria-label="Price range"
+          aria-label="نطاق السعر"
           data-testid="price-range"
         >
-          <Slider.Track className="relative h-0.5 w-full grow rounded-full bg-ui-border-base">
-            <Slider.Range className="absolute h-full rounded-full bg-ui-fg-interactive" />
+          <Slider.Track className="relative h-1 w-full grow rounded-full bg-laly-line">
+            <Slider.Range className="absolute h-full rounded-full bg-laly-teal" />
           </Slider.Track>
           {value.map((_, index) => (
             <Slider.Thumb
               key={index}
-              className="block h-4 w-4 rounded-full border border-ui-border-interactive bg-ui-bg-base shadow-elevation-card-rest outline-none focus-visible:ring-2 focus-visible:ring-ui-fg-interactive"
-              aria-label={index === 0 ? "Minimum price" : "Maximum price"}
+              className="block h-4 w-4 rounded-full border-2 border-laly-teal bg-white shadow-laly outline-none focus-visible:ring-2 focus-visible:ring-laly-teal"
+              aria-label={index === 0 ? "أدنى سعر" : "أعلى سعر"}
             />
           ))}
         </Slider.Root>
 
         <div className="flex items-center justify-between">
-          <span className="text-small-regular text-ui-fg-subtle">
+          <span className="text-xs font-bold text-laly-mut">
             {format(value[0])}
           </span>
-          <span className="text-small-regular text-ui-fg-subtle">
+          <span className="text-xs font-bold text-laly-mut">
             {format(value[1])}
           </span>
         </div>
       </div>
-    </div>
+    </FilterCard>
   )
 }
 

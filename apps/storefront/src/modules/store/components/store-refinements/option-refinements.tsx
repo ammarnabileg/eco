@@ -35,6 +35,11 @@ function groupItems(
     const title = item.label.slice(0, separator)
     const label = item.label.slice(separator + 1)
 
+    // Single-variant products carry an internal "Default" option; not a filter.
+    if (title === "Default") {
+      continue
+    }
+
     if (!groups.has(title)) {
       groups.set(title, { title, values: [] })
     }
@@ -79,7 +84,7 @@ const OptionRefinements = () => {
             .filter((title) => !openTitles.includes(title))
         )
       }
-      className="flex flex-col gap-y-3 pr-6"
+      className="flex flex-col bg-white border border-laly-line rounded-card px-4 py-1 divide-y divide-laly-line"
     >
       {groups.map((group) => {
         const isOpen = !closedGroups.includes(group.title)
@@ -94,18 +99,18 @@ const OptionRefinements = () => {
             className="overflow-hidden"
           >
             <Accordion.Header>
-              <Accordion.Trigger className="flex w-full items-center justify-between py-3 text-left">
+              <Accordion.Trigger className="flex w-full items-center justify-between py-3 text-start">
                 <div className="flex items-center gap-2">
-                  <span className="txt-compact-small-plus text-ui-fg-base">
+                  <span className="text-sm font-extrabold text-laly-ink">
                     {group.title}
                   </span>
-                  <span className="txt-compact-small-plus text-ui-fg-muted">
+                  <span className="text-xs text-laly-faint">
                     ({selectedCount})
                   </span>
                 </div>
                 <span
                   className={clsx(
-                    "flex h-7 w-7 items-center justify-center text-ui-fg-muted transition-transform duration-150",
+                    "flex h-7 w-7 items-center justify-center text-laly-mut transition-transform duration-150",
                     { "rotate-180": isOpen }
                   )}
                 >
@@ -121,18 +126,18 @@ const OptionRefinements = () => {
                     onClick={() => refine(value.value)}
                     aria-pressed={value.isRefined}
                     className={clsx(
-                      "border-ui-border-base border text-small-regular h-10 rounded-rounded px-3 flex items-center gap-x-1.5 transition-colors duration-150",
+                      "border text-[13px] h-9 rounded-btn px-3 flex items-center gap-x-1.5 transition-colors duration-150",
                       {
-                        "border-ui-border-interactive text-ui-fg-base":
+                        "border-laly-teal bg-laly-teal-faint text-laly-teal font-bold":
                           value.isRefined,
-                        "text-ui-fg-muted hover:text-ui-fg-base":
+                        "border-laly-line text-laly-mut hover:border-laly-teal hover:text-laly-ink":
                           !value.isRefined,
                       }
                     )}
                     data-testid="option-refinement"
                   >
                     {value.label}
-                    <span className="text-ui-fg-muted">({value.count})</span>
+                    <span className="text-xs text-laly-faint">({value.count})</span>
                   </button>
                 ))}
               </div>

@@ -46,17 +46,17 @@ const Addresses = ({
           level="h2"
           className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
         >
-          Shipping Address
+          عنوان التوصيل
           {!isOpen && <CheckCircleSolid />}
         </Heading>
         {!isOpen && cart?.shipping_address && (
           <Text>
             <button
               onClick={handleEdit}
-              className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+              className="text-laly-teal hover:text-laly-teal-d"
               data-testid="edit-address-button"
             >
-              Edit
+              تعديل
             </button>
           </Text>
         )}
@@ -77,14 +77,14 @@ const Addresses = ({
                   level="h2"
                   className="text-3xl-regular gap-x-4 pb-6 pt-8"
                 >
-                  Billing address
+                  عنوان الفاتورة
                 </Heading>
 
                 <BillingAddress cart={cart} />
               </div>
             )}
             <SubmitButton className="mt-6" data-testid="submit-address-button">
-              Continue to delivery
+              متابعة إلى التوصيل
             </SubmitButton>
             <ErrorMessage error={message} data-testid="address-error-message" />
           </div>
@@ -100,7 +100,7 @@ const Addresses = ({
                     data-testid="shipping-address-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Shipping Address
+                      عنوان التوصيل
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle">
                       {cart.shipping_address.first_name}{" "}
@@ -111,11 +111,17 @@ const Addresses = ({
                       {cart.shipping_address.address_2}
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.postal_code},{" "}
-                      {cart.shipping_address.city}
+                      {[
+                        cart.shipping_address.city,
+                        cart.shipping_address.province,
+                      ]
+                        .filter(Boolean)
+                        .join("، ")}
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.country_code?.toUpperCase()}
+                      {cart.shipping_address.country_code === "kw"
+                        ? "الكويت"
+                        : cart.shipping_address.country_code?.toUpperCase()}
                     </Text>
                   </div>
 
@@ -124,12 +130,12 @@ const Addresses = ({
                     data-testid="shipping-contact-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Contact
+                      بيانات التواصل
                     </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
+                    <Text className="txt-medium text-ui-fg-subtle" dir="ltr">
                       {cart.shipping_address.phone}
                     </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
+                    <Text className="txt-medium text-ui-fg-subtle" dir="ltr">
                       {cart.email}
                     </Text>
                   </div>
@@ -139,12 +145,12 @@ const Addresses = ({
                     data-testid="billing-address-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Billing Address
+                      عنوان الفاتورة
                     </Text>
 
                     {sameAsBilling ? (
                       <Text className="txt-medium text-ui-fg-subtle">
-                        Billing and delivery address are the same.
+                        عنوان الفاتورة هو نفسه عنوان التوصيل.
                       </Text>
                     ) : (
                       <>
@@ -157,11 +163,17 @@ const Addresses = ({
                           {cart.billing_address?.address_2}
                         </Text>
                         <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address?.postal_code},{" "}
-                          {cart.billing_address?.city}
+                          {[
+                            cart.billing_address?.city,
+                            cart.billing_address?.province,
+                          ]
+                            .filter(Boolean)
+                            .join("، ")}
                         </Text>
                         <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address?.country_code?.toUpperCase()}
+                          {cart.billing_address?.country_code === "kw"
+                            ? "الكويت"
+                            : cart.billing_address?.country_code?.toUpperCase()}
                         </Text>
                       </>
                     )}

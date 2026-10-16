@@ -2,7 +2,6 @@
 
 import { useSortBy } from "react-instantsearch"
 
-import FilterRadioGroup from "@modules/common/components/filter-radio-group"
 import {
   CATEGORY_ATTRIBUTE,
   LABELS_ATTRIBUTE,
@@ -13,14 +12,15 @@ import OnSaleToggle from "./on-sale-toggle"
 import OptionRefinements from "./option-refinements"
 import PriceRange from "./price-range"
 import RefinementGroup from "./refinement-group"
+import SortRadioGroup from "@modules/store/components/sort-radio-group"
 
 const SortProducts = ({ currencyCode }: { currencyCode: string }) => {
   const items = getSortOptions(currencyCode)
   const { currentRefinement, refine } = useSortBy({ items })
 
   return (
-    <FilterRadioGroup
-      title="Sort by"
+    <SortRadioGroup
+      title="ترتيب حسب"
       items={items}
       value={currentRefinement}
       handleChange={refine}
@@ -31,14 +31,14 @@ const SortProducts = ({ currencyCode }: { currencyCode: string }) => {
 
 const StoreRefinements = ({ currencyCode }: { currencyCode: string }) => {
   return (
-    <div className="flex flex-col gap-12 py-4 mb-8 small:px-0 pl-6 small:w-[250px] small:shrink-0 small:ml-[1.675rem]">
+    <div className="flex flex-col gap-4 mb-6 small:mb-0 small:w-[260px] small:shrink-0 small:me-6">
       <SortProducts currencyCode={currencyCode} />
       <CurrentRefinements currencyCode={currencyCode} />
       <OptionRefinements />
       <PriceRange currencyCode={currencyCode} />
       <OnSaleToggle currencyCode={currencyCode} />
-      <RefinementGroup attribute={CATEGORY_ATTRIBUTE} title="Category" />
-      <RefinementGroup attribute={LABELS_ATTRIBUTE} title="Labels" />
+      <RefinementGroup attribute={CATEGORY_ATTRIBUTE} title="الفئة" />
+      <RefinementGroup attribute={LABELS_ATTRIBUTE} title="الوسوم" />
     </div>
   )
 }

@@ -55,17 +55,13 @@ const OptionsPicker = ({
   }
 
   return (
-    <div className="flex flex-col gap-y-4">
-      <div className="flex items-center justify-between px-1">
-        <span className="txt-compact-small-plus text-ui-fg-subtle">
-          Options
-        </span>
-      </div>
+    <div className="bg-white border border-laly-line rounded-card p-4">
+      <h2 className="text-sm font-extrabold text-laly-ink">الخيارات</h2>
       <Accordion.Root
         type="multiple"
         value={openItems}
         onValueChange={(values) => setOpenItems(values as string[])}
-        className="flex flex-col gap-y-3 pr-6"
+        className="flex flex-col divide-y divide-laly-line"
       >
         {options.map((option) => {
           const values =
@@ -104,18 +100,18 @@ const OptionsPicker = ({
               className="overflow-hidden"
             >
               <Accordion.Header>
-                <Accordion.Trigger className="flex w-full items-center justify-between py-3 text-left">
+                <Accordion.Trigger className="flex w-full items-center justify-between py-3 text-start">
                   <div className="flex items-center gap-2">
-                    <span className="txt-compact-small-plus text-ui-fg-base">
-                      {option.title || "Option"}
+                    <span className="text-[13px] font-bold text-laly-ink">
+                      {option.title || "خيار"}
                     </span>
-                    <span className="txt-compact-small-plus text-ui-fg-muted">
+                    <span className="text-xs text-laly-faint">
                       ({selectedCount})
                     </span>
                   </div>
                   <span
                     className={clsx(
-                      "flex h-7 w-7 items-center justify-center text-ui-fg-muted transition-transform duration-150",
+                      "flex h-7 w-7 items-center justify-center text-laly-mut transition-transform duration-150",
                       {
                         "rotate-180": isOpen,
                       }
@@ -135,11 +131,11 @@ const OptionsPicker = ({
                         key={value.id}
                         onClick={() => toggleValue(value.id)}
                         className={clsx(
-                          "border-ui-border-base border text-small-regular h-10 rounded-rounded px-3 flex items-center transition-colors duration-150",
+                          "border text-[13px] h-9 rounded-btn px-3 flex items-center transition-colors duration-150",
                           {
-                            "border-ui-border-interactive text-ui-fg-base":
+                            "border-laly-teal bg-laly-teal-faint text-laly-teal font-bold":
                               isSelected,
-                            "text-ui-fg-muted hover:text-ui-fg-base":
+                            "border-laly-line text-laly-mut hover:border-laly-teal hover:text-laly-ink":
                               !isSelected,
                           }
                         )}

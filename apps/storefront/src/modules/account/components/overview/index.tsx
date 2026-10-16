@@ -1,9 +1,11 @@
-import { Container } from "@modules/common/components/ui"
-
 import ChevronDown from "@modules/common/icons/chevron-down"
+import MapPin from "@modules/common/icons/map-pin"
+import Package from "@modules/common/icons/package"
+import User from "@modules/common/icons/user"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
+import { formatOrderDate } from "@modules/order/util/format"
 
 type OverviewProps = {
   customer: HttpTypes.StoreCustomer | null
@@ -11,125 +13,193 @@ type OverviewProps = {
 }
 
 const Overview = ({ customer, orders }: OverviewProps) => {
+  const completion = getProfileCompletion(customer)
+  const addressesCount = customer?.addresses?.length || 0
+
   return (
-    <div data-testid="overview-page-wrapper">
-      <div className="hidden small:block">
-        <div className="text-xl-semi flex justify-between items-center mb-4">
-          <span data-testid="welcome-message" data-value={customer?.first_name}>
-            Hello {customer?.first_name}
+    <div className="flex flex-col gap-y-5" data-testid="overview-page-wrapper">
+      {/* Greeting (the mobile account nav shows its own greeting) */}
+      <div className="hidden small:flex flex-col gap-y-2 rounded-card bg-laly-teal text-white p-6 shadow-laly">
+        <span
+          className="text-2xl font-bold"
+          data-testid="welcome-message"
+          data-value={customer?.first_name}
+        >
+          أهلاً {customer?.first_name}
+        </span>
+        <span className="text-small-regular text-white/80">
+          مسجّل الدخول بالبريد:{" "}
+          <span
+            className="font-semibold text-white"
+            dir="ltr"
+            data-testid="customer-email"
+            data-value={customer?.email}
+          >
+            {customer?.email}
           </span>
-          <span className="text-small-regular text-ui-fg-base">
-            Signed in as:{" "}
-            <span
-              className="font-semibold"
-              data-testid="customer-email"
-              data-value={customer?.email}
-            >
-              {customer?.email}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 xsmall:grid-cols-2 gap-4">
+        <LocalizedClientLink
+          href="/account/profile"
+          className="group bg-white border border-laly-line rounded-card p-5 flex flex-col gap-y-3 hover:border-laly-teal transition-colors"
+        >
+          <div className="flex items-center gap-x-2 text-laly-ink">
+            <span className="flex items-center justify-center w-9 h-9 rounded-btn bg-laly-teal-soft text-laly-teal">
+              <User size={18} />
             </span>
-          </span>
-        </div>
-        <div className="flex flex-col py-8 border-t border-gray-200">
-          <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
-            <div className="flex items-start gap-x-16 mb-6">
-              <div className="flex flex-col gap-y-4">
-                <h3 className="text-large-semi">Profile</h3>
-                <div className="flex items-end gap-x-2">
-                  <span
-                    className="text-3xl-semi leading-none"
-                    data-testid="customer-profile-completion"
-                    data-value={getProfileCompletion(customer)}
-                  >
-                    {getProfileCompletion(customer)}%
-                  </span>
-                  <span className="uppercase text-base-regular text-ui-fg-subtle">
-                    Completed
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-y-4">
-                <h3 className="text-large-semi">Addresses</h3>
-                <div className="flex items-end gap-x-2">
-                  <span
-                    className="text-3xl-semi leading-none"
-                    data-testid="addresses-count"
-                    data-value={customer?.addresses?.length || 0}
-                  >
-                    {customer?.addresses?.length || 0}
-                  </span>
-                  <span className="uppercase text-base-regular text-ui-fg-subtle">
-                    Saved
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-y-4">
-              <div className="flex items-center gap-x-2">
-                <h3 className="text-large-semi">Recent orders</h3>
-              </div>
-              <ul
-                className="flex flex-col gap-y-4"
-                data-testid="orders-wrapper"
-              >
-                {orders && orders.length > 0 ? (
-                  orders.slice(0, 5).map((order) => {
-                    return (
-                      <li
-                        key={order.id}
-                        data-testid="order-wrapper"
-                        data-value={order.id}
-                      >
-                        <LocalizedClientLink
-                          href={`/account/orders/details/${order.id}`}
-                        >
-                          <Container className="bg-gray-50 flex justify-between items-center p-4">
-                            <div className="grid grid-cols-3 grid-rows-2 text-small-regular gap-x-4 flex-1">
-                              <span className="font-semibold">Date placed</span>
-                              <span className="font-semibold">
-                                Order number
-                              </span>
-                              <span className="font-semibold">
-                                Total amount
-                              </span>
-                              <span data-testid="order-created-date">
-                                {new Date(order.created_at).toDateString()}
-                              </span>
-                              <span
-                                data-testid="order-id"
-                                data-value={order.display_id}
-                              >
-                                #{order.display_id}
-                              </span>
-                              <span data-testid="order-amount">
-                                {convertToLocale({
-                                  amount: order.total,
-                                  currency_code: order.currency_code,
-                                })}
-                              </span>
-                            </div>
-                            <button
-                              className="flex items-center justify-between"
-                              data-testid="open-order-button"
-                            >
-                              <span className="sr-only">
-                                Go to order #{order.display_id}
-                              </span>
-                              <ChevronDown className="-rotate-90" />
-                            </button>
-                          </Container>
-                        </LocalizedClientLink>
-                      </li>
-                    )
-                  })
-                ) : (
-                  <span data-testid="no-orders-message">No recent orders</span>
-                )}
-              </ul>
-            </div>
+            <h3 className="text-base-semi">الملف الشخصي</h3>
           </div>
+          <div className="flex items-end gap-x-2">
+            <span
+              className="text-3xl font-bold leading-none text-laly-ink"
+              data-testid="customer-profile-completion"
+              data-value={completion}
+            >
+              {completion}%
+            </span>
+            <span className="text-small-regular text-laly-mut">مكتمل</span>
+          </div>
+          <div
+            className="h-2 w-full rounded-full bg-laly-teal-soft overflow-hidden"
+            role="progressbar"
+            aria-label="نسبة اكتمال الملف الشخصي"
+            aria-valuenow={completion}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div
+              className="h-full rounded-full bg-laly-teal"
+              style={{ width: `${completion}%` }}
+            />
+          </div>
+        </LocalizedClientLink>
+
+        <LocalizedClientLink
+          href="/account/addresses"
+          className="group bg-white border border-laly-line rounded-card p-5 flex flex-col gap-y-3 hover:border-laly-teal transition-colors"
+        >
+          <div className="flex items-center gap-x-2 text-laly-ink">
+            <span className="flex items-center justify-center w-9 h-9 rounded-btn bg-laly-teal-soft text-laly-teal">
+              <MapPin size={18} />
+            </span>
+            <h3 className="text-base-semi">العناوين</h3>
+          </div>
+          <div className="flex items-end gap-x-2">
+            <span
+              className="text-3xl font-bold leading-none text-laly-ink"
+              data-testid="addresses-count"
+              data-value={addressesCount}
+            >
+              {addressesCount}
+            </span>
+            <span className="text-small-regular text-laly-mut">
+              {addressesCount === 1 ? "عنوان محفوظ" : "عناوين محفوظة"}
+            </span>
+          </div>
+          <span className="text-small-regular font-semibold text-laly-teal group-hover:text-laly-teal-d">
+            إدارة العناوين
+          </span>
+        </LocalizedClientLink>
+      </div>
+
+      <div className="bg-white border border-laly-line rounded-card p-5 flex flex-col gap-y-4">
+        <div className="flex items-center justify-between gap-x-2">
+          <div className="flex items-center gap-x-2 text-laly-ink">
+            <span className="flex items-center justify-center w-9 h-9 rounded-btn bg-laly-teal-soft text-laly-teal">
+              <Package size={18} />
+            </span>
+            <h3 className="text-base-semi">أحدث الطلبات</h3>
+          </div>
+          {orders && orders.length > 0 && (
+            <LocalizedClientLink
+              href="/account/orders"
+              className="text-small-regular font-semibold text-laly-teal hover:text-laly-teal-d"
+            >
+              عرض كل الطلبات
+            </LocalizedClientLink>
+          )}
         </div>
+        <ul className="flex flex-col gap-y-3" data-testid="orders-wrapper">
+          {orders && orders.length > 0 ? (
+            orders.slice(0, 5).map((order) => {
+              return (
+                <li
+                  key={order.id}
+                  data-testid="order-wrapper"
+                  data-value={order.id}
+                >
+                  <LocalizedClientLink
+                    href={`/account/orders/details/${order.id}`}
+                    className="flex justify-between items-center gap-x-3 p-4 rounded-btn bg-laly-bg hover:bg-laly-teal-faint border border-transparent hover:border-laly-teal-soft transition-colors"
+                  >
+                    <div className="grid grid-cols-1 xsmall:grid-cols-3 text-small-regular gap-x-4 gap-y-1 flex-1">
+                      <div className="flex xsmall:flex-col gap-x-2">
+                        <span className="text-laly-mut">تاريخ الطلب</span>
+                        <span
+                          className="text-laly-ink font-semibold"
+                          data-testid="order-created-date"
+                        >
+                          {formatOrderDate(order.created_at)}
+                        </span>
+                      </div>
+                      <div className="flex xsmall:flex-col gap-x-2">
+                        <span className="text-laly-mut">رقم الطلب</span>
+                        <span
+                          className="text-laly-ink font-semibold"
+                          data-testid="order-id"
+                          data-value={order.display_id}
+                        >
+                          #{order.display_id}
+                        </span>
+                      </div>
+                      <div className="flex xsmall:flex-col gap-x-2">
+                        <span className="text-laly-mut">الإجمالي</span>
+                        <span
+                          className="text-laly-ink font-semibold"
+                          data-testid="order-amount"
+                        >
+                          {convertToLocale({
+                            amount: order.total,
+                            currency_code: order.currency_code,
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                    <span
+                      className="flex items-center justify-center text-laly-teal"
+                      data-testid="open-order-button"
+                    >
+                      <span className="sr-only">
+                        عرض الطلب #{order.display_id}
+                      </span>
+                      <ChevronDown
+                        aria-hidden="true"
+                        className="-rotate-90 rtl:rotate-90"
+                      />
+                    </span>
+                  </LocalizedClientLink>
+                </li>
+              )
+            })
+          ) : (
+            <li className="flex flex-col items-start gap-y-3 py-2">
+              <span
+                className="text-base-regular text-laly-mut"
+                data-testid="no-orders-message"
+              >
+                لا توجد طلبات حديثة
+              </span>
+              <LocalizedClientLink
+                href="/store"
+                className="inline-flex items-center h-10 px-4 rounded-btn bg-laly-teal text-white font-bold hover:bg-laly-teal-d transition-colors"
+              >
+                ابدأ التسوق
+              </LocalizedClientLink>
+            </li>
+          )}
+        </ul>
       </div>
     </div>
   )

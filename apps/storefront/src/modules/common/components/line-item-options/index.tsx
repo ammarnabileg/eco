@@ -12,13 +12,18 @@ const LineItemOptions = ({
   "data-testid": dataTestid,
   "data-value": dataValue,
 }: LineItemOptionsProps) => {
+  // Single-variant products are named "Default"; there is nothing to show.
+  if (!variant?.title || variant.title === "Default") {
+    return null
+  }
+
   return (
     <Text
       data-testid={dataTestid}
       data-value={dataValue}
       className="inline-block txt-medium text-ui-fg-subtle w-full overflow-hidden text-ellipsis"
     >
-      Variant: {variant?.title}
+      {variant.title}
     </Text>
   )
 }

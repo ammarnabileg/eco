@@ -9,52 +9,56 @@ type ShippingDetailsProps = {
 }
 
 const ShippingDetails = ({ order }: ShippingDetailsProps) => {
+  const address = order.shipping_address
+
   return (
     <div>
       <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
-        Delivery
+        التوصيل
       </Heading>
-      <div className="flex items-start gap-x-8">
-        <div
-          className="flex flex-col w-1/3"
-          data-testid="shipping-address-summary"
-        >
+      <div className="grid grid-cols-1 small:grid-cols-3 gap-6">
+        <div className="flex flex-col" data-testid="shipping-address-summary">
           <Text className="txt-medium-plus text-ui-fg-base mb-1">
-            Shipping Address
+            عنوان التوصيل
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
-            {order.shipping_address?.first_name}{" "}
-            {order.shipping_address?.last_name}
+            {address?.first_name} {address?.last_name}
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
-            {order.shipping_address?.address_1}{" "}
-            {order.shipping_address?.address_2}
+            {[address?.address_1, address?.address_2]
+              .filter(Boolean)
+              .join("، ")}
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
-            {order.shipping_address?.postal_code},{" "}
-            {order.shipping_address?.city}
+            {[address?.city, address?.province, address?.postal_code]
+              .filter(Boolean)
+              .join("، ")}
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
-            {order.shipping_address?.country_code?.toUpperCase()}
+            {address?.country_code?.toLowerCase() === "kw"
+              ? "الكويت"
+              : address?.country_code?.toUpperCase()}
           </Text>
         </div>
 
-        <div
-          className="flex flex-col w-1/3 "
-          data-testid="shipping-contact-summary"
-        >
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">Contact</Text>
-          <Text className="txt-medium text-ui-fg-subtle">
-            {order.shipping_address?.phone}
+        <div className="flex flex-col" data-testid="shipping-contact-summary">
+          <Text className="txt-medium-plus text-ui-fg-base mb-1">
+            معلومات التواصل
           </Text>
-          <Text className="txt-medium text-ui-fg-subtle">{order.email}</Text>
+          {address?.phone && (
+            <Text className="txt-medium text-ui-fg-subtle">
+              <span dir="ltr">{address.phone}</span>
+            </Text>
+          )}
+          <Text className="txt-medium text-ui-fg-subtle">
+            <span dir="ltr">{order.email}</span>
+          </Text>
         </div>
 
-        <div
-          className="flex flex-col w-1/3"
-          data-testid="shipping-method-summary"
-        >
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">Method</Text>
+        <div className="flex flex-col" data-testid="shipping-method-summary">
+          <Text className="txt-medium-plus text-ui-fg-base mb-1">
+            طريقة التوصيل
+          </Text>
           <Text className="txt-medium text-ui-fg-subtle">
             {(order.shipping_methods?.[0] as { name?: string })?.name} (
             {convertToLocale({

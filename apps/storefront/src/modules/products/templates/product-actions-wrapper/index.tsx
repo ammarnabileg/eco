@@ -3,14 +3,16 @@ import { HttpTypes } from "@medusajs/types"
 import ProductActions from "@modules/products/components/product-actions"
 
 /**
- * Fetches real time pricing for a product and renders the product actions component.
+ * Fetches real-time pricing and stock for a product and renders its actions.
  */
 export default async function ProductActionsWrapper({
   id,
   region,
+  layout,
 }: {
   id: string
   region: HttpTypes.StoreRegion
+  layout: "mobile" | "desktop"
 }) {
   const product = await listProducts({
     queryParams: { id: [id] },
@@ -21,5 +23,5 @@ export default async function ProductActionsWrapper({
     return null
   }
 
-  return <ProductActions product={product} region={region} />
+  return <ProductActions product={product} region={region} layout={layout} />
 }

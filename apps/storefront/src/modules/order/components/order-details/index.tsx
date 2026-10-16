@@ -1,5 +1,10 @@
 import { HttpTypes } from "@medusajs/types"
 import { Text } from "@modules/common/components/ui"
+import {
+  formatFulfillmentStatus,
+  formatOrderDate,
+  formatPaymentStatus,
+} from "@modules/order/util/format"
 
 type OrderDetailsProps = {
   order: HttpTypes.StoreOrder
@@ -7,50 +12,48 @@ type OrderDetailsProps = {
 }
 
 const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
-  const formatStatus = (str: string) => {
-    const formatted = str.split("_").join(" ")
-
-    return formatted.slice(0, 1).toUpperCase() + formatted.slice(1)
-  }
-
   return (
     <div>
-      <Text>
-        We have sent the order confirmation details to{" "}
+      <Text className="text-laly-mut">
+        أرسلنا تفاصيل تأكيد الطلب إلى{" "}
         <span
-          className="text-ui-fg-medium-plus font-semibold"
+          className="text-laly-ink font-semibold"
+          dir="ltr"
           data-testid="order-email"
         >
           {order.email}
         </span>
         .
       </Text>
-      <Text className="mt-2">
-        Order date:{" "}
-        <span data-testid="order-date">
-          {new Date(order.created_at).toDateString()}
+      <Text className="mt-2 text-laly-mut">
+        تاريخ الطلب:{" "}
+        <span className="text-laly-ink" data-testid="order-date">
+          {formatOrderDate(order.created_at)}
         </span>
       </Text>
-      <Text className="mt-2 text-ui-fg-interactive">
-        Order number: <span data-testid="order-id">{order.display_id}</span>
+      <Text className="mt-2 text-laly-teal font-semibold">
+        رقم الطلب: <span data-testid="order-id">{order.display_id}</span>
       </Text>
 
-      <div className="flex items-center text-compact-small gap-x-4 mt-4">
+      <div className="flex flex-wrap items-center text-compact-small gap-x-4 gap-y-2 mt-4">
         {showStatus && (
           <>
-            <Text>
-              Order status:{" "}
-              <span className="text-ui-fg-subtle " data-testid="order-status">
-                {formatStatus(order.fulfillment_status)}
+            <Text className="text-laly-mut">
+              حالة الطلب:{" "}
+              <span
+                className="inline-flex px-2 py-0.5 rounded-full bg-laly-teal-soft text-laly-teal-d font-semibold"
+                data-testid="order-status"
+              >
+                {formatFulfillmentStatus(order.fulfillment_status)}
               </span>
             </Text>
-            <Text>
-              Payment status:{" "}
+            <Text className="text-laly-mut">
+              حالة الدفع:{" "}
               <span
-                className="text-ui-fg-subtle "
+                className="inline-flex px-2 py-0.5 rounded-full bg-laly-bg text-laly-ink font-semibold"
                 sata-testid="order-payment-status"
               >
-                {formatStatus(order.payment_status)}
+                {formatPaymentStatus(order.payment_status)}
               </span>
             </Text>
           </>

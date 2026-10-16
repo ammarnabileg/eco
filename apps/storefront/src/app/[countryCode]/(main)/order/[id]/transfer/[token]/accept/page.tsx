@@ -12,26 +12,26 @@ export default async function TransferPage({
   const { success, error } = await acceptTransferRequest(id, token)
 
   return (
-    <div className="flex flex-col gap-y-4 items-start w-2/5 mx-auto mt-10 mb-20">
+    <div className="flex flex-col gap-y-4 items-start w-full max-w-xl px-4 mx-auto mt-10 mb-20">
       <TransferImage />
       <div className="flex flex-col gap-y-6">
         {success && (
           <>
             <Heading level="h1" className="text-xl text-zinc-900">
-              Order transfered!
+              تم نقل الطلب!
             </Heading>
             <Text className="text-zinc-600">
-              Order {id} has been successfully transfered to the new owner.
+              تم نقل الطلب <span dir="ltr">{id}</span> إلى المالك الجديد بنجاح.
             </Text>
           </>
         )}
         {!success && (
           <>
             <Text className="text-zinc-600">
-              There was an error accepting the transfer. Please try again.
+              حدث خطأ أثناء قبول النقل. يرجى المحاولة مرة أخرى.
             </Text>
             {error && (
-              <Text className="text-red-500">Error message: {error}</Text>
+              <Text className="text-red-500">رسالة الخطأ: {error}</Text>
             )}
           </>
         )}

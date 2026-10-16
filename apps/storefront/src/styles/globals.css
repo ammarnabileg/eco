@@ -23,7 +23,7 @@
   }
 
   input:focus ~ label {
-    @apply left-0;
+    @apply start-0;
   }
 
   input:-webkit-autofill,
@@ -47,6 +47,22 @@
   input[type="search"]::-webkit-search-results-decoration {
     -webkit-appearance: none;
   }
+}
+
+/* Laly theme for the Medusa UI tokens used across the starter pages. */
+:root {
+  --fg-base: #14262c;
+  --fg-subtle: #5e6f76;
+  --fg-muted: #93a1a8;
+  --fg-interactive: #0e7c8a;
+  --fg-interactive-hover: #0a616d;
+  --bg-interactive: #0e7c8a;
+  --border-interactive: #0e7c8a;
+  --border-base: #e4eaec;
+  --bg-subtle: #f5f8f9;
+  --button-inverted: #0e7c8a;
+  --button-inverted-hover: #0a616d;
+  --button-inverted-pressed: #0a616d;
 }
 
 @layer components {

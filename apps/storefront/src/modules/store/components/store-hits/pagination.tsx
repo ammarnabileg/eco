@@ -16,10 +16,15 @@ const SearchPagination = () => {
   const renderPage = (page: number) => (
     <button
       key={page}
-      className={clx("txt-xlarge-plus text-ui-fg-muted", {
-        "text-ui-fg-base hover:text-ui-fg-subtle": page === currentRefinement,
-      })}
+      className={clx(
+        "min-w-10 h-10 px-2 rounded-btn border text-sm font-bold transition-colors",
+        page === currentRefinement
+          ? "bg-laly-teal border-laly-teal text-white"
+          : "bg-white border-laly-line text-laly-ink hover:border-laly-teal hover:text-laly-teal"
+      )}
       disabled={page === currentRefinement}
+      aria-label={`الصفحة ${page + 1}`}
+      aria-current={page === currentRefinement ? "page" : undefined}
       onClick={() => refine(page)}
     >
       {page + 1}
@@ -29,7 +34,7 @@ const SearchPagination = () => {
   const renderEllipsis = (key: string) => (
     <span
       key={key}
-      className="txt-xlarge-plus text-ui-fg-muted items-center cursor-default"
+      className="h-10 flex items-center text-sm font-bold text-laly-faint cursor-default"
     >
       ...
     </span>
@@ -38,8 +43,12 @@ const SearchPagination = () => {
   const lastPage = nbPages - 1
 
   return (
-    <div className="flex justify-center w-full mt-12">
-      <div className="flex gap-3 items-end" data-testid="product-pagination">
+    <div className="flex justify-center w-full mt-10">
+      <nav
+        className="flex flex-wrap justify-center gap-2 items-center"
+        aria-label="التنقل بين الصفحات"
+        data-testid="product-pagination"
+      >
         {!pages.includes(0) && renderPage(0)}
         {!pages.includes(0) && !pages.includes(1) && renderEllipsis("start")}
         {pages.map(renderPage)}
@@ -47,7 +56,7 @@ const SearchPagination = () => {
           !pages.includes(lastPage - 1) &&
           renderEllipsis("end")}
         {!pages.includes(lastPage) && renderPage(lastPage)}
-      </div>
+      </nav>
     </div>
   )
 }

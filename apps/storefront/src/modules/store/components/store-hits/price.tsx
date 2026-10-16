@@ -1,20 +1,19 @@
 "use client"
 
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
+import { getPercentageDiff } from "@lib/util/get-percentage-diff"
 import { convertToLocale } from "@lib/util/money"
-import { Text, clx } from "@modules/common/components/ui"
 
 /** The per-currency price fields a hit may carry, e.g. `min_price_eur`. */
 export type HitPricing = Record<string, unknown>
 
-type HitPriceProps = {
-  hit: HitPricing
-  currencyCode: string
-}
-
 const amount = (value: unknown) => (typeof value === "number" ? value : null)
 
-const HitPrice = ({ hit, currencyCode }: HitPriceProps) => {
+/**
+ * Reads a hit's indexed prices for the region's currency. `discount` is the
+ * whole-number percentage off, set only for a single-price hit on sale.
+ */
+export const getHitPricing = (hit: HitPricing, currencyCode: string) => {
   const currency_code = indexedCurrency(currencyCode)
   const min_price = amount(hit[priceAttribute("min_price", currencyCode)])
   const max_price = amount(hit[priceAttribute("max_price", currencyCode)])
@@ -27,30 +26,61 @@ const HitPrice = ({ hit, currencyCode }: HitPriceProps) => {
     return null
   }
 
-  const format = (value: number) =>
-    convertToLocale({ amount: value, currency_code })
-
   const max = max_price ?? min_price
   const isRange = max > min_price
+  const showOriginal =
+    !isRange && on_sale && original_price !== null && original_price > min_price
+
+  return {
+    currency_code,
+    min_price,
+    max,
+    isRange,
+    on_sale,
+    original_price: showOriginal ? original_price : null,
+    discount:
+      showOriginal && original_price !== null
+        ? getPercentageDiff(original_price, min_price)
+        : null,
+  }
+}
+
+type HitPriceProps = {
+  hit: HitPricing
+  currencyCode: string
+}
+
+const HitPrice = ({ hit, currencyCode }: HitPriceProps) => {
+  const pricing = getHitPricing(hit, currencyCode)
+
+  if (!pricing) {
+    return null
+  }
+
+  const format = (value: number) =>
+    convertToLocale({ amount: value, currency_code: pricing.currency_code })
 
   return (
-    <div className="flex items-center gap-x-2" data-testid="product-price">
-      {!isRange && on_sale && original_price !== null && (
-        <Text
-          className="line-through text-ui-fg-muted"
-          data-testid="original-price"
-        >
-          {format(original_price)}
-        </Text>
-      )}
-      <Text
-        className={clx("text-ui-fg-muted", {
-          "text-ui-tag-red-text": on_sale,
-        })}
+    <div
+      className="flex items-baseline flex-wrap gap-x-2"
+      data-testid="product-price"
+    >
+      <span
+        className="text-base small:text-[17px] font-extrabold text-laly-ink"
         data-testid="price"
       >
-        {isRange ? `${format(min_price)} - ${format(max)}` : format(min_price)}
-      </Text>
+        {pricing.isRange
+          ? `${format(pricing.min_price)} - ${format(pricing.max)}`
+          : format(pricing.min_price)}
+      </span>
+      {pricing.original_price !== null && (
+        <span
+          className="text-xs text-laly-faint line-through"
+          data-testid="original-price"
+        >
+          {format(pricing.original_price)}
+        </span>
+      )}
     </div>
   )
 }

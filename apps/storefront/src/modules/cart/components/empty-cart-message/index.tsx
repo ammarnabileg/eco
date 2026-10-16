@@ -1,25 +1,24 @@
-import { Heading, Text } from "@modules/common/components/ui"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Icon from "@modules/laly/components/icon"
 
-import InteractiveLink from "@modules/common/components/interactive-link"
-
-const EmptyCartMessage = () => {
-  return (
-    <div className="py-48 px-2 flex flex-col justify-center items-start" data-testid="empty-cart-message">
-      <Heading
-        level="h1"
-        className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
-      >
-        Cart
-      </Heading>
-      <Text className="text-base-regular mt-4 mb-6 max-w-[32rem]">
-        You don&apos;t have anything in your cart. Let&apos;s change that, use
-        the link below to start browsing our products.
-      </Text>
-      <div>
-        <InteractiveLink href="/store">Explore products</InteractiveLink>
-      </div>
+const EmptyCartMessage = () => (
+  <div className="py-20 small:py-32 flex flex-col items-center text-center gap-4" data-testid="empty-cart-message">
+    <span className="w-20 h-20 rounded-full bg-laly-teal-soft text-laly-teal flex items-center justify-center">
+      <Icon name="cart" size={36} />
+    </span>
+    <h1 className="text-2xl font-extrabold">سلتك فاضية</h1>
+    <p className="text-laly-mut max-w-sm">
+      ما أضفت أي منتج للحين. تصفح الأقسام والعروض واختار اللي يناسبك.
+    </p>
+    <div className="flex gap-3 mt-2">
+      <LocalizedClientLink href="/store" className="rounded-btn bg-laly-teal hover:bg-laly-teal-d text-white font-bold px-6 py-3">
+        تصفح المنتجات
+      </LocalizedClientLink>
+      <LocalizedClientLink href="/offers" className="rounded-btn border-[1.6px] border-laly-teal text-laly-teal font-bold px-6 py-3">
+        العروض
+      </LocalizedClientLink>
     </div>
-  )
-}
+  </div>
+)
 
 export default EmptyCartMessage

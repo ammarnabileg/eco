@@ -47,8 +47,22 @@ const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
   return (
     <form action={formAction} className="w-full">
       <AccountInfo
-        label="Phone"
-        currentInfo={`${customer.phone}`}
+        label="رقم الهاتف"
+        currentInfo={
+          customer.phone ? (
+            <span
+              className="font-semibold text-laly-ink"
+              dir="ltr"
+              data-testid="current-info"
+            >
+              {customer.phone}
+            </span>
+          ) : (
+            <span className="text-laly-mut" data-testid="current-info">
+              لم تتم إضافة رقم هاتف
+            </span>
+          )
+        }
         isSuccess={successState}
         isError={!!state.error}
         errorMessage={state.error || undefined}
@@ -57,10 +71,11 @@ const ProfileEmail: React.FC<MyInformationProps> = ({ customer }) => {
       >
         <div className="grid grid-cols-1 gap-y-2">
           <Input
-            label="Phone"
+            label="رقم الهاتف"
             name="phone"
-            type="phone"
-            autoComplete="phone"
+            type="tel"
+            dir="ltr"
+            autoComplete="tel"
             required
             defaultValue={customer.phone ?? ""}
             data-testid="phone-input"

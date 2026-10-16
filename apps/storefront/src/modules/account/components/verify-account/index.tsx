@@ -34,36 +34,38 @@ const VerifyAccount = () => {
 
   return (
     <div
-      className="max-w-sm w-full flex flex-col items-center text-center gap-y-4"
+      className="max-w-sm w-full flex flex-col items-center text-center gap-y-4 bg-white border border-laly-line rounded-card shadow-laly p-6 small:p-8"
       data-testid="verify-account-page"
     >
-      <h1 className="text-large-semi uppercase">Email verification</h1>
+      <h1 className="text-2xl font-bold text-laly-ink">
+        تأكيد البريد الإلكتروني
+      </h1>
 
       {state === "verifying" && (
-        <p className="text-base-regular text-ui-fg-base">
-          Verifying your email...
+        <p className="text-base-regular text-laly-mut">
+          جاري التحقق من بريدك الإلكتروني…
         </p>
       )}
 
       {state === "success" && (
         <>
-          <p className="text-base-regular text-ui-fg-base">
-            Your email is verified. You can now sign in to your account.
+          <p className="text-base-regular text-laly-mut">
+            تم تأكيد بريدك الإلكتروني. يمكنك الآن تسجيل الدخول إلى حسابك.
           </p>
           <LocalizedClientLink href="/account">
-            <Button variant="primary">Go to sign in</Button>
+            <Button variant="primary">الذهاب لتسجيل الدخول</Button>
           </LocalizedClientLink>
         </>
       )}
 
       {state === "error" && (
         <>
-          <p className="text-base-regular text-ui-fg-base">
-            This verification link is invalid or has expired. Sign in to receive
-            a new verification email.
+          <p className="text-base-regular text-laly-mut">
+            رابط التحقق غير صالح أو انتهت صلاحيته. سجّل الدخول لنرسل لك رسالة
+            تحقق جديدة.
           </p>
           <LocalizedClientLink href="/account">
-            <Button variant="secondary">Go to sign in</Button>
+            <Button variant="secondary">الذهاب لتسجيل الدخول</Button>
           </LocalizedClientLink>
         </>
       )}

@@ -9,20 +9,20 @@ export const getSortOptions = (currencyCode: string) => {
   const minPrice = priceAttribute("min_price", currencyCode)
 
   return [
-    { value: PRODUCT_INDEX_NAME, label: "Relevance" },
+    { value: PRODUCT_INDEX_NAME, label: "الأكثر صلة" },
     {
       value: `${PRODUCT_INDEX_NAME}/sort/created_at:desc`,
-      label: "Latest Arrivals",
+      label: "الأحدث",
     },
     {
       value: `${PRODUCT_INDEX_NAME}/sort/${minPrice}:asc`,
-      label: "Price: Low -> High",
+      label: "السعر: من الأقل للأعلى",
     },
     {
       value: `${PRODUCT_INDEX_NAME}/sort/${minPrice}:desc`,
-      label: "Price: High -> Low",
+      label: "السعر: من الأعلى للأقل",
     },
-    { value: `${PRODUCT_INDEX_NAME}/sort/title:asc`, label: "Title: A -> Z" },
-    { value: `${PRODUCT_INDEX_NAME}/sort/title:desc`, label: "Title: Z -> A" },
+    { value: `${PRODUCT_INDEX_NAME}/sort/title:asc`, label: "الاسم: أ - ي" },
+    { value: `${PRODUCT_INDEX_NAME}/sort/title:desc`, label: "الاسم: ي - أ" },
   ]
 }

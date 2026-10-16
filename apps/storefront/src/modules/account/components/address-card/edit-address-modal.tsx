@@ -11,6 +11,10 @@ import CountrySelect from "@modules/checkout/components/country-select"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import Modal from "@modules/common/components/modal"
+import {
+  GovernorateSelect,
+  KuwaitPhoneInput,
+} from "@modules/account/components/kuwait-address-fields"
 import { Button, Heading, Text, clx } from "@modules/common/components/ui"
 import Spinner from "@modules/common/icons/spinner"
 import React, { useActionState, useEffect, useState } from "react"
@@ -59,77 +63,103 @@ const EditAddress: React.FC<EditAddressProps> = ({
     setRemoving(false)
   }
 
+  const countries = region.countries ?? []
+  const singleCountry = countries.length === 1 ? countries[0] : null
+  const countryName =
+    countries.find((c) => c.iso_2 === address.country_code)?.display_name ||
+    address.country_code?.toUpperCase()
+
   return (
     <>
       <div
         className={clx(
-          "border rounded-rounded p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors",
+          "bg-white border border-laly-line rounded-card p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors",
           {
-            "border-gray-900": isActive,
+            "border-laly-teal": isActive,
           }
         )}
         data-testid="address-container"
       >
         <div className="flex flex-col">
           <Heading
-            className="text-left text-base-semi"
+            className="text-start text-base-semi text-laly-ink"
             data-testid="address-name"
           >
             {address.first_name} {address.last_name}
           </Heading>
           {address.company && (
             <Text
-              className="txt-compact-small text-ui-fg-base"
+              className="txt-compact-small text-laly-mut"
               data-testid="address-company"
             >
               {address.company}
             </Text>
           )}
-          <Text className="flex flex-col text-left text-base-regular mt-2">
+          <Text className="flex flex-col text-start text-base-regular text-laly-mut mt-2 gap-y-0.5">
             <span data-testid="address-address">
               {address.address_1}
-              {address.address_2 && <span>, {address.address_2}</span>}
+              {address.address_2 && <span>، {address.address_2}</span>}
             </span>
             <span data-testid="address-postal-city">
-              {address.postal_code}, {address.city}
+              {[address.city, address.postal_code].filter(Boolean).join("، ")}
             </span>
             <span data-testid="address-province-country">
-              {address.province && `${address.province}, `}
-              {address.country_code?.toUpperCase()}
+              {address.province && `${address.province}، `}
+              {countryName}
             </span>
+            {address.phone && (
+              <span dir="ltr" className="text-end">
+                {address.phone}
+              </span>
+            )}
           </Text>
         </div>
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-4 mt-4">
           <button
-            className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
+            className="text-small-regular text-laly-teal hover:text-laly-teal-d font-semibold flex items-center gap-x-2"
             onClick={open}
             data-testid="address-edit-button"
           >
             <Edit />
-            Edit
+            تعديل
           </button>
           <button
-            className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
+            className="text-small-regular text-laly-mut hover:text-laly-red flex items-center gap-x-2"
             onClick={removeAddress}
             data-testid="address-delete-button"
           >
             {removing ? <Spinner /> : <Trash />}
-            Remove
+            حذف
           </button>
         </div>
       </div>
 
       <Modal isOpen={state} close={close} data-testid="edit-address-modal">
         <Modal.Title>
-          <Heading className="mb-2">Edit address</Heading>
+          <Heading className="mb-2 text-laly-ink">تعديل العنوان</Heading>
         </Modal.Title>
         <form action={formAction}>
           <input type="hidden" name="addressId" value={address.id} />
+          {/* Kuwait has no postal codes and the company field is not used.
+              Keep any stored values so editing does not erase them. */}
+          <input type="hidden" name="company" value={address.company ?? ""} />
+          <input
+            type="hidden"
+            name="postal_code"
+            value={address.postal_code ?? ""}
+          />
+          {singleCountry && (
+            <input
+              type="hidden"
+              name="country_code"
+              value={address.country_code || singleCountry.iso_2 || ""}
+            />
+          )}
           <Modal.Body>
-            <div className="grid grid-cols-1 gap-y-2">
+            <div className="grid grid-cols-1 gap-y-3">
               <div className="grid grid-cols-2 gap-x-2">
                 <Input
-                  label="First name"
+                  label="الاسم الأول"
                   name="first_name"
                   required
                   autoComplete="given-name"
@@ -137,7 +167,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                   data-testid="first-name-input"
                 />
                 <Input
-                  label="Last name"
+                  label="اسم العائلة"
                   name="last_name"
                   required
                   autoComplete="family-name"
@@ -145,15 +175,20 @@ const EditAddress: React.FC<EditAddressProps> = ({
                   data-testid="last-name-input"
                 />
               </div>
-              <Input
-                label="Company"
-                name="company"
-                autoComplete="organization"
-                defaultValue={address.company || undefined}
-                data-testid="company-input"
+              <GovernorateSelect
+                defaultValue={address.province}
+                data-testid="state-input"
               />
               <Input
-                label="Address"
+                label="المنطقة"
+                name="city"
+                required
+                autoComplete="address-level2"
+                defaultValue={address.city || undefined}
+                data-testid="city-input"
+              />
+              <Input
+                label="القطعة، الشارع، الجادة"
                 name="address_1"
                 required
                 autoComplete="address-line1"
@@ -161,50 +196,25 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 data-testid="address-1-input"
               />
               <Input
-                label="Apartment, suite, etc."
+                label="المبنى، الدور، الشقة (اختياري)"
                 name="address_2"
                 autoComplete="address-line2"
                 defaultValue={address.address_2 || undefined}
                 data-testid="address-2-input"
               />
-              <div className="grid grid-cols-[144px_1fr] gap-x-2">
-                <Input
-                  label="Postal code"
-                  name="postal_code"
+              {!singleCountry && (
+                <CountrySelect
+                  name="country_code"
+                  region={region}
+                  placeholder="الدولة"
                   required
-                  autoComplete="postal-code"
-                  defaultValue={address.postal_code || undefined}
-                  data-testid="postal-code-input"
+                  autoComplete="country"
+                  defaultValue={address.country_code || undefined}
+                  data-testid="country-select"
                 />
-                <Input
-                  label="City"
-                  name="city"
-                  required
-                  autoComplete="locality"
-                  defaultValue={address.city || undefined}
-                  data-testid="city-input"
-                />
-              </div>
-              <Input
-                label="Province / State"
-                name="province"
-                autoComplete="address-level1"
-                defaultValue={address.province || undefined}
-                data-testid="state-input"
-              />
-              <CountrySelect
-                name="country_code"
-                region={region}
-                required
-                autoComplete="country"
-                defaultValue={address.country_code || undefined}
-                data-testid="country-select"
-              />
-              <Input
-                label="Phone"
-                name="phone"
-                autoComplete="phone"
-                defaultValue={address.phone || undefined}
+              )}
+              <KuwaitPhoneInput
+                defaultValue={address.phone}
                 data-testid="phone-input"
               />
             </div>
@@ -223,9 +233,9 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 className="h-10"
                 data-testid="cancel-button"
               >
-                Cancel
+                إلغاء
               </Button>
-              <SubmitButton data-testid="save-button">Save</SubmitButton>
+              <SubmitButton data-testid="save-button">حفظ</SubmitButton>
             </div>
           </Modal.Footer>
         </form>

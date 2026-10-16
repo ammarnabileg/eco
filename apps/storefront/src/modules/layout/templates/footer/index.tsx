@@ -10,6 +10,7 @@ const CARE_LINKS = [
   { href: "/account/orders", label: "تتبع الطلب" },
   { href: "/account", label: "حسابي" },
   { href: "/cart", label: "السلة" },
+  { href: "/contact", label: "تواصل معنا" },
 ]
 
 export default async function Footer() {

@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRightOnRectangle } from "@medusajs/icons"
+import { ArrowRightOnRectangle, House } from "@medusajs/icons"
 import { clx } from "@modules/common/components/ui"
 import { useParams, usePathname } from "next/navigation"
 
@@ -24,103 +24,126 @@ const AccountNav = ({
     await signout(countryCode)
   }
 
+  const mobileRowClass =
+    "flex items-center justify-between w-full py-4 px-5 border-b border-laly-line last:border-b-0 text-laly-ink hover:bg-laly-teal-faint transition-colors"
+  const forwardChevron = (
+    <ChevronDown
+      aria-hidden="true"
+      className="-rotate-90 rtl:rotate-90 text-laly-mut"
+    />
+  )
+
   return (
     <div>
       <div className="small:hidden" data-testid="mobile-account-nav">
         {route !== `/${countryCode}/account` ? (
           <LocalizedClientLink
             href="/account"
-            className="flex items-center gap-x-2 text-small-regular py-2"
+            className="inline-flex items-center gap-x-2 text-small-regular font-semibold text-laly-teal py-2 mb-4"
             data-testid="account-main-link"
           >
             <>
-              <ChevronDown className="transform rotate-90" />
-              <span>Account</span>
+              <ChevronDown
+                aria-hidden="true"
+                className="rotate-90 rtl:-rotate-90"
+              />
+              <span>حسابي</span>
             </>
           </LocalizedClientLink>
         ) : (
-          <>
-            <div className="text-xl-semi mb-4 px-8">
-              Hello {customer?.first_name}
+          <div className="flex flex-col gap-y-4 mb-6">
+            <div className="rounded-card bg-laly-teal text-white p-5 shadow-laly">
+              <div className="text-xl font-bold">
+                أهلاً {customer?.first_name}
+              </div>
+              {customer?.email && (
+                <div
+                  className="text-small-regular text-white/80 mt-1 truncate"
+                  dir="ltr"
+                >
+                  {customer.email}
+                </div>
+              )}
             </div>
-            <div className="text-base-regular">
+            <div className="text-base-regular bg-white border border-laly-line rounded-card overflow-hidden">
               <ul>
                 <li>
                   <LocalizedClientLink
                     href="/account/profile"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    className={mobileRowClass}
                     data-testid="profile-link"
                   >
                     <>
-                      <div className="flex items-center gap-x-2">
+                      <div className="flex items-center gap-x-3">
                         <User size={20} />
-                        <span>Profile</span>
+                        <span>الملف الشخصي</span>
                       </div>
-                      <ChevronDown className="transform -rotate-90" />
+                      {forwardChevron}
                     </>
                   </LocalizedClientLink>
                 </li>
                 <li>
                   <LocalizedClientLink
                     href="/account/addresses"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    className={mobileRowClass}
                     data-testid="addresses-link"
                   >
                     <>
-                      <div className="flex items-center gap-x-2">
+                      <div className="flex items-center gap-x-3">
                         <MapPin size={20} />
-                        <span>Addresses</span>
+                        <span>العناوين</span>
                       </div>
-                      <ChevronDown className="transform -rotate-90" />
+                      {forwardChevron}
                     </>
                   </LocalizedClientLink>
                 </li>
                 <li>
                   <LocalizedClientLink
                     href="/account/orders"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    className={mobileRowClass}
                     data-testid="orders-link"
                   >
-                    <div className="flex items-center gap-x-2">
+                    <div className="flex items-center gap-x-3">
                       <Package size={20} />
-                      <span>Orders</span>
+                      <span>الطلبات</span>
                     </div>
-                    <ChevronDown className="transform -rotate-90" />
+                    {forwardChevron}
                   </LocalizedClientLink>
                 </li>
                 <li>
                   <button
                     type="button"
-                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
+                    className={clx(mobileRowClass, "text-laly-red")}
                     onClick={handleLogout}
                     data-testid="logout-button"
                   >
-                    <div className="flex items-center gap-x-2">
-                      <ArrowRightOnRectangle />
-                      <span>Log out</span>
+                    <div className="flex items-center gap-x-3">
+                      <ArrowRightOnRectangle className="rtl:-scale-x-100" />
+                      <span>تسجيل الخروج</span>
                     </div>
-                    <ChevronDown className="transform -rotate-90" />
+                    {forwardChevron}
                   </button>
                 </li>
               </ul>
             </div>
-          </>
+          </div>
         )}
       </div>
       <div className="hidden small:block" data-testid="account-nav">
-        <div>
-          <div className="pb-4">
-            <h3 className="text-base-semi">Account</h3>
+        <div className="bg-white border border-laly-line rounded-card p-4">
+          <div className="pb-3 px-3">
+            <h3 className="text-base-semi text-laly-ink">حسابي</h3>
           </div>
           <div className="text-base-regular">
-            <ul className="flex mb-0 justify-start items-start flex-col gap-y-4">
+            <ul className="flex mb-0 justify-start items-stretch flex-col gap-y-1">
               <li>
                 <AccountNavLink
                   href="/account"
                   route={route!}
                   data-testid="overview-link"
                 >
-                  Overview
+                  <House />
+                  نظرة عامة
                 </AccountNavLink>
               </li>
               <li>
@@ -129,7 +152,8 @@ const AccountNav = ({
                   route={route!}
                   data-testid="profile-link"
                 >
-                  Profile
+                  <User size={18} />
+                  الملف الشخصي
                 </AccountNavLink>
               </li>
               <li>
@@ -138,7 +162,8 @@ const AccountNav = ({
                   route={route!}
                   data-testid="addresses-link"
                 >
-                  Addresses
+                  <MapPin size={18} />
+                  العناوين
                 </AccountNavLink>
               </li>
               <li>
@@ -147,16 +172,19 @@ const AccountNav = ({
                   route={route!}
                   data-testid="orders-link"
                 >
-                  Orders
+                  <Package size={18} />
+                  الطلبات
                 </AccountNavLink>
               </li>
-              <li className="text-grey-700">
+              <li className="border-t border-laly-line mt-2 pt-2">
                 <button
                   type="button"
+                  className="flex items-center gap-x-2 w-full px-3 py-2 rounded-btn text-laly-mut hover:text-laly-red hover:bg-laly-bg transition-colors"
                   onClick={handleLogout}
                   data-testid="logout-button"
                 >
-                  Log out
+                  <ArrowRightOnRectangle className="rtl:-scale-x-100" />
+                  تسجيل الخروج
                 </button>
               </li>
             </ul>
@@ -186,9 +214,13 @@ const AccountNavLink = ({
   return (
     <LocalizedClientLink
       href={href}
-      className={clx("text-ui-fg-subtle hover:text-ui-fg-base", {
-        "text-ui-fg-base font-semibold": active,
-      })}
+      className={clx(
+        "flex items-center gap-x-2 px-3 py-2 rounded-btn transition-colors",
+        active
+          ? "bg-laly-teal-soft text-laly-teal-d font-bold"
+          : "text-laly-mut hover:text-laly-ink hover:bg-laly-bg"
+      )}
+      aria-current={active ? "page" : undefined}
       data-testid={dataTestId}
     >
       {children}
