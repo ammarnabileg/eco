@@ -28,6 +28,10 @@ jobs:
     env:
       MEDUSA_DISABLE_TELEMETRY: "true"
       NEXT_TELEMETRY_DISABLED: "1"
+      # Placeholders: next.config requires them for lint and build, and
+      # neither calls the backend.
+      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: pk_ci_placeholder
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://localhost:9000
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -37,12 +41,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
-      - name: Build
-        run: pnpm build
-        env:
-          # Placeholder; the storefront build does not call the backend.
-          NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: pk_ci_placeholder
-          NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://localhost:9000
+      - run: pnpm build
       - name: Unit tests
         run: pnpm test
       - name: HTTP integration tests
