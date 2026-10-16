@@ -1,0 +1,30 @@
+{
+  "name": "laly-mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP server that lets AI assistants manage the Laly store through the Medusa admin API",
+  "type": "module",
+  "bin": {
+    "laly-mcp-server": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "lint": "tsc --noEmit",
+    "smoke": "tsx scripts/smoke.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.3.1",
+    "@types/node": "^22.20.5",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3"
+  }
+}

@@ -4,8 +4,31 @@ E-commerce monorepo: Medusa v2 backend + Next.js 15 storefront, managed with pnp
 
 ```
 apps/backend     Medusa (API + admin dashboard at /app), port 9000
-apps/storefront  Next.js storefront, port 8000
+apps/storefront  Next.js storefront (Arabic, RTL), port 8000
+apps/mcp         MCP server: AI assistants manage the store via the admin API
 ```
+
+## How each part is built
+
+Every feature follows the same layers, so people (admin panel) and AI
+(MCP tools) drive it the same way:
+
+| Layer | Where |
+|---|---|
+| Data model + service | `apps/backend/src/modules/<feature>` |
+| Business logic (with rollback) | `apps/backend/src/workflows/<feature>` |
+| Validated API | `apps/backend/src/api/admin/...`, `apps/backend/src/api/store/...` |
+| Admin UI | `apps/backend/src/admin/routes/...` |
+| Storefront | `apps/storefront/src/lib/data/...` + `modules/...` |
+| AI tools | `apps/mcp/src/tools/...` |
+
+Managed from the admin: contact details, trust badges (warranty/returns/
+delivery promises), hero carousel slides (ar/en, scheduled), and offers
+(Price Lists with real start/end dates that drive the storefront countdowns).
+
+Google Merchant Center feeds: `/feeds/google/ar` and `/feeds/google/en` on the
+backend (set `STOREFRONT_URL`). Google does not accept SVG images, so real
+product photos (JPG/PNG/WebP) are required before submitting the feed.
 
 ## Requirements
 

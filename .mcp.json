@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "laly": {
+      "command": "node",
+      "args": ["apps/mcp/dist/index.js"],
+      "env": {
+        "MEDUSA_BACKEND_URL": "${MEDUSA_BACKEND_URL:-http://localhost:9000}",
+        "MEDUSA_ADMIN_API_KEY": "${LALY_MCP_ADMIN_KEY}"
+      }
+    },
+    "medusa-docs": {
+      "type": "http",
+      "url": "https://docs.medusajs.com/mcp"
+    }
+  }
+}
