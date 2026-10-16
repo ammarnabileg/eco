@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 
 import { listCategories } from "@lib/data/categories"
+import { getStoreContent } from "@lib/data/content"
 import { getCollectionByHandle } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import Brands from "@modules/home/components/brands"
@@ -24,7 +25,8 @@ export default async function Home(props: {
     return null
   }
 
-  const [categories, deals, bestSellers] = await Promise.all([
+  const [content, categories, deals, bestSellers] = await Promise.all([
+    getStoreContent(),
     listCategories().catch(() => []),
     getCollectionByHandle("deals").catch(() => undefined),
     getCollectionByHandle("best-sellers").catch(() => undefined),
@@ -32,12 +34,12 @@ export default async function Home(props: {
 
   return (
     <div className="pb-4">
-      <Hero />
-      <TrustStrip />
+      <Hero slides={content.hero_slides} whatsapp={content.settings.whatsapp} />
+      <TrustStrip badges={content.trust_badges} />
       <CategoryTiles categories={categories} />
       <ProductSection collection={deals} region={region} layout="rail" eyebrow="وفّر أكثر" />
       <ProductSection collection={bestSellers} region={region} layout="grid" eyebrow="مختارات عملائنا" />
-      <InstallCta />
+      <InstallCta whatsapp={content.settings.whatsapp} />
       <Brands />
     </div>
   )

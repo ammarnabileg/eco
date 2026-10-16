@@ -2,7 +2,9 @@ import { listCategories } from "@lib/data/categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon from "@modules/laly/components/icon"
 import Logo from "@modules/laly/components/logo"
-import { CONTACT, PAYMENT_METHODS } from "@modules/laly/lib/content"
+import { getStoreContent } from "@lib/data/content"
+import { whatsappLink } from "@lib/util/localize"
+import { PAYMENT_METHODS } from "@modules/laly/lib/content"
 
 const CARE_LINKS = [
   { href: "/account/orders", label: "تتبع الطلب" },
@@ -11,7 +13,11 @@ const CARE_LINKS = [
 ]
 
 export default async function Footer() {
-  const categories = await listCategories().catch(() => [])
+  const [categories, { settings }] = await Promise.all([
+    listCategories().catch(() => []),
+    getStoreContent(),
+  ])
+  const whatsapp = whatsappLink(settings.whatsapp)
   const topLevel = categories.filter((c) => !c.parent_category).slice(0, 6)
 
   return (
@@ -69,21 +75,21 @@ export default async function Footer() {
         <div>
           <h3 className="text-white font-extrabold mb-4">تواصل معنا</h3>
           <ul className="grid gap-3 text-[13.5px]">
-            {CONTACT.phone && (
+            {settings.phone && (
               <li>
                 <a
-                  href={`tel:${CONTACT.phone.replace(/\s/g, "")}`}
+                  href={`tel:${settings.phone.replace(/\s/g, "")}`}
                   className="flex items-center gap-2.5 hover:text-white"
                 >
                   <Icon name="call" size={16} className="text-laly-sand" />
-                  <span dir="ltr">{CONTACT.phone}</span>
+                  <span dir="ltr">{settings.phone}</span>
                 </a>
               </li>
             )}
-            {CONTACT.whatsapp && (
+            {whatsapp && (
               <li>
                 <a
-                  href={`https://wa.me/${CONTACT.whatsapp.replace(/\D/g, "")}`}
+                  href={whatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2.5 hover:text-white"
@@ -93,21 +99,23 @@ export default async function Footer() {
                 </a>
               </li>
             )}
-            {CONTACT.email && (
+            {settings.email && (
               <li>
                 <a
-                  href={`mailto:${CONTACT.email}`}
+                  href={`mailto:${settings.email}`}
                   className="flex items-center gap-2.5 hover:text-white"
                 >
                   <Icon name="mail" size={16} className="text-laly-sand" />
-                  {CONTACT.email}
+                  {settings.email}
                 </a>
               </li>
             )}
-            <li className="flex items-center gap-2.5">
-              <Icon name="pin" size={16} className="text-laly-sand" />
-              {CONTACT.address}
-            </li>
+            {settings.address_ar && (
+              <li className="flex items-center gap-2.5">
+                <Icon name="pin" size={16} className="text-laly-sand" />
+                {settings.address_ar}
+              </li>
+            )}
           </ul>
         </div>
       </div>

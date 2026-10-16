@@ -1,14 +1,17 @@
+import { getStoreContent } from "@lib/data/content"
+import { whatsappLink } from "@lib/util/localize"
 import Icon from "@modules/laly/components/icon"
-import { CONTACT } from "@modules/laly/lib/content"
 
-export default function WhatsAppButton() {
-  if (!CONTACT.whatsapp) {
+export default async function WhatsAppButton() {
+  const { settings } = await getStoreContent()
+  const href = whatsappLink(settings.whatsapp)
+  if (!href) {
     return null
   }
 
   return (
     <a
-      href={`https://wa.me/${CONTACT.whatsapp.replace(/\D/g, "")}`}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="تواصل معنا عبر واتساب"

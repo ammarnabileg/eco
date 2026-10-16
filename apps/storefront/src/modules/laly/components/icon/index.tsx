@@ -31,6 +31,8 @@ const ICONS = {
 
 export type IconName = keyof typeof ICONS
 
+export const isIconName = (name: string): name is IconName => name in ICONS
+
 export default function Icon({
   name,
   size = 20,

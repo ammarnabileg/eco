@@ -1,12 +1,11 @@
+import { whatsappLink } from "@lib/util/localize"
 import Icon from "@modules/laly/components/icon"
-import { CONTACT } from "@modules/laly/lib/content"
 
-export default function InstallCta() {
-  if (!CONTACT.whatsapp) {
+export default function InstallCta({ whatsapp }: { whatsapp: string | null }) {
+  const href = whatsappLink(whatsapp, "أريد حجز موعد تركيب")
+  if (!href) {
     return null
   }
-
-  const href = `https://wa.me/${CONTACT.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("أريد حجز موعد تركيب")}`
 
   return (
     <section className="content-container mt-10 small:mt-14">

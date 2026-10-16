@@ -1,0 +1,123 @@
+"use client"
+
+import { useEffect, useState } from "react"
+
+import type { HeroSlide } from "@lib/data/content"
+import { localize } from "@lib/util/localize"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Icon from "@modules/laly/components/icon"
+
+const AUTOPLAY_MS = 6500
+
+export default function HeroCarousel({
+  slides,
+  installHref,
+}: {
+  slides: HeroSlide[]
+  installHref: string | null
+}) {
+  const [index, setIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (paused || reduceMotion || slides.length < 2) {
+      return
+    }
+    const timer = setInterval(
+      () => setIndex((i) => (i + 1) % slides.length),
+      AUTOPLAY_MS
+    )
+    return () => clearInterval(timer)
+  }, [paused, slides.length])
+
+  const slide = slides[index] ?? slides[0]
+  const eyebrow = localize(slide, "eyebrow")
+  const highlight = localize(slide, "highlight")
+  const subtitle = localize(slide, "subtitle")
+  const ctaLabel = localize(slide, "cta_label") || "تسوّق الآن"
+  const ctaUrl = slide.cta_url || "/store"
+  const ctaClass =
+    "inline-flex items-center gap-2 rounded-btn bg-laly-sand hover:bg-laly-sand-d text-[#26200D] font-bold text-sm px-5 py-3 transition-colors"
+
+  return (
+    <section
+      aria-roledescription="carousel"
+      aria-label="العروض الرئيسية"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+      className="small:relative small:bg-[radial-gradient(1100px_520px_at_18%_-10%,#12525F_0%,transparent_55%),linear-gradient(160deg,#0A2A31_0%,#0B333B_46%,#0E4652_100%)] small:pt-16 small:pb-24 px-4 pt-4 small:px-0"
+    >
+      <div className="content-container !px-0 small:!px-6 grid small:grid-cols-[1fr_1.08fr] gap-8 items-center rounded-[18px] small:rounded-none overflow-hidden bg-[linear-gradient(160deg,#0A2A31_0%,#0B333B_46%,#0E4652_100%)] small:bg-none p-5 small:p-0 text-white">
+        <div key={slide.id} className="animate-fade-in-top" aria-live="polite">
+          {eyebrow && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-laly-sand/40 bg-laly-sand/10 text-laly-sand text-[11.5px] small:text-xs font-bold px-3 py-1.5">
+              <Icon name="bolt" size={14} />
+              {eyebrow}
+            </span>
+          )}
+          <h1 className="mt-4 text-[26px] small:text-[clamp(32px,4.4vw,54px)] font-extrabold leading-[1.18]">
+            {localize(slide, "title")} <br className="hidden small:block" />
+            {highlight && <span className="text-laly-sand">{highlight}</span>}
+          </h1>
+          {subtitle && (
+            <p className="mt-3 text-[13.5px] small:text-[15.5px] text-[#B9D3D8] max-w-[430px] leading-7">
+              {subtitle}
+            </p>
+          )}
+          <div className="mt-6 flex flex-wrap gap-3">
+            {ctaUrl.startsWith("/") ? (
+              <LocalizedClientLink href={ctaUrl} className={ctaClass}>
+                {ctaLabel}
+                <Icon name="arrowr" size={17} className="rtl:-scale-x-100" />
+              </LocalizedClientLink>
+            ) : (
+              <a href={ctaUrl} className={ctaClass} rel="noopener noreferrer">
+                {ctaLabel}
+                <Icon name="arrowr" size={17} className="rtl:-scale-x-100" />
+              </a>
+            )}
+            {installHref && (
+              <a
+                href={installHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-btn border-[1.6px] border-white/55 hover:border-white hover:bg-white/10 font-bold text-sm px-5 py-3 transition-colors"
+              >
+                احجز تركيب
+              </a>
+            )}
+          </div>
+          {slides.length > 1 && (
+            <div className="mt-6 small:mt-8 flex items-center gap-2.5">
+              {slides.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  aria-label={`الشريحة ${i + 1}`}
+                  aria-current={i === index}
+                  className={`h-[9px] rounded-full transition-all ${
+                    i === index ? "w-[26px] bg-laly-sand" : "w-[9px] bg-white/30"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="hidden small:block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={slide.image_url || "/hero-kuwait.svg"}
+            alt=""
+            width={560}
+            height={340}
+            className="w-full h-auto drop-shadow-[0_30px_40px_rgba(0,0,0,.35)]"
+          />
+        </div>
+      </div>
+    </section>
+  )
+}

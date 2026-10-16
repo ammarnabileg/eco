@@ -5,7 +5,7 @@ import CartButton from "@modules/layout/components/cart-button"
 import Search from "@modules/layout/components/search"
 import Icon from "@modules/laly/components/icon"
 import Logo from "@modules/laly/components/logo"
-import { CONTACT } from "@modules/laly/lib/content"
+import { getStoreContent } from "@lib/data/content"
 
 const NAV_LINKS = [
   { href: "/store", label: "الأقسام" },
@@ -13,7 +13,9 @@ const NAV_LINKS = [
   { href: "/collections/best-sellers", label: "الأكثر مبيعاً" },
 ]
 
-export default function Nav() {
+export default async function Nav() {
+  const { settings } = await getStoreContent()
+
   return (
     <>
       <div className="hidden small:block bg-laly-deep text-[#BFD8DD] text-xs">
@@ -23,10 +25,12 @@ export default function Nav() {
               <Icon name="pin" size={14} className="opacity-75" />
               توصيل لجميع مناطق الكويت
             </span>
-            <span className="flex items-center gap-1.5">
-              <Icon name="clock" size={14} className="opacity-75" />
-              {CONTACT.hours}
-            </span>
+            {settings.hours_ar && (
+              <span className="flex items-center gap-1.5">
+                <Icon name="clock" size={14} className="opacity-75" />
+                {settings.hours_ar}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-5">
             <LocalizedClientLink
