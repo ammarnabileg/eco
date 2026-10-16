@@ -35,6 +35,21 @@ services:
       timeout: 5s
       retries: 10
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.55.0
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: production
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?set MEILI_MASTER_KEY in .env}
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meili-data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:7700/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   backend:
     build:
       context: .
@@ -44,6 +59,8 @@ services:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      meilisearch:
         condition: service_healthy
     environment:
       # Postgres is only reachable on the private compose network, so SSL is off.
@@ -57,6 +74,8 @@ services:
       AUTH_CORS: ${AUTH_CORS:-http://localhost:9000,http://localhost:8000}
       MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-http://localhost:9000}
       STOREFRONT_URL: ${STOREFRONT_URL:-http://localhost:8000}
+      MEILISEARCH_HOST: http://meilisearch:7700
+      MEILISEARCH_API_KEY: ${MEILI_MASTER_KEY}
     ports:
       - "9000:9000"
 
@@ -80,3 +99,4 @@ services:
 volumes:
   postgres-data:
   redis-data:
+  meili-data:

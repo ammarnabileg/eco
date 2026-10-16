@@ -66,6 +66,31 @@ const redisModules = redisUrl
     ]
   : []
 
+// Search: Meilisearch when configured, otherwise Medusa's built-in Postgres
+// provider. Postgres stays registered so switching providers re-indexes cleanly.
+const meilisearch = process.env.MEILISEARCH_HOST
+  ? [
+      {
+        resolve: "@medusajs/medusa/search",
+        options: {
+          providers: [
+            { resolve: "@medusajs/medusa/search-postgres", id: "postgres", options: { engine: "native" } },
+            {
+              resolve: "./src/modules/meilisearch",
+              id: "meilisearch",
+              options: {
+                host: process.env.MEILISEARCH_HOST,
+                apiKey: process.env.MEILISEARCH_API_KEY,
+                indexPrefix: process.env.MEILISEARCH_INDEX_PREFIX,
+              },
+            },
+          ],
+          default_provider: "meilisearch",
+        },
+      },
+    ]
+  : []
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -84,5 +109,5 @@ module.exports = defineConfig({
     disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
     backendUrl: process.env.MEDUSA_BACKEND_URL,
   },
-  modules: [{ resolve: "./src/modules/store-content" }, ...redisModules],
+  modules: [{ resolve: "./src/modules/store-content" }, ...meilisearch, ...redisModules],
 })

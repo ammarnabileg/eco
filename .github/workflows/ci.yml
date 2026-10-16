@@ -25,6 +25,12 @@ jobs:
         ports: ["5432:5432"]
         options: >-
           --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      meilisearch:
+        image: getmeili/meilisearch:v1.55.0
+        env:
+          MEILI_MASTER_KEY: ci-only-master-key-not-secret
+          MEILI_NO_ANALYTICS: "true"
+        ports: ["7700:7700"]
     env:
       MEDUSA_DISABLE_TELEMETRY: "true"
       NEXT_TELEMETRY_DISABLED: "1"
@@ -44,6 +50,10 @@ jobs:
       - run: pnpm build
       - name: Unit tests
         run: pnpm test
+        env:
+          # Live tests for the Meilisearch provider (Arabic, synonyms, facets).
+          MEILISEARCH_TEST_HOST: http://localhost:7700
+          MEILISEARCH_TEST_API_KEY: ci-only-master-key-not-secret
       - name: HTTP integration tests
         working-directory: apps/backend
         run: pnpm test:integration:http

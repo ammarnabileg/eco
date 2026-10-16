@@ -26,6 +26,13 @@ Managed from the admin: contact details, trust badges (warranty/returns/
 delivery promises), hero carousel slides (ar/en, scheduled), and offers
 (Price Lists with real start/end dates that drive the storefront countdowns).
 
+Search: Meilisearch when `MEILISEARCH_HOST` is set (Docker Compose runs it),
+otherwise Medusa's Postgres search. The provider (`apps/backend/src/modules/meilisearch`)
+adds Arabic tokenization, typo tolerance, Gulf-dialect and Arabic/English
+synonyms (`language.ts`), phrase rewriting, and a word-by-word fallback for
+conversational queries. Offers re-index their products every 5 minutes
+(`src/jobs/sync-offer-search-prices.ts`).
+
 Google Merchant Center feeds: `/feeds/google/ar` and `/feeds/google/en` on the
 backend (set `STOREFRONT_URL`). Google does not accept SVG images, so real
 product photos (JPG/PNG/WebP) are required before submitting the feed.
