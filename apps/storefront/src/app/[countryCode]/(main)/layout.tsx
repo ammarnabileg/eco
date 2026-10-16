@@ -7,6 +7,8 @@ import { StoreCartShippingOption } from "@medusajs/types"
 import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
 import Footer from "@modules/layout/templates/footer"
 import Nav from "@modules/layout/templates/nav"
+import BottomNav from "@modules/laly/components/bottom-nav"
+import WhatsAppButton from "@modules/laly/components/whatsapp-button"
 import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge"
 
 export const metadata: Metadata = {
@@ -40,6 +42,10 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
       )}
       {props.children}
       <Footer />
+      <WhatsAppButton />
+      <BottomNav
+        cartCount={cart?.items?.reduce((n, item) => n + item.quantity, 0) ?? 0}
+      />
     </>
   )
 }

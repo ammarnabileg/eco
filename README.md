@@ -21,11 +21,10 @@ cp apps/storefront/.env.template apps/storefront/.env.local
 
 cd apps/backend
 pnpm exec medusa db:create --db eco
-pnpm exec medusa db:migrate                                 # also seeds initial data
+pnpm exec medusa db:migrate                                 # seeds Kuwait region, categories, demo catalogue
 pnpm exec medusa user -e you@example.com -p <password>      # admin login
 cd ../..
 
-pnpm backend:seed   # optional: 50 demo products
 pnpm dev            # backend on :9000, storefront on :8000
 ```
 

@@ -20,6 +20,27 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
+        // Laly brand tokens (from the approved design)
+        laly: {
+          teal: "#0E7C8A",
+          "teal-d": "#0A616D",
+          "teal-soft": "#E6F2F4",
+          "teal-faint": "#F2F8F9",
+          glow: "#4DD0E1",
+          deep: "#0B333B",
+          "deep-2": "#0E4652",
+          sand: "#E9B84C",
+          "sand-d": "#C9992F",
+          "sand-soft": "#FBF3DE",
+          ink: "#14262C",
+          mut: "#5E6F76",
+          faint: "#93A1A8",
+          line: "#E4EAEC",
+          bg: "#F5F8F9",
+          red: "#E5484D",
+          green: "#1FA669",
+          "green-soft": "#EAF7F0",
+        },
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -41,6 +62,8 @@ module.exports = {
         rounded: "8px",
         large: "16px",
         circle: "9999px",
+        card: "18px",
+        btn: "11px",
       },
       maxWidth: {
         "8xl": "100rem",
@@ -57,8 +80,13 @@ module.exports = {
       fontSize: {
         "3xl": "2rem",
       },
+      boxShadow: {
+        laly: "0 1px 2px rgba(20,38,44,.05), 0 14px 34px -24px rgba(20,38,44,.35)",
+      },
       fontFamily: {
+        latin: ["Poppins", "sans-serif"],
         sans: [
+          "Tajawal",
           "Inter",
           "-apple-system",
           "BlinkMacSystemFont",

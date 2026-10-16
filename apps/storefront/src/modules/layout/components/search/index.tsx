@@ -1,6 +1,5 @@
 "use client"
 
-import { MagnifyingGlass } from "@medusajs/icons"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { SearchClient } from "instantsearch.js"
 import {
@@ -15,6 +14,7 @@ import useSearchSettled from "@lib/hooks/use-search-settled"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { PRODUCT_INDEX_NAME, searchClient } from "@lib/search-client"
 import { Text } from "@modules/common/components/ui"
+import Icon from "@modules/laly/components/icon"
 import SearchDrawer from "./drawer"
 import SearchHit, { ProductHit } from "./hit"
 
@@ -48,7 +48,7 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
   return (
     <>
       <div className="flex items-center gap-x-3 border-b border-ui-border-base px-4">
-        <MagnifyingGlass className="shrink-0 text-ui-fg-muted" />
+        <Icon name="search" size={20} className="shrink-0 text-laly-faint" />
         <input
           type="search"
           value={inputValue}
@@ -56,8 +56,8 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
             setInputValue(event.target.value)
             refine(event.target.value)
           }}
-          placeholder="Search products"
-          aria-label="Search products"
+          placeholder="ابحث عن كاميرا، راوتر، أي منتج…"
+          aria-label="ابحث في المنتجات"
           autoFocus
           className="txt-medium w-full bg-transparent py-4 text-ui-fg-base outline-none placeholder:text-ui-fg-muted"
           data-testid="search-input"
@@ -70,14 +70,14 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
             className="px-4 py-6 text-center text-ui-fg-muted"
             data-testid="search-empty"
           >
-            Start typing to search for products.
+            اكتب اسم المنتج للبحث.
           </Text>
         ) : status === "error" ? (
           <Text
             className="px-4 py-6 text-center text-ui-fg-error"
             data-testid="search-error"
           >
-            Couldn&apos;t search products
+            تعذّر البحث
             {error?.message ? `: ${error.message}` : "."}
           </Text>
         ) : !isSettled ? (
@@ -85,7 +85,7 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
             className="px-4 py-6 text-center text-ui-fg-muted"
             data-testid="search-loading"
           >
-            Searching&hellip;
+            جاري البحث…
           </Text>
         ) : hasResults ? (
           <ul className="py-2" data-testid="search-results">
@@ -98,14 +98,14 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
             className="px-4 py-6 text-center text-ui-fg-muted"
             data-testid="search-loading"
           >
-            Searching&hellip;
+            جاري البحث…
           </Text>
         ) : (
           <Text
             className="px-4 py-6 text-center text-ui-fg-subtle"
             data-testid="search-no-results"
           >
-            No products found for &quot;{query}&quot;
+            لا توجد نتائج لـ &quot;{query}&quot;
           </Text>
         )}
       </div>
@@ -113,20 +113,35 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
   )
 }
 
-const Search = () => {
+const Search = ({ variant = "icon" }: { variant?: "icon" | "bar" }) => {
   const { state: isOpen, open, close } = useToggleState()
 
   return (
     <>
-      <button
-        type="button"
-        onClick={open}
-        aria-label="Search products"
-        className="flex items-center hover:text-ui-fg-base"
-        data-testid="nav-search-button"
-      >
-        <MagnifyingGlass />
-      </button>
+      {variant === "bar" ? (
+        <button
+          type="button"
+          onClick={open}
+          aria-label="ابحث في المنتجات"
+          className="relative w-full max-w-[440px] h-11 rounded-full border border-laly-line bg-laly-bg ps-5 pe-12 text-start text-[13.5px] text-laly-faint hover:border-laly-teal transition-colors"
+          data-testid="nav-search-button"
+        >
+          ابحث عن كاميرا، راوتر، أي منتج…
+          <span className="absolute end-1 top-1 w-9 h-9 rounded-full bg-laly-teal text-white flex items-center justify-center">
+            <Icon name="search" size={18} />
+          </span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={open}
+          aria-label="ابحث في المنتجات"
+          className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-laly-teal-soft hover:text-laly-teal"
+          data-testid="nav-search-button"
+        >
+          <Icon name="search" size={21} />
+        </button>
+      )}
 
       <SearchDrawer isOpen={isOpen} close={close}>
         <InstantSearch

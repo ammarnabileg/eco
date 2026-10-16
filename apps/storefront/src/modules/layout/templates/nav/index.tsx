@@ -1,68 +1,97 @@
 import { Suspense } from "react"
 
-import { listLocales } from "@lib/data/locales"
-import { getLocale } from "@lib/data/locale-actions"
-import { listRegions } from "@lib/data/regions"
-import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import Search from "@modules/layout/components/search"
-import SideMenu from "@modules/layout/components/side-menu"
+import Icon from "@modules/laly/components/icon"
+import Logo from "@modules/laly/components/logo"
+import { CONTACT } from "@modules/laly/lib/content"
 
-export default async function Nav() {
-  const [regions, locales, currentLocale] = await Promise.all([
-    listRegions().then((regions: StoreRegion[]) => regions),
-    listLocales(),
-    getLocale(),
-  ])
+const NAV_LINKS = [
+  { href: "/store", label: "الأقسام" },
+  { href: "/collections/deals", label: "العروض" },
+  { href: "/collections/best-sellers", label: "الأكثر مبيعاً" },
+]
 
+export default function Nav() {
   return (
-    <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-white border-ui-border-base">
-        <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
-          <div className="flex-1 basis-0 h-full flex items-center">
-            <div className="h-full">
-              <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
-            </div>
+    <>
+      <div className="hidden small:block bg-laly-deep text-[#BFD8DD] text-xs">
+        <div className="content-container flex items-center justify-between h-[38px]">
+          <div className="flex items-center gap-5">
+            <span className="flex items-center gap-1.5">
+              <Icon name="pin" size={14} className="opacity-75" />
+              توصيل لجميع مناطق الكويت
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Icon name="clock" size={14} className="opacity-75" />
+              {CONTACT.hours}
+            </span>
           </div>
-
-          <div className="flex items-center h-full">
+          <div className="flex items-center gap-5">
             <LocalizedClientLink
-              href="/"
-              className="txt-compact-xlarge-plus hover:text-ui-fg-base uppercase"
-              data-testid="nav-store-link"
+              href="/account/orders"
+              className="flex items-center gap-1.5 hover:text-white"
             >
-              Medusa Store
+              <Icon name="truck" size={14} className="opacity-75" />
+              تتبع طلبك
             </LocalizedClientLink>
           </div>
+        </div>
+      </div>
 
-          <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-            <Search />
-            <div className="hidden small:flex items-center gap-x-6 h-full">
+      <div className="sticky top-0 inset-x-0 z-50">
+        <header className="bg-white border-b border-laly-line">
+          <nav className="content-container flex items-center gap-4 small:gap-7 h-16 small:h-[82px]">
+            <Logo />
+
+            <div className="hidden small:flex flex-1 justify-center">
+              <Search variant="bar" />
+            </div>
+
+            <ul className="hidden medium:flex items-center gap-6">
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <LocalizedClientLink
+                    href={link.href}
+                    className="relative py-1 text-sm font-bold hover:text-laly-teal after:absolute after:bottom-0 after:start-0 after:h-[2.5px] after:w-0 after:rounded after:bg-laly-teal after:transition-all hover:after:w-full"
+                  >
+                    {link.label}
+                  </LocalizedClientLink>
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex items-center gap-1 ms-auto small:ms-0">
+              <div className="small:hidden">
+                <Search />
+              </div>
+              <Suspense
+                fallback={
+                  <LocalizedClientLink
+                    href="/cart"
+                    aria-label="السلة"
+                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    data-testid="nav-cart-link"
+                  >
+                    <Icon name="cart" size={22} />
+                  </LocalizedClientLink>
+                }
+              >
+                <CartButton />
+              </Suspense>
               <LocalizedClientLink
-                className="hover:text-ui-fg-base"
                 href="/account"
+                aria-label="حسابي"
+                className="hidden small:flex w-10 h-10 rounded-full items-center justify-center hover:bg-laly-teal-soft hover:text-laly-teal"
                 data-testid="nav-account-link"
               >
-                Account
+                <Icon name="user" size={22} />
               </LocalizedClientLink>
             </div>
-            <Suspense
-              fallback={
-                <LocalizedClientLink
-                  className="hover:text-ui-fg-base flex gap-2"
-                  href="/cart"
-                  data-testid="nav-cart-link"
-                >
-                  Cart (0)
-                </LocalizedClientLink>
-              }
-            >
-              <CartButton />
-            </Suspense>
-          </div>
-        </nav>
-      </header>
-    </div>
+          </nav>
+        </header>
+      </div>
+    </>
   )
 }

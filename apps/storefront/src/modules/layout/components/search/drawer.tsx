@@ -27,29 +27,29 @@ const SearchDrawer = ({ isOpen, close, children }: SearchDrawerProps) => {
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-hidden">
-          <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div className="pointer-events-none fixed inset-y-0 start-0 flex max-w-full ps-10">
             <Transition.Child
               as={Fragment}
               enter="transform transition ease-in-out duration-300"
-              enterFrom="translate-x-full"
+              enterFrom="ltr:-translate-x-full rtl:translate-x-full"
               enterTo="translate-x-0"
               leave="transform transition ease-in-out duration-200"
               leaveFrom="translate-x-0"
-              leaveTo="translate-x-full"
+              leaveTo="ltr:-translate-x-full rtl:translate-x-full"
             >
               <Dialog.Panel
                 className="pointer-events-auto w-screen max-w-md"
                 data-testid="search-drawer"
               >
-                <div className="flex h-full flex-col border-l border-ui-border-base bg-ui-bg-base shadow-elevation-modal">
+                <div className="flex h-full flex-col border-s border-ui-border-base bg-ui-bg-base shadow-elevation-modal">
                   <div className="flex items-center justify-between border-b border-ui-border-base px-4 py-3">
                     <Dialog.Title className="text-large-semi text-ui-fg-base">
-                      Search
+                      البحث
                     </Dialog.Title>
                     <button
                       type="button"
                       onClick={close}
-                      aria-label="Close search"
+                      aria-label="إغلاق البحث"
                       className="text-ui-fg-muted hover:text-ui-fg-base"
                       data-testid="close-search-drawer"
                     >

@@ -51,7 +51,7 @@
 
 @layer components {
   .content-container {
-    @apply max-w-[1440px] w-full mx-auto px-6;
+    @apply max-w-[1280px] w-full mx-auto px-4 small:px-6;
   }
 
   .contrast-btn {
