@@ -6,11 +6,13 @@ export default function SectionHeading({
   title,
   href,
   linkLabel = "عرض الكل",
+  extra,
 }: {
   eyebrow?: string
   title: string
   href?: string
   linkLabel?: string
+  extra?: React.ReactNode
 }) {
   return (
     <div className="flex items-end justify-between gap-4 mb-5 small:mb-7">
@@ -21,9 +23,12 @@ export default function SectionHeading({
             {eyebrow}
           </span>
         )}
-        <h2 className="text-xl small:text-[28px] font-extrabold leading-tight">
-          {title}
-        </h2>
+        <div className="flex items-center gap-3 flex-wrap">
+          <h2 className="text-xl small:text-[28px] font-extrabold leading-tight">
+            {title}
+          </h2>
+          {extra}
+        </div>
       </div>
       {href && (
         <LocalizedClientLink

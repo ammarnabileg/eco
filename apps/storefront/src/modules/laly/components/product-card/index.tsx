@@ -5,6 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
 import AddToCartButton from "@modules/laly/components/add-to-cart-button"
+import Countdown from "@modules/laly/components/countdown"
 
 // Fields a product query must request for this card to render fully.
 export const PRODUCT_CARD_FIELDS =
@@ -19,9 +20,12 @@ const isInStock = (variant?: HttpTypes.StoreProductVariant) =>
 export default function ProductCard({
   product,
   priority = false,
+  offerEndsAt,
 }: {
   product: HttpTypes.StoreProduct
   priority?: boolean
+  // End of the sale price list this product is in, for a real countdown.
+  offerEndsAt?: string
 }) {
   const { cheapestPrice } = getProductPrice({ product })
   const variants = product.variants ?? []
@@ -69,6 +73,7 @@ export default function ProductCard({
       </LocalizedClientLink>
 
       <div className="flex flex-col flex-1 pt-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
         <span
           className={`flex items-center gap-1 text-[11.5px] font-bold ${
             inStock ? "text-laly-green" : "text-laly-faint"
@@ -81,6 +86,8 @@ export default function ProductCard({
           />
           {inStock ? "متوفر" : "غير متوفر"}
         </span>
+        {onSale && offerEndsAt && <Countdown endsAt={offerEndsAt} variant="chip" />}
+        </div>
 
         <h3 className="mt-1 text-[13.5px] small:text-sm font-bold leading-snug line-clamp-2 min-h-[2.6em]">
           <LocalizedClientLink

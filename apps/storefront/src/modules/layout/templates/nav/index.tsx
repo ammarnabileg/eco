@@ -9,7 +9,7 @@ import { getStoreContent } from "@lib/data/content"
 
 const NAV_LINKS = [
   { href: "/store", label: "الأقسام" },
-  { href: "/collections/deals", label: "العروض" },
+  { href: "/offers", label: "العروض" },
   { href: "/collections/best-sellers", label: "الأكثر مبيعاً" },
 ]
 

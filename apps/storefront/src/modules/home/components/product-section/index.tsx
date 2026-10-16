@@ -5,20 +5,32 @@ import ProductCard, {
   PRODUCT_CARD_FIELDS,
 } from "@modules/laly/components/product-card"
 
-// A collection's products, either as a horizontal rail (scrolls on phones)
-// or as a grid.
+// A row of products, either as a horizontal rail (scrolls on phones) or as a
+// grid. Products come from a collection or from an explicit id list (offers).
 export default async function ProductSection({
-  collection,
+  title,
+  href,
   region,
   layout,
   eyebrow,
+  collectionId,
+  productIds,
+  offerEnds = {},
+  extra,
+  limit = 8,
 }: {
-  collection?: HttpTypes.StoreCollection | null
+  title: string
+  href?: string
   region: HttpTypes.StoreRegion
   layout: "rail" | "grid"
   eyebrow?: string
+  collectionId?: string
+  productIds?: string[]
+  offerEnds?: Record<string, string>
+  extra?: React.ReactNode
+  limit?: number
 }) {
-  if (!collection) {
+  if (!collectionId && !productIds?.length) {
     return null
   }
 
@@ -27,8 +39,8 @@ export default async function ProductSection({
   } = await listProducts({
     regionId: region.id,
     queryParams: {
-      collection_id: collection.id,
-      limit: 8,
+      ...(collectionId ? { collection_id: collectionId } : { id: productIds }),
+      limit,
       fields: PRODUCT_CARD_FIELDS,
     },
   })
@@ -39,16 +51,12 @@ export default async function ProductSection({
 
   return (
     <section className="content-container mt-10 small:mt-14">
-      <SectionHeading
-        eyebrow={eyebrow}
-        title={collection.title}
-        href={`/collections/${collection.handle}`}
-      />
+      <SectionHeading eyebrow={eyebrow} title={title} href={href} extra={extra} />
       {layout === "rail" ? (
         <ul className="flex gap-3 small:gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 small:mx-0 small:px-0 small:grid small:grid-cols-4">
           {products.map((p, i) => (
             <li key={p.id} className="snap-start shrink-0 w-[46%] xsmall:w-[38%] small:w-auto">
-              <ProductCard product={p} priority={i < 2} />
+              <ProductCard product={p} priority={i < 2} offerEndsAt={offerEnds[p.id]} />
             </li>
           ))}
         </ul>
@@ -56,7 +64,7 @@ export default async function ProductSection({
         <ul className="grid grid-cols-2 small:grid-cols-4 gap-3 small:gap-4">
           {products.map((p) => (
             <li key={p.id}>
-              <ProductCard product={p} />
+              <ProductCard product={p} offerEndsAt={offerEnds[p.id]} />
             </li>
           ))}
         </ul>

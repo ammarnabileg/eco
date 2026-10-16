@@ -45,7 +45,8 @@ type SeedProduct = {
   en: string
   brand: string
   category: CategoryHandle
-  collection: "deals" | "best-sellers"
+  // Products on sale (compareAt) appear in the weekly offer price list.
+  collection?: "best-sellers"
   art: string
   price: number
   // Regular price when the product is on sale; `price` becomes the sale price.
@@ -53,10 +54,10 @@ type SeedProduct = {
 }
 
 const PRODUCTS: SeedProduct[] = [
-  { handle: "hikvision-2mp-bullet", title: "كاميرا Hikvision Bullet دقة 2MP", en: "Hikvision 2MP Bullet Camera", brand: "Hikvision", category: "cctv", collection: "deals", art: "bullet", price: 12.5, compareAt: 17.5 },
-  { handle: "surveillance-hdd-1tb", title: "هارد مراقبة 1TB Surveillance", en: "1TB Surveillance Hard Drive", brand: "Western Digital", category: "storage", collection: "deals", art: "hdd", price: 12.9, compareAt: 15.9 },
-  { handle: "jbl-tune-520bt", title: "سماعات JBL Tune 520BT", en: "JBL Tune 520BT Headphones", brand: "JBL", category: "accessories", collection: "deals", art: "headphones", price: 13.9, compareAt: 18.5 },
-  { handle: "tapo-c200", title: "كاميرا Tapo C200 منزلية Wi-Fi", en: "TP-Link Tapo C200 Wi-Fi Camera", brand: "TP-Link", category: "cctv", collection: "deals", art: "ptz", price: 9.9, compareAt: 13.9 },
+  { handle: "hikvision-2mp-bullet", title: "كاميرا Hikvision Bullet دقة 2MP", en: "Hikvision 2MP Bullet Camera", brand: "Hikvision", category: "cctv", art: "bullet", price: 12.5, compareAt: 17.5 },
+  { handle: "surveillance-hdd-1tb", title: "هارد مراقبة 1TB Surveillance", en: "1TB Surveillance Hard Drive", brand: "Western Digital", category: "storage", art: "hdd", price: 12.9, compareAt: 15.9 },
+  { handle: "jbl-tune-520bt", title: "سماعات JBL Tune 520BT", en: "JBL Tune 520BT Headphones", brand: "JBL", category: "accessories", art: "headphones", price: 13.9, compareAt: 18.5 },
+  { handle: "tapo-c200", title: "كاميرا Tapo C200 منزلية Wi-Fi", en: "TP-Link Tapo C200 Wi-Fi Camera", brand: "TP-Link", category: "cctv", art: "ptz", price: 9.9, compareAt: 13.9 },
   { handle: "hikvision-2mp-kit-4", title: "طقم Hikvision كامل — 4 كاميرات 2MP", en: "Hikvision 2MP CCTV Kit — 4 Cameras", brand: "Hikvision", category: "cctv", collection: "best-sellers", art: "kit", price: 74.9, compareAt: 89.9 },
   { handle: "hikvision-4mp-dome", title: "كاميرا Hikvision Dome دقة 4MP", en: "Hikvision 4MP Turbo Dome Camera", brand: "Hikvision", category: "cctv", collection: "best-sellers", art: "dome", price: 18.9, compareAt: 24.9 },
   { handle: "tp-link-archer-c6", title: "راوتر TP-Link Archer C6 AC1200", en: "TP-Link Archer C6 AC1200 Router", brand: "TP-Link", category: "networking", collection: "best-sellers", art: "router", price: 12.9 },
@@ -228,7 +229,6 @@ export default async function initial_data_seed({
   const { result: collections } = await createCollectionsWorkflow(container).run({
     input: {
       collections: [
-        { title: "عروض الأسبوع", handle: "deals", metadata: { en_title: "Deals of the week" } },
         { title: "الأكثر مبيعاً هذا الأسبوع", handle: "best-sellers", metadata: { en_title: "Best sellers this week" } },
       ],
     },
@@ -249,7 +249,9 @@ export default async function initial_data_seed({
         thumbnail: `/products/${p.art}.svg`,
         images: [{ url: `/products/${p.art}.svg` }],
         category_ids: [categories.find((c) => c.handle === p.category)!.id],
-        collection_id: collections.find((c) => c.handle === p.collection)!.id,
+        collection_id: p.collection
+          ? collections.find((c) => c.handle === p.collection)!.id
+          : undefined,
         shipping_profile_id: shippingProfile.id,
         metadata: { en_title: p.en, brand: p.brand },
         options: [{ id: defaultOption.id }],
@@ -284,8 +286,12 @@ export default async function initial_data_seed({
       price_lists_data: [
         {
           title: "عروض الأسبوع",
-          description: "Weekly deals",
+          description: "خصومات حقيقية لفترة محدودة",
           status: "active",
+          // Real end date: Medusa stops applying these prices afterwards and
+          // the storefront countdown ends at the same moment.
+          starts_at: new Date().toISOString(),
+          ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
           prices: salePrices,
         },
       ],
