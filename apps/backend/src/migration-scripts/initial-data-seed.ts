@@ -43,6 +43,7 @@ type SeedProduct = {
   handle: string
   title: string
   en: string
+  description: string
   brand: string
   category: CategoryHandle
   // Products on sale (compareAt) appear in the weekly offer price list.
@@ -54,16 +55,16 @@ type SeedProduct = {
 }
 
 const PRODUCTS: SeedProduct[] = [
-  { handle: "hikvision-2mp-bullet", title: "كاميرا Hikvision Bullet دقة 2MP", en: "Hikvision 2MP Bullet Camera", brand: "Hikvision", category: "cctv", art: "bullet", price: 12.5, compareAt: 17.5 },
-  { handle: "surveillance-hdd-1tb", title: "هارد مراقبة 1TB Surveillance", en: "1TB Surveillance Hard Drive", brand: "Western Digital", category: "storage", art: "hdd", price: 12.9, compareAt: 15.9 },
-  { handle: "jbl-tune-520bt", title: "سماعات JBL Tune 520BT", en: "JBL Tune 520BT Headphones", brand: "JBL", category: "accessories", art: "headphones", price: 13.9, compareAt: 18.5 },
-  { handle: "tapo-c200", title: "كاميرا Tapo C200 منزلية Wi-Fi", en: "TP-Link Tapo C200 Wi-Fi Camera", brand: "TP-Link", category: "cctv", art: "ptz", price: 9.9, compareAt: 13.9 },
-  { handle: "hikvision-2mp-kit-4", title: "طقم Hikvision كامل — 4 كاميرات 2MP", en: "Hikvision 2MP CCTV Kit — 4 Cameras", brand: "Hikvision", category: "cctv", collection: "best-sellers", art: "kit", price: 74.9, compareAt: 89.9 },
-  { handle: "hikvision-4mp-dome", title: "كاميرا Hikvision Dome دقة 4MP", en: "Hikvision 4MP Turbo Dome Camera", brand: "Hikvision", category: "cctv", collection: "best-sellers", art: "dome", price: 18.9, compareAt: 24.9 },
-  { handle: "tp-link-archer-c6", title: "راوتر TP-Link Archer C6 AC1200", en: "TP-Link Archer C6 AC1200 Router", brand: "TP-Link", category: "networking", collection: "best-sellers", art: "router", price: 12.9 },
-  { handle: "tapo-l530e", title: "لمبة Tapo L530E ذكية Wi-Fi", en: "Tapo L530E Smart Wi-Fi Bulb", brand: "TP-Link", category: "smart-home", collection: "best-sellers", art: "bulb", price: 3.5, compareAt: 4.9 },
-  { handle: "d-link-cat6-305m", title: "كيبل شبكة D-Link CAT6 (305م)", en: "D-Link CAT6 Network Cable (305m)", brand: "D-Link", category: "networking", collection: "best-sellers", art: "cable", price: 8.25 },
-  { handle: "hikvision-dvr-4ch", title: "جهاز تسجيل Hikvision DVR — 4 قنوات", en: "Hikvision 4-Channel Turbo DVR", brand: "Hikvision", category: "cctv", collection: "best-sellers", art: "dvr", price: 22.9 },
+  { handle: "hikvision-2mp-bullet", description: "كاميرا خارجية من Hikvision بدقة 2MP مع رؤية ليلية، مناسبة لمداخل البيوت والمحلات والمواقف.", title: "كاميرا Hikvision Bullet دقة 2MP", en: "Hikvision 2MP Bullet Camera", brand: "Hikvision", category: "cctv", art: "bullet", price: 12.5, compareAt: 17.5 },
+  { handle: "surveillance-hdd-1tb", description: "هارد ديسك مخصص لأجهزة التسجيل يعمل على مدار الساعة، بسعة 1TB لتخزين تسجيلات الكاميرات.", title: "هارد مراقبة 1TB Surveillance", en: "1TB Surveillance Hard Drive", brand: "Western Digital", category: "storage", art: "hdd", price: 12.9, compareAt: 15.9 },
+  { handle: "jbl-tune-520bt", description: "سماعات رأس لاسلكية من JBL بتقنية Bluetooth وبطارية تدوم طويلاً، خفيفة ومريحة للاستخدام اليومي.", title: "سماعات JBL Tune 520BT", en: "JBL Tune 520BT Headphones", brand: "JBL", category: "accessories", art: "headphones", price: 13.9, compareAt: 18.5 },
+  { handle: "tapo-c200", description: "كاميرا منزلية ذكية تعمل بالواي فاي، تدور وتتحرك وتتابعها من تطبيق Tapo على موبايلك.", title: "كاميرا Tapo C200 منزلية Wi-Fi", en: "TP-Link Tapo C200 Wi-Fi Camera", brand: "TP-Link", category: "cctv", art: "ptz", price: 9.9, compareAt: 13.9 },
+  { handle: "hikvision-2mp-kit-4", description: "طقم مراقبة متكامل من Hikvision: 4 كاميرات بدقة 2MP مع جهاز تسجيل، جاهز للتركيب في البيت أو المحل.", title: "طقم Hikvision كامل — 4 كاميرات 2MP", en: "Hikvision 2MP CCTV Kit — 4 Cameras", brand: "Hikvision", category: "cctv", collection: "best-sellers", art: "kit", price: 74.9, compareAt: 89.9 },
+  { handle: "hikvision-4mp-dome", description: "كاميرا داخلية بتصميم قبة من Hikvision بدقة 4MP، صورة واضحة للصالات والمكاتب والمحلات.", title: "كاميرا Hikvision Dome دقة 4MP", en: "Hikvision 4MP Turbo Dome Camera", brand: "Hikvision", category: "cctv", collection: "best-sellers", art: "dome", price: 18.9, compareAt: 24.9 },
+  { handle: "tp-link-archer-c6", description: "راوتر لاسلكي ثنائي النطاق من TP-Link بسرعة AC1200 وتغطية قوية لكل غرف البيت.", title: "راوتر TP-Link Archer C6 AC1200", en: "TP-Link Archer C6 AC1200 Router", brand: "TP-Link", category: "networking", collection: "best-sellers", art: "router", price: 12.9 },
+  { handle: "tapo-l530e", description: "لمبة ذكية ملوّنة تعمل بالواي فاي، تتحكم في لونها وإضاءتها من الموبايل أو بالأوامر الصوتية.", title: "لمبة Tapo L530E ذكية Wi-Fi", en: "Tapo L530E Smart Wi-Fi Bulb", brand: "TP-Link", category: "smart-home", collection: "best-sellers", art: "bulb", price: 3.5, compareAt: 4.9 },
+  { handle: "d-link-cat6-305m", description: "كيبل شبكة CAT6 من D-Link بطول 305 متر، مناسب لتمديدات الشبكات والكاميرات.", title: "كيبل شبكة D-Link CAT6 (305م)", en: "D-Link CAT6 Network Cable (305m)", brand: "D-Link", category: "networking", collection: "best-sellers", art: "cable", price: 8.25 },
+  { handle: "hikvision-dvr-4ch", description: "جهاز تسجيل DVR من Hikvision يدعم 4 كاميرات، مع مشاهدة مباشرة من الموبايل.", title: "جهاز تسجيل Hikvision DVR — 4 قنوات", en: "Hikvision 4-Channel Turbo DVR", brand: "Hikvision", category: "cctv", collection: "best-sellers", art: "dvr", price: 22.9 },
 ]
 
 export default async function initial_data_seed({
@@ -244,6 +245,7 @@ export default async function initial_data_seed({
     input: {
       products: PRODUCTS.map((p) => ({
         title: p.title,
+        description: p.description,
         handle: p.handle,
         status: ProductStatus.PUBLISHED,
         thumbnail: `/products/${p.art}.svg`,

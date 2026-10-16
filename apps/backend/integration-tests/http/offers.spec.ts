@@ -81,6 +81,26 @@ medusaIntegrationTestRunner({
       expect(new Date(data.offers[0].ends_at).toISOString()).toEqual(endsAt)
     })
 
+    it("publishes the product in the Google Merchant feed with its sale window", async () => {
+      await api.post(
+        "/admin/regions",
+        { name: "Kuwait", currency_code: "kwd", countries: ["kw"] },
+        adminHeaders
+      )
+      const endsAt = new Date(Date.now() + 86400000).toISOString()
+      await createOffer({ ends_at: endsAt })
+
+      const res = await api.get("/feeds/google/ar")
+      expect(res.headers["content-type"]).toContain("application/xml")
+      expect(res.data).toContain("<g:title>Test camera</g:title>")
+      expect(res.data).toContain("<g:price>20.000 KWD</g:price>")
+      expect(res.data).toContain("<g:sale_price>15.000 KWD</g:sale_price>")
+      expect(res.data).toContain(`/${endsAt}</g:sale_price_effective_date>`)
+
+      const bad = await api.get("/feeds/google/fr").catch((e) => e.response)
+      expect(bad.status).toEqual(404)
+    })
+
     it("drops offers that ended or have not started", async () => {
       await createOffer({ ends_at: new Date(Date.now() - 60000).toISOString() })
       await createOffer({ starts_at: new Date(Date.now() + 86400000).toISOString() })
