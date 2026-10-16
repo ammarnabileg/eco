@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/.medusa
+**/.turbo
+**/dist
+**/.env
+**/.env.*
+!**/.env.template
+.git
+.github
+**/*.log
+**/tsconfig.tsbuildinfo

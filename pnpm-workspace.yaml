@@ -1,0 +1,14 @@
+packages:
+  - "apps/*"
+
+# Install scripts are blocked unless listed here. Medusa telemetry's script is
+# deliberately not allowed.
+onlyBuiltDependencies:
+  - "@swc/core"
+  - esbuild
+  - sharp
+ignoredBuiltDependencies:
+  - "@medusajs/telemetry"
+  - msgpackr-extract
+  - protobufjs
+  - unrs-resolver
