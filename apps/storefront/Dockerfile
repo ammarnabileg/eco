@@ -7,7 +7,7 @@
 # NEXT_PUBLIC_* values are inlined into the client bundle at build time, so
 # they must be passed as build args. Never put secrets in NEXT_PUBLIC_* vars.
 
-FROM node:22-alpine AS base
+FROM node:25-alpine AS base
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable
 WORKDIR /repo
@@ -31,7 +31,7 @@ ENV NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY \
     NEXT_PUBLIC_STRIPE_KEY=$NEXT_PUBLIC_STRIPE_KEY
 RUN pnpm --filter @dtc/storefront build
 
-FROM node:22-alpine AS runtime
+FROM node:25-alpine AS runtime
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=8000 HOSTNAME=0.0.0.0
 WORKDIR /app
 COPY --from=build --chown=node:node /repo/apps/storefront/.next/standalone ./
