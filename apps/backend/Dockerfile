@@ -1,7 +1,7 @@
 # Build from the repository root:
 #   docker build -f apps/backend/Dockerfile -t eco-backend .
 
-FROM node:22-alpine AS base
+FROM node:25-alpine AS base
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH MEDUSA_DISABLE_TELEMETRY=true
 RUN corepack enable
 WORKDIR /repo
@@ -22,7 +22,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
  && mv /deploy/node_modules /out/node_modules \
  && cp -r apps/backend/.medusa/server/. /out/
 
-FROM node:22-alpine AS runtime
+FROM node:25-alpine AS runtime
 ENV NODE_ENV=production MEDUSA_DISABLE_TELEMETRY=true PORT=9000
 WORKDIR /app
 COPY --from=build --chown=node:node /out ./
