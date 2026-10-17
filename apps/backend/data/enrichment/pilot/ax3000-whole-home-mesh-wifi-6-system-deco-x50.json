@@ -1,0 +1,94 @@
+{
+  "handle": "ax3000-whole-home-mesh-wifi-6-system-deco-x50",
+  "botble_id": "572",
+  "title_ar": "نظام ميش واي فاي 6 AX3000 لكامل البيت من TP-Link Deco X50 – 3 قطع",
+  "title_en": "TP-Link Deco X50 AX3000 Whole Home Mesh Wi-Fi 6 System (3-Pack)",
+  "subtitle_ar": "تغطية واي فاي 6 لكامل البيت حتى 6,500 قدم مربع (نحو 600 م²) بشبكة واحدة",
+  "subtitle_en": "Seamless Wi-Fi 6 for the whole home, up to 6,500 ft² (about 600 m²) under one network name",
+  "description_ar": "Deco X50 نظام ميش (Mesh) من TP-Link يتكون من ثلاث وحدات تعمل معاً لتغطية البيت كله بشبكة واي فاي واحدة باسم واحد وكلمة مرور واحدة، فتتنقل بين الغرف والأدوار دون انقطاع. يدعم النظام واي فاي 6 بفئة سرعة AX3000: حتى 2402 ميجابت/ث على تردد 5 GHz و574 ميجابت/ث على تردد 2.4 GHz، مع تقنية HE160 التي تضاعف عرض القناة لسرعات أعلى مع الأجهزة الحديثة.\n\nيناسب الشقق الكبيرة والفلل متعددة الأدوار، إذ تذكر TP-Link أن المجموعة الثلاثية تغطي حتى 6,500 قدم مربع (نحو 600 متر مربع) وتتسع لأكثر من 150 جهازاً متصلاً. تقنية AI-Driven Mesh تتعلم بيئة الشبكة لتوفر أفضل اتصال لبيتك، ويمكن ربط الوحدات لاسلكياً أو بكابل إيثرنت للحصول على أداء أقوى بين الأدوار.\n\nفي كل وحدة 3 منافذ جيجابت تتعرف تلقائياً على منفذ الإنترنت (WAN) أو الشبكة المحلية (LAN)، فتوصل الوحدة الرئيسية بجهاز الألياف الضوئية (ONT) أو المودم وتستخدم بقية المنافذ للتلفزيون أو جهاز الألعاب أو الكمبيوتر. الإعداد والإدارة من تطبيق Deco خطوة بخطوة، مع حماية TP-Link HomeShield (الخطة الأساسية مجانية) وأدوات رقابة أبوية وشبكة للضيوف ودعم خادم وعميل VPN.\n\nمحتويات العلبة: 3 وحدات Deco X50، كابل إيثرنت RJ45 واحد، 3 محولات طاقة، ودليل التثبيت السريع.",
+  "description_en": "Deco X50 is a TP-Link mesh system of three units that work together to cover your whole home with one Wi-Fi network name, so you can move between rooms and floors without dropping the connection. It uses Wi-Fi 6 in the AX3000 class: up to 2402 Mbps on 5 GHz and 574 Mbps on 2.4 GHz, with HE160 channels for higher speeds on compatible devices.\n\nIt suits large apartments and multi-floor villas: TP-Link rates the 3-pack for up to 6,500 ft² (about 600 m²) and over 150 connected devices. AI-Driven Mesh learns your network environment, and units can link wirelessly or over Ethernet backhaul for stronger performance between floors.\n\nEach unit has 3 Gigabit ports with WAN/LAN auto-sensing, so the main unit connects to your fiber ONT or modem and the rest serve a TV, console or PC. Setup and management run through the Deco app, with TP-Link HomeShield (free Basic plan), parental controls, guest network and VPN server/client.\n\nIn the box: 3 Deco X50 units, 1 RJ45 Ethernet cable, 3 power adapters and a quick installation guide.",
+  "highlights_ar": [
+    "واي فاي 6 بفئة AX3000: حتى 2402 ميجابت/ث على 5 GHz و574 ميجابت/ث على 2.4 GHz",
+    "تغطية حتى 6,500 قدم مربع (نحو 600 م²) للمجموعة الثلاثية حسب TP-Link",
+    "أكثر من 150 جهازاً متصلاً بشبكة واحدة باسم واحد",
+    "3 منافذ جيجابت في كل وحدة مع تعرف تلقائي على منفذ الإنترنت",
+    "ربط الوحدات لاسلكياً أو بكابل إيثرنت مع تقنية AI-Driven Mesh",
+    "إعداد سهل من تطبيق Deco مع حماية HomeShield ودعم VPN"
+  ],
+  "highlights_en": [
+    "AX3000 Wi-Fi 6: up to 2402 Mbps on 5 GHz and 574 Mbps on 2.4 GHz",
+    "Up to 6,500 ft² (about 600 m²) coverage for the 3-pack, per TP-Link",
+    "Over 150 connected devices on one seamless network",
+    "3 Gigabit WAN/LAN auto-sensing ports on every unit",
+    "Wireless or Ethernet backhaul with AI-Driven Mesh",
+    "Easy setup in the Deco app, HomeShield security and VPN support"
+  ],
+  "specs": {
+    "wifi_standard": "wifi6",
+    "speed_class": "AX3000",
+    "bands": "dual",
+    "max_speed_mbps": 2976,
+    "internet_connection": [
+      "fiber"
+    ],
+    "wan_speed": "1g",
+    "lan_ports": 2,
+    "mesh": [
+      "deco"
+    ],
+    "coverage_sqm": 604,
+    "max_devices": 150,
+    "mounting": "desktop",
+    "gaming": false,
+    "poe_powered": false,
+    "vpn": true,
+    "usb_ports": {
+      "ar": "لا يوجد",
+      "en": "None"
+    }
+  },
+  "faq": [
+    {
+      "question_ar": "هل تكفي المجموعة لتغطية فيلا من دورين أو ثلاثة؟",
+      "answer_ar": "تذكر TP-Link أن المجموعة الثلاثية تغطي حتى 6,500 قدم مربع (نحو 600 م²) وتناسب البيوت من 4 إلى 6 غرف نوم أو أكثر. ضع وحدة في كل دور، ويمكن ربط الوحدات بكابل إيثرنت عند وجود جدران خرسانية سميكة، وإضافة وحدة Deco أخرى إذا احتجت تغطية أكبر.",
+      "question_en": "Is the 3-pack enough for a two- or three-floor villa?",
+      "answer_en": "TP-Link rates the 3-pack for up to 6,500 ft² (about 600 m²), aimed at 4–6+ bedroom homes. Place one unit per floor, use Ethernet backhaul where thick concrete walls weaken the signal, and add another Deco if you need more coverage."
+    },
+    {
+      "question_ar": "هل يعمل مع خط الألياف الضوئية (الفايبر) من مزود الإنترنت عندي؟",
+      "answer_ar": "نعم، توصل الوحدة الرئيسية بجهاز الألياف (ONT) أو المودم عبر منفذ جيجابت، وهو يدعم أنواع الاتصال Dynamic IP وStatic IP وPPPoE وL2TP وPPTP. وإذا أردت إبقاء راوتر المزود يمكن تشغيل Deco في وضع Access Point.",
+      "question_en": "Will it work with my fiber internet provider?",
+      "answer_en": "Yes. Connect the main unit to your fiber ONT or modem through a Gigabit port; it supports Dynamic IP, Static IP, PPPoE, L2TP and PPTP. If you want to keep the provider's router, Deco can run in Access Point mode."
+    },
+    {
+      "question_ar": "كم جهازاً يمكن توصيله؟",
+      "answer_ar": "تذكر TP-Link أن Deco X50 يربط أكثر من 150 جهازاً، مع تقنيات OFDMA وMU-MIMO لخدمة عدة أجهزة في نفس الوقت. العدد الفعلي يتأثر بنوع الاستخدام وظروف الشبكة.",
+      "question_en": "How many devices can it handle?",
+      "answer_en": "TP-Link states Deco X50 connects over 150 devices, using OFDMA and MU-MIMO to serve several devices at once. Real-world numbers depend on usage and network conditions."
+    },
+    {
+      "question_ar": "هل يمكن إضافة وحدات Deco أخرى لاحقاً؟",
+      "answer_ar": "نعم، توسع الشبكة بإضافة وحدة Deco أخرى من تطبيق Deco. للتأكد من توافق موديل Deco مختلف راجع قائمة التوافق الرسمية من TP-Link.",
+      "question_en": "Can I add more Deco units later?",
+      "answer_en": "Yes, you can expand coverage by adding another Deco unit through the Deco app. If you plan to mix in a different Deco model, check TP-Link's official compatibility list first."
+    },
+    {
+      "question_ar": "كيف يتم الإعداد؟",
+      "answer_ar": "وصّل الوحدة الرئيسية بالمودم أو جهاز الفايبر، ثم حمّل تطبيق Deco (أندرويد 5.0 أو iOS 9.0 فأحدث) واتبع التعليمات. من التطبيق تدير الأجهزة المتصلة والرقابة الأبوية وشبكة الضيوف.",
+      "question_en": "How do I set it up?",
+      "answer_en": "Connect the main unit to your modem or fiber ONT, install the Deco app (Android 5.0 / iOS 9.0 or later) and follow the steps. The app also manages connected devices, parental controls and the guest network."
+    }
+  ],
+  "seo_title_ar": "TP-Link Deco X50 نظام ميش واي فاي 6 AX3000 – 3 قطع",
+  "seo_title_en": "TP-Link Deco X50 AX3000 Wi-Fi 6 Mesh System 3-Pack",
+  "seo_description_ar": "نظام ميش TP-Link Deco X50 بثلاث وحدات: واي فاي 6 AX3000 وتغطية حتى 600 م² تقريباً لأكثر من 150 جهازاً و3 منافذ جيجابت لكل وحدة. مناسب للفلل والشقق.",
+  "seo_description_en": "TP-Link Deco X50 3-pack: AX3000 Wi-Fi 6 mesh covering up to 6,500 ft² (about 600 m²), 150+ devices and 3 Gigabit ports per unit. For villas and flats.",
+  "mpn": "Deco X50",
+  "source_url": "https://www.tp-link.com/ae/home-networking/deco/deco-x50/",
+  "sources": [
+    "https://www.tp-link.com/ae/home-networking/deco/deco-x50/",
+    "https://www.tp-link.com/ae/home-networking/deco/deco-x50/#specifications",
+    "https://www.tp-link.com/uk/home-networking/deco/deco-x50/"
+  ],
+  "notes": "Variant SKU is the 3-pack. AE page only quotes 1-pack coverage (2,500 ft², 1-3 bedroom); 3-pack coverage 6,500 ft² (4-6+ bedrooms) taken from the official UK/US pages; coverage_sqm 604 is a unit conversion of 6,500 ft². max_speed_mbps = 2402 + 574. lan_ports=2 refers to the free ports on the main unit (each unit has 3 Gigabit WAN/LAN auto-sensing ports; satellites have 3). Antenna count differs by hardware version (2 internal on V1-V2, 3 internal on V3); not stated in copy. Spec page does not state EasyMesh support, so mesh lists Deco only. No USB port on spec sheet. HomeShield Pro is a paid plan."
+}

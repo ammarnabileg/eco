@@ -1,0 +1,81 @@
+{
+  "handle": "ax1800-wi-fi-range-extender-re605x",
+  "botble_id": "555",
+  "title_ar": "مقوي واي فاي 6 ثنائي النطاق AX1800 من TP-Link RE605X",
+  "title_en": "TP-Link RE605X AX1800 Dual-Band Wi-Fi 6 Range Extender",
+  "subtitle_ar": "يقوي إشارة الراوتر الحالي بواي فاي 6 ويوصل أجهزتك السلكية بمنفذ جيجابت",
+  "subtitle_en": "Extends your existing router with Wi-Fi 6 and adds a Gigabit port for wired devices",
+  "description_ar": "RE605X مقوي واي فاي 6 من TP-Link يُركّب مباشرة في فيش الكهرباء ويتصل لاسلكياً بالراوتر الحالي ليوصل الإشارة إلى الغرف البعيدة والأماكن الميتة في البيت. يعمل بفئة سرعة AX1800: حتى 1201 ميجابت/ث على تردد 5 GHz و574 ميجابت/ث على تردد 2.4 GHz، وهو متوافق مع أي راوتر أو نقطة وصول لاسلكية.\n\nمناسب للشقق والبيوت التي يضعف فيها الواي فاي في غرفة النوم أو الدور الثاني أو المجلس. مع راوتر TP-Link يدعم OneMesh يكوّن شبكة ميش باسم واحد، فينتقل الجوال بين الراوتر والمقوي بدون تغيير الشبكة. ضوء مؤشر الإشارة يساعدك على اختيار أفضل مكان للتركيب، وهوائيان خارجيان لتوجيه الإشارة.\n\nفيه منفذ إيثرنت جيجابت لتوصيل تلفزيون ذكي أو جهاز ألعاب أو كمبيوتر بسلك، ويمكن تشغيله في وضع نقطة الوصول (Access Point) لتحويل اتصال سلكي إلى واي فاي ثنائي النطاق. الإعداد بضغطة زر WPS أو من تطبيق Tether على أندرويد وiOS.\n\nمحتويات العلبة: المقوي RE605X ودليل التثبيت السريع.",
+  "description_en": "RE605X is a TP-Link Wi-Fi 6 range extender that plugs straight into a wall socket and connects wirelessly to your existing router, carrying the signal to far rooms and dead zones. It runs in the AX1800 class: up to 1201 Mbps on 5 GHz and 574 Mbps on 2.4 GHz, and works with any Wi-Fi router or wireless access point.\n\nIt suits apartments and homes where Wi-Fi drops in a bedroom, upstairs or in the majlis. With a OneMesh-capable TP-Link router it forms a mesh network with one Wi-Fi name, so phones roam between router and extender automatically. A signal indicator light helps you find the best spot, and two external antennas direct the signal.\n\nA Gigabit Ethernet port connects a smart TV, console or PC by cable, and Access Point mode turns a wired connection into dual-band Wi-Fi. Setup takes a press of the WPS button or a few steps in the Tether app for Android and iOS.\n\nIn the box: RE605X range extender and quick installation guide.",
+  "highlights_ar": [
+    "واي فاي 6 بفئة AX1800: حتى 1201 ميجابت/ث على 5 GHz و574 ميجابت/ث على 2.4 GHz",
+    "يعمل مع أي راوتر أو نقطة وصول لاسلكية",
+    "OneMesh لشبكة ميش باسم واحد مع راوترات TP-Link المتوافقة",
+    "منفذ إيثرنت جيجابت للتلفزيون أو جهاز الألعاب",
+    "وضع نقطة الوصول (Access Point) ومؤشر قوة الإشارة",
+    "إعداد بزر WPS أو من تطبيق Tether"
+  ],
+  "highlights_en": [
+    "AX1800 Wi-Fi 6: up to 1201 Mbps on 5 GHz and 574 Mbps on 2.4 GHz",
+    "Works with any Wi-Fi router or wireless access point",
+    "OneMesh for one seamless network with compatible TP-Link routers",
+    "Gigabit Ethernet port for a TV or console",
+    "Access Point mode and signal strength indicator",
+    "Setup via WPS button or the Tether app"
+  ],
+  "specs": {
+    "wifi_standard": "wifi6",
+    "speed_class": "AX1800",
+    "bands": "dual",
+    "max_speed_mbps": 1775,
+    "lan_ports": 1,
+    "mesh": [
+      "onemesh"
+    ],
+    "mounting": "plug",
+    "gaming": false,
+    "poe_powered": false,
+    "usb_ports": {
+      "ar": "لا يوجد",
+      "en": "None"
+    }
+  },
+  "faq": [
+    {
+      "question_ar": "هل يعمل مع راوتر شركة الإنترنت الموجود عندي؟",
+      "answer_ar": "نعم، تذكر TP-Link أنه يقوي إشارة أي راوتر أو نقطة وصول لاسلكية. قد لا يتوافق مع راوترات بأنظمة معدلة أو قديمة جداً.",
+      "question_en": "Will it work with my internet provider's router?",
+      "answer_en": "Yes, TP-Link states it extends any Wi-Fi router or wireless access point. Routers running modified or very outdated firmware may not be compatible."
+    },
+    {
+      "question_ar": "أين أضع المقوي؟",
+      "answer_ar": "اختر مكاناً بين الراوتر والمنطقة الضعيفة، واستعن بضوء مؤشر الإشارة الذي يوضح قوة الإشارة في موضعه الحالي ليساعدك على تحديد أفضل مكان للتغطية.",
+      "question_en": "Where should I place the extender?",
+      "answer_en": "Pick a socket between the router and the weak area, and use the signal indicator light, which shows signal strength at its current spot, to find the best location."
+    },
+    {
+      "question_ar": "هل يكوّن شبكة ميش واحدة مع الراوتر؟",
+      "answer_ar": "نعم مع راوترات TP-Link الداعمة لـ OneMesh، فتحصل على اسم شبكة واحد وتنقل سلس. مع الراوترات الأخرى يعمل كمقوي عادي.",
+      "question_en": "Does it create one mesh network with my router?",
+      "answer_en": "Yes, with TP-Link routers that support OneMesh you get one network name and smooth roaming. With other routers it works as a standard extender."
+    },
+    {
+      "question_ar": "هل يمكن توصيل التلفزيون أو البلايستيشن بسلك؟",
+      "answer_ar": "نعم، فيه منفذ إيثرنت جيجابت واحد لتوصيل جهاز سلكي مثل التلفزيون الذكي أو جهاز الألعاب أو الكمبيوتر.",
+      "question_en": "Can I connect a TV or PlayStation by cable?",
+      "answer_en": "Yes, it has one Gigabit Ethernet port for a wired device such as a smart TV, game console or PC."
+    }
+  ],
+  "seo_title_ar": "مقوي واي فاي 6 TP-Link RE605X AX1800",
+  "seo_title_en": "TP-Link RE605X AX1800 Wi-Fi 6 Range Extender",
+  "seo_description_ar": "مقوي واي فاي TP-Link RE605X بتقنية واي فاي 6 AX1800 يعمل مع أي راوتر، يدعم OneMesh ومنفذ جيجابت ووضع نقطة الوصول، وإعداد سهل من تطبيق Tether.",
+  "seo_description_en": "TP-Link RE605X AX1800 Wi-Fi 6 range extender: works with any router, OneMesh support, Gigabit Ethernet port, Access Point mode and easy Tether setup.",
+  "mpn": "RE605X",
+  "source_url": "https://www.tp-link.com/ae/home-networking/range-extender/re605x/",
+  "sources": [
+    "https://www.tp-link.com/ae/home-networking/range-extender/re605x/",
+    "https://www.tp-link.com/ae/home-networking/range-extender/re605x/#specifications",
+    "https://www.tp-link.com/en/home-networking/range-extender/re605x/"
+  ],
+  "notes": "AE page lists Mesh Technology = OneMesh; the global /en/ page now lists 'EasyMesh-Compatible' instead (likely newer firmware/hardware version; footnote says EasyMesh is still being rolled out on some models). Specs list OneMesh only; confirm unit version before advertising EasyMesh. max_speed_mbps = 1201 + 574. lan_ports=1 is the single Gigabit Ethernet port. wan_speed, coverage and device count not on official page, omitted. vpn/internet_connection not applicable to an extender, omitted."
+}

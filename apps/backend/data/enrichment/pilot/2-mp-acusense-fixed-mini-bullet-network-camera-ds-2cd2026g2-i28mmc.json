@@ -1,0 +1,96 @@
+{
+  "handle": "2-mp-acusense-fixed-mini-bullet-network-camera-ds-2cd2026g2-i28mmc",
+  "botble_id": "346",
+  "title_ar": "كاميرا مراقبة بولت 2 ميجا AcuSense رؤية ليلية 40 م Hikvision DS-2CD2026G2-I",
+  "title_en": "Hikvision DS-2CD2026G2-I 2 MP AcuSense Fixed Mini Bullet Network Camera (2.8 mm)",
+  "subtitle_ar": "كاميرا Full HD بتمييز الإنسان والمركبة لتقليل الإنذارات الكاذبة، وأشعة تحت حمراء حتى 40 متراً",
+  "subtitle_en": "Full HD bullet with human/vehicle classification to cut false alarms and IR up to 40 m",
+  "description_ar": "كاميرا Hikvision DS-2CD2026G2-I هي كاميرا مراقبة شبكية (IP) صغيرة من نوع بولت بدقة 2 ميجابكسل (1920 × 1080)، من سلسلة Pro، بعدسة ثابتة 2.8 مم تعطي زاوية رؤية أفقية 107 درجات، مناسبة لتغطية مداخل البيوت والفلل وواجهات المحلات وممرات المستودعات.\n\nتستخدم تقنية AcuSense المبنية على التعلم العميق لتمييز الإنسان والمركبة، فلا تُرسل التنبيهات إلا عند حركة شخص أو سيارة، مع دعم عبور الخط والتسلل ودخول المنطقة والخروج منها، والتقاط الوجوه. في الإضاءة المنخفضة تعطي صورة ملونة حتى 0.002 لوكس بفتحة F1.4 بفضل تقنية powered-by-DarkFighter، وفي الظلام التام تتحول إلى الأشعة تحت الحمراء بمدى يصل إلى 40 متراً. تقنية WDR الحقيقية بقوة 120 dB تحسن الصورة أمام الإضاءة الخلفية القوية.\n\nالهيكل معدني بتصنيف IP67 ضد الماء والغبار، ونطاق التشغيل من -30 إلى 60 درجة مئوية. ضغط H.265+ يقلل حجم التسجيلات ويطيل مدة الحفظ على القرص.\n\nتعمل عبر كيبل شبكة PoE (802.3af) أو محول 12 فولت. يمكن ربطها بجهاز NVR مع قرص صلب، أو التسجيل على بطاقة microSD حتى 256 GB، والمشاهدة من الجوال عبر تطبيق Hik-Connect. هذا الموديل (-I) لا يحتوي على ميكروفون.",
+  "description_en": "The Hikvision DS-2CD2026G2-I is a 2 MP (1920 × 1080) Pro Series fixed mini bullet network camera. The 2.8 mm lens gives a 107° horizontal view, suited to home and villa entrances, shop fronts and warehouse aisles.\n\nAcuSense deep learning classifies humans and vehicles, so alerts focus on people and cars, with line crossing, intrusion, region entrance and exiting detection, plus face capture. Powered-by-DarkFighter low-light performance gives colour images down to 0.002 lux at F1.4, and IR covers up to 40 m in darkness. 120 dB true WDR handles strong backlight.\n\nThe metal housing is IP67 rated and operates from -30 °C to 60 °C. H.265+ compression reduces storage use.\n\nPower it by PoE (802.3af) or 12 VDC. Record to a Hikvision NVR with a hard drive or to a microSD card up to 256 GB, and view remotely with Hik-Connect. This -I model has no built-in microphone.",
+  "highlights_ar": [
+    "دقة 2 ميجابكسل Full HD بعدسة 2.8 مم وزاوية أفقية 107 درجات",
+    "تمييز الإنسان والمركبة AcuSense مع عبور الخط والتسلل والتقاط الوجوه",
+    "رؤية ليلية بالأشعة تحت الحمراء حتى 40 متراً",
+    "WDR حقيقي 120 dB وضغط H.265+",
+    "تعمل بكيبل شبكة PoE أو محول 12 فولت",
+    "هيكل معدني IP67 ويعمل من -30 إلى 60 درجة مئوية"
+  ],
+  "highlights_en": [
+    "2 MP Full HD, 2.8 mm lens, 107° horizontal view",
+    "AcuSense human/vehicle classification, line crossing, intrusion, face capture",
+    "IR night vision up to 40 m",
+    "120 dB true WDR and H.265+ compression",
+    "PoE (802.3af) or 12 VDC power",
+    "Metal IP67 housing, -30 °C to 60 °C"
+  ],
+  "specs": {
+    "resolution_mp": 2,
+    "form_factor": "bullet",
+    "lens_type": "fixed",
+    "focal_length": "2.8 mm",
+    "field_of_view": "107°",
+    "wdr_db": 120,
+    "night_technologies": [
+      "ir",
+      "darkfighter"
+    ],
+    "night_range_m": 40,
+    "ai_features": [
+      "human_vehicle",
+      "perimeter",
+      "face"
+    ],
+    "audio": "none",
+    "active_deterrence": false,
+    "power": [
+      "poe",
+      "12v_dc"
+    ],
+    "video_compression": "H.265+, H.265, H.264+, H.264",
+    "onboard_storage": "microSD up to 256 GB",
+    "protection": "IP67",
+    "operating_temperature": "-30 °C to 60 °C"
+  },
+  "faq": [
+    {
+      "question_ar": "ما مدى الرؤية الليلية؟ وهل الصورة ملونة ليلاً؟",
+      "answer_ar": "مدى الأشعة تحت الحمراء يصل إلى 40 متراً، والصورة في الظلام التام تكون بالأبيض والأسود. في الإضاءة الخافتة تبقى الصورة ملونة حتى 0.002 لوكس.",
+      "question_en": "What is the night range, and is the image in colour at night?",
+      "answer_en": "IR reaches up to 40 m and gives a black-and-white image in total darkness. In dim light it stays in colour down to 0.002 lux."
+    },
+    {
+      "question_ar": "هل تعمل بدون جهاز تسجيل NVR؟",
+      "answer_ar": "نعم، يمكن التسجيل على بطاقة microSD بسعة حتى 256 GB والمشاهدة عبر تطبيق Hik-Connect. لأكثر من كاميرا أو لتسجيل أطول يُفضّل جهاز NVR مع قرص صلب.",
+      "question_en": "Does it work without an NVR?",
+      "answer_en": "Yes. It records to a microSD card up to 256 GB and can be viewed in Hik-Connect. For several cameras or longer retention, use an NVR with a hard drive."
+    },
+    {
+      "question_ar": "هل تسجل الصوت؟",
+      "answer_ar": "لا، موديل DS-2CD2026G2-I بدون ميكروفون. النسخة التي تدعم الصوت هي DS-2CD2026G2-IU.",
+      "question_en": "Does it record audio?",
+      "answer_en": "No. The DS-2CD2026G2-I has no microphone; the audio version is the DS-2CD2026G2-IU."
+    },
+    {
+      "question_ar": "هل تحتاج إلى محول كهرباء؟",
+      "answer_ar": "لا يلزم مع سويتش أو NVR يدعم PoE بمعيار 802.3af، إذ يكفي كيبل شبكة واحد للكهرباء والبيانات (حتى 7 واط). وتقبل أيضاً محول 12 فولت DC.",
+      "question_en": "Do I need a power adapter?",
+      "answer_en": "Not with an 802.3af PoE switch or NVR; one network cable carries power and data (max. 7 W). It also accepts 12 VDC."
+    },
+    {
+      "question_ar": "هل تصلح للتركيب الخارجي في الكويت؟",
+      "answer_ar": "نعم، هيكلها معدني بتصنيف IP67 ضد الماء والغبار، ونطاق تشغيلها من -30 إلى 60 درجة مئوية.",
+      "question_en": "Is it suitable for outdoor installation in Kuwait?",
+      "answer_en": "It has a metal IP67 housing against water and dust and operates from -30 °C to 60 °C."
+    }
+  ],
+  "seo_title_ar": "كاميرا بولت 2 ميجا AcuSense هيكفيجن DS-2CD2026G2-I",
+  "seo_title_en": "Hikvision DS-2CD2026G2-I 2MP AcuSense Mini Bullet Camera",
+  "seo_description_ar": "كاميرا مراقبة بولت 2 ميجا من Hikvision بعدسة 2.8 مم، تمييز الإنسان والمركبة، رؤية ليلية حتى 40 م، PoE وIP67، تسجيل على microSD أو NVR.",
+  "seo_description_en": "Hikvision DS-2CD2026G2-I 2MP AcuSense mini bullet, 2.8 mm lens, human/vehicle detection, 40 m IR, 120 dB WDR, PoE, IP67 outdoor housing.",
+  "mpn": "DS-2CD2026G2-I",
+  "source_url": "https://assets.hikvision.com/prd/normal/all/doc/sm000059125/DS-2CD2026G2-I_Datasheet_20260105.pdf",
+  "sources": [
+    "https://assets.hikvision.com/prd/normal/all/doc/sm000059125/DS-2CD2026G2-I_Datasheet_20260105.pdf"
+  ],
+  "notes": "Store SKU 'DS-2CD2026G2-I(2.8mm)(C)'; the official datasheet used (DS-2CD2026G2-I, 2026-01-05) lists available models DS-2CD2026G2-I(2.8mm)/(4mm)/(6mm) without the (C) hardware-revision suffix. A separate (D) revision datasheet exists (sm000059127) and was not used. Specs given for the 2.8 mm lens. Datasheet says 'powered-by-DarkFighter' (not full DarkFighter) - night_technologies includes darkfighter on that basis; IR is the actual illuminator (B/W at 0 lux). On-board storage per this datasheet is microSD up to 256 GB (newer cameras list 512 GB). Protection is IP67 only, no IK10 listed, so vandal_proof omitted. No microphone on -I (mic only on -IU)."
+}

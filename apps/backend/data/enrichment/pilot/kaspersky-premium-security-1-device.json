@@ -1,0 +1,85 @@
+{
+  "handle": "kaspersky-premium-security-1-device",
+  "botble_id": "938",
+  "title_ar": "برنامج حماية Kaspersky Premium لجهاز واحد مع VPN ومدير كلمات المرور",
+  "title_en": "Kaspersky Premium Security, 1 Device",
+  "subtitle_ar": "حماية من الفيروسات، VPN غير محدود، مدير كلمات مرور وحماية الهوية لأنظمة Windows وmacOS وAndroid وiOS",
+  "subtitle_en": "Antivirus, unlimited VPN, password manager and identity protection for Windows, macOS, Android and iOS",
+  "description_ar": "Kaspersky Premium هي الباقة الأعلى من Kaspersky للمستخدمين المنزليين، وهذا الترخيص لجهاز واحد تختاره: كمبيوتر Windows أو Mac أو جوال Android أو iPhone.\n\nتشمل الباقة الحماية من الفيروسات والبرامج الضارة وبرامج الفدية، والتصفح الآمن، والحماية من التصيد والاحتيال، وجدار حماية ثنائي الاتجاه، وحماية المدفوعات عبر الإنترنت. وللخصوصية تضم VPN غير محدود، ومدير كلمات المرور، وفحص تسرب البيانات، وحماية الهوية مع خزنة للمستندات وكشف الوصول عن بعد. وتتضمن أدوات لتنظيف مساحة الجهاز ومراقبة صحة القرص الصلب وتحسين الأداء.\n\nمن مزايا Premium دعم فني عن بعد على مدار الساعة، وخدمة فحص الفيروسات وإزالتها بواسطة خبير، وفحص صحة الكمبيوتر، إضافة إلى Kaspersky Safe Kids مجانًا لمدة سنة للرقابة الأبوية.\n\nما تحتاجه: اتصال بالإنترنت وحساب My Kaspersky لتفعيل الترخيص. الأنظمة المدعومة حسب Kaspersky: Windows 11/10/8.1/8/7 SP1، وmacOS 14 إلى 26، وAndroid 11 إلى 16، وiOS 26. البرنامج متوفر باللغتين العربية والإنجليزية. بعض المزايا قد تختلف حسب نظام التشغيل.",
+  "description_en": "Kaspersky Premium is Kaspersky's top home plan, and this licence covers one device of your choice: a Windows PC, Mac, Android phone or iPhone.\n\nIt includes protection against viruses, malware and ransomware, safe browsing, anti-phishing and scam protection, a two-way firewall and online payment protection. For privacy it adds an unlimited VPN, a password manager, data leak checking, and identity protection with a documents vault and remote access detection. Device cleanup, hard drive health monitoring and performance tools are also included.\n\nPremium adds 24/7 remote IT support, expert virus check and removal, an expert PC health check, and Kaspersky Safe Kids free for one year for parental control.\n\nYou need an internet connection and a My Kaspersky account to activate. Kaspersky lists support for Windows 11/10/8.1/8/7 SP1, macOS 14 to 26, Android 11 to 16 and iOS 26, in English and Arabic. Some features vary by platform.",
+  "highlights_ar": [
+    "ترخيص لجهاز واحد: Windows أو macOS أو Android أو iOS",
+    "حماية من الفيروسات وبرامج الفدية والتصيد",
+    "VPN غير محدود ومدير كلمات المرور",
+    "حماية الهوية وفحص تسرب البيانات",
+    "دعم فني عن بعد على مدار الساعة",
+    "Kaspersky Safe Kids مجانًا لمدة سنة"
+  ],
+  "highlights_en": [
+    "1-device licence: Windows, macOS, Android or iOS",
+    "Antivirus, anti-ransomware and anti-phishing",
+    "Unlimited VPN and password manager",
+    "Identity protection and data leak checker",
+    "24/7 remote IT support",
+    "Kaspersky Safe Kids free for one year"
+  ],
+  "specs": {
+    "devices": 1,
+    "platforms": [
+      "windows",
+      "mac",
+      "android",
+      "ios"
+    ],
+    "features": [
+      "antivirus",
+      "vpn",
+      "password_manager",
+      "parental",
+      "identity"
+    ]
+  },
+  "faq": [
+    {
+      "question_ar": "على كم جهاز أستطيع تثبيت البرنامج؟",
+      "answer_ar": "هذا الترخيص لجهاز واحد فقط، ويمكن أن يكون كمبيوتر Windows أو Mac أو جوال Android أو iPhone.",
+      "question_en": "How many devices does it cover?",
+      "answer_en": "This licence covers one device, which can be a Windows PC, Mac, Android phone or iPhone."
+    },
+    {
+      "question_ar": "هل الـVPN محدود؟",
+      "answer_ar": "حسب Kaspersky، تتضمن باقة Premium خدمة VPN غير محدودة.",
+      "question_en": "Is the VPN limited?",
+      "answer_en": "According to Kaspersky, the Premium plan includes an unlimited VPN."
+    },
+    {
+      "question_ar": "ماذا أحتاج لتفعيل الترخيص؟",
+      "answer_ar": "تحتاج اتصالًا بالإنترنت وحساب My Kaspersky، ثم تدخل رمز التفعيل في البرنامج.",
+      "question_en": "What do I need to activate it?",
+      "answer_en": "An internet connection and a My Kaspersky account; then enter the activation code in the app."
+    },
+    {
+      "question_ar": "هل يدعم البرنامج اللغة العربية؟",
+      "answer_ar": "نعم، تذكر Kaspersky أن البرنامج متوفر باللغتين العربية والإنجليزية في المنطقة.",
+      "question_en": "Is it available in Arabic?",
+      "answer_en": "Yes, Kaspersky lists English and Arabic as supported languages for the region."
+    },
+    {
+      "question_ar": "هل تشمل الباقة رقابة أبوية؟",
+      "answer_ar": "نعم، تأتي Kaspersky Premium مع Kaspersky Safe Kids مجانًا لمدة سنة، ويشمل تحديد الموقع وتصفية المواقع وإدارة وقت الشاشة.",
+      "question_en": "Does it include parental controls?",
+      "answer_en": "Yes, Kaspersky Premium comes with Kaspersky Safe Kids free for one year, including location tracking, website filtering and screen-time management."
+    }
+  ],
+  "seo_title_ar": "Kaspersky Premium لجهاز واحد مع VPN غير محدود",
+  "seo_title_en": "Kaspersky Premium Security 1 Device Licence",
+  "seo_description_ar": "برنامج حماية Kaspersky Premium لجهاز واحد: حماية من الفيروسات، VPN غير محدود، مدير كلمات المرور وحماية الهوية لأنظمة Windows وMac وAndroid وiOS.",
+  "seo_description_en": "Kaspersky Premium licence for 1 device: antivirus, unlimited VPN, password manager and identity protection for Windows, macOS, Android and iOS.",
+  "mpn": "Kaspersky Premium",
+  "source_url": "https://me-en.kaspersky.com/premium",
+  "sources": [
+    "https://me-en.kaspersky.com/premium",
+    "https://www.kaspersky.com/premium"
+  ],
+  "notes": "Single variant; devices=1 from title 'Kaspersky Premium Security (1 Device)'. Licence duration is NOT stated in title/input, so duration_months omitted - confirm (typically 1 year) before setting. delivery omitted (title does not say 'Card'). Input mpn null; used product name 'Kaspersky Premium' (no official part number found). Platform versions from me-en.kaspersky.com/premium system requirements (Windows 11/10/8.1/8/7 SP1+, macOS 14-26, Android 11-16, iOS 26). 'parental' feature = Kaspersky Safe Kids included free for 1 year only. Kaspersky notes some features differ by platform. Renewal terms not covered on page, so no renewal FAQ."
+}

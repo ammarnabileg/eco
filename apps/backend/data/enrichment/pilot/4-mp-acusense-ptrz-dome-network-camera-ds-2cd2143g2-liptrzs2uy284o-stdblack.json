@@ -1,0 +1,97 @@
+{
+  "handle": "4-mp-acusense-ptrz-dome-network-camera-ds-2cd2143g2-liptrzs2uy284o-stdblack",
+  "botble_id": "229",
+  "title_ar": "كاميرا مراقبة دوم 4 ميجا AcuSense بتحكم PTRZ عن بُعد Hikvision DS-2CD2143G2-LIPTRZS2UY",
+  "title_en": "Hikvision DS-2CD2143G2-LIPTRZS2UY 4 MP AcuSense PTRZ Dome Network Camera",
+  "subtitle_ar": "اضبط زاوية الكاميرا وتقريب العدسة عن بُعد بعد التركيب، مع تمييز الإنسان والمركبة وميكروفونين مدمجين",
+  "subtitle_en": "Remote pan, tilt, rotate and zoom after installation, with human/vehicle classification and dual mics",
+  "description_ar": "كاميرا Hikvision DS-2CD2143G2-LIPTRZS2UY هي كاميرا مراقبة شبكية (IP) على شكل دوم بدقة 4 ميجابكسل (2688 × 1520)، من سلسلة Pro. أهم ما يميزها نظام PTRZ: يمكن تدوير الكاميرا أفقياً ورأسياً ولفّها وتغيير البعد البؤري للعدسة بين 2.8 و4 مم عن بُعد من البرنامج، فلا حاجة للصعود إلى السقف لإعادة ضبط الزاوية بعد التركيب.\n\nتعتمد على تقنية AcuSense المبنية على التعلم العميق لتمييز الإنسان والمركبة، فتقل الإنذارات الكاذبة الناتجة عن حركة الأشجار أو الظلال أو الحيوانات، وتدعم عبور الخط والتسلل ودخول المنطقة والخروج منها، إضافة إلى التقاط الوجوه. للرؤية الليلية توفر إضاءة تكميلية ذكية بثلاثة أوضاع (أشعة تحت حمراء، ضوء أبيض، وضع ذكي) بمدى يصل إلى 30 متراً. تقنية WDR الحقيقية بقوة 120 dB توضح الصورة عند المداخل المواجهة للشمس.\n\nالهيكل معدني بتصنيف IP67 ضد الماء والغبار وIK10 ضد التخريب، ونطاق تشغيل من -30 إلى 60 درجة مئوية، ما يناسب الفلل والمحلات والمستودعات والمواقف. النسخة S2U تضم ميكروفونين مدمجين ومنفذ إنذار دخل/خرج.\n\nتعمل عبر كيبل شبكة PoE (802.3at) أو محول 12 فولت. يمكن التسجيل على جهاز NVR من Hikvision، أو مباشرة على بطاقة microSD حتى 512 GB، والمشاهدة من الجوال عبر تطبيق Hik-Connect.",
+  "description_en": "The Hikvision DS-2CD2143G2-LIPTRZS2UY is a 4 MP (2688 × 1520) Pro Series dome network camera with motorized PTRZ. You can pan, tilt, rotate and adjust the 2.8–4 mm varifocal lens remotely from software, so the view can be corrected after installation without a ladder.\n\nAcuSense deep learning classifies humans and vehicles, reducing false alarms from trees, shadows and animals, and supports line crossing, intrusion, region entrance and exiting detection plus face capture. At night, smart supplemental lighting offers IR, white light and Smart modes with a range of up to 30 m. 120 dB true WDR keeps sunlit entrances readable.\n\nThe metal housing is rated IP67 and IK10 with an operating range of -30 °C to 60 °C, suiting villas, shops, warehouses and car parks. The S2U version adds two built-in microphones and one alarm input/output.\n\nPower it by PoE (802.3at) or 12 VDC. Record to a Hikvision NVR or to a microSD card up to 512 GB, and view remotely with Hik-Connect.",
+  "highlights_ar": [
+    "دقة 4 ميجابكسل (2688 × 1520) بضغط H.265+ لتوفير مساحة التخزين",
+    "تحكم PTRZ عن بُعد: تدوير وإمالة ولفّ وتقريب العدسة 2.8-4 مم",
+    "تمييز الإنسان والمركبة بتقنية AcuSense مع حماية المحيط والتقاط الوجوه",
+    "إضاءة ذكية (أشعة تحت حمراء وضوء أبيض) بمدى حتى 30 متراً",
+    "ميكروفونان مدمجان ومنفذ إنذار دخل/خرج",
+    "هيكل معدني IP67 وIK10 ويعمل من -30 إلى 60 درجة مئوية"
+  ],
+  "highlights_en": [
+    "4 MP (2688 × 1520) with H.265+ compression",
+    "Remote PTRZ: pan, tilt, rotate and 2.8–4 mm motorized zoom",
+    "AcuSense human/vehicle classification, perimeter protection and face capture",
+    "Smart hybrid IR and white light, up to 30 m",
+    "Dual built-in microphones and 1 alarm in/out",
+    "Metal housing, IP67 and IK10, -30 °C to 60 °C"
+  ],
+  "specs": {
+    "resolution_mp": 4,
+    "form_factor": "dome",
+    "lens_type": "varifocal_motorized",
+    "focal_length": "2.8–4 mm",
+    "field_of_view": "99.1° to 79.9°",
+    "wdr_db": 120,
+    "night_technologies": [
+      "smart_hybrid",
+      "ir"
+    ],
+    "night_range_m": 30,
+    "ai_features": [
+      "human_vehicle",
+      "perimeter",
+      "face"
+    ],
+    "audio": "mic",
+    "active_deterrence": false,
+    "power": [
+      "poe",
+      "12v_dc"
+    ],
+    "video_compression": "H.265+, H.265, H.264+, H.264",
+    "onboard_storage": "microSD up to 512 GB",
+    "protection": "IP67, IK10, NEMA 4X",
+    "vandal_proof": true,
+    "operating_temperature": "-30 °C to 60 °C"
+  },
+  "faq": [
+    {
+      "question_ar": "هل أستطيع تغيير زاوية الكاميرا بعد تركيبها دون الصعود إليها؟",
+      "answer_ar": "نعم. تدعم الكاميرا التدوير الأفقي من 0 إلى 346 درجة والإمالة من 0 إلى 75 درجة واللفّ من 0 إلى 344 درجة، مع تغيير البعد البؤري بين 2.8 و4 مم، وكل ذلك عن بُعد من البرنامج أو المتصفح.",
+      "question_en": "Can I change the camera angle after installation without climbing up to it?",
+      "answer_en": "Yes. Pan (0–346°), tilt (0–75°), rotate (0–344°) and the 2.8–4 mm zoom are all adjusted remotely from software or a web browser."
+    },
+    {
+      "question_ar": "ما مدى الرؤية الليلية؟",
+      "answer_ar": "مدى الإضاءة التكميلية يصل إلى 30 متراً، ويمكن اختيار الأشعة تحت الحمراء أو الضوء الأبيض للحصول على صورة ملونة ليلاً، أو الوضع الذكي الذي يجمع بينهما.",
+      "question_en": "What is the night vision range?",
+      "answer_en": "Supplemental lighting reaches up to 30 m. You can use IR, white light for colour images at night, or Smart mode that combines them."
+    },
+    {
+      "question_ar": "هل تعمل الكاميرا بدون جهاز تسجيل NVR؟",
+      "answer_ar": "نعم، فيها منفذ لبطاقة microSD بسعة حتى 512 GB للتسجيل المباشر، ويمكن مشاهدتها عبر تطبيق Hik-Connect. للتسجيل المستمر لعدة كاميرات يُنصح بجهاز NVR.",
+      "question_en": "Does it work without an NVR?",
+      "answer_en": "Yes. It records to a microSD card up to 512 GB and can be viewed in Hik-Connect. For continuous multi-camera recording an NVR is recommended."
+    },
+    {
+      "question_ar": "هل تحتاج إلى محول كهرباء؟",
+      "answer_ar": "لا يلزم إذا استخدمت سويتش PoE يدعم معيار 802.3at، إذ تصلها الكهرباء والبيانات عبر كيبل الشبكة نفسه (حتى 16 واط). كما تقبل محول 12 فولت DC.",
+      "question_en": "Do I need a power adapter?",
+      "answer_en": "Not with an 802.3at PoE switch, which carries power and data over one network cable (max. 16 W). It also accepts 12 VDC."
+    },
+    {
+      "question_ar": "هل تتحمل الأجواء الخارجية في الكويت؟",
+      "answer_ar": "الكاميرا مصنفة IP67 ضد الماء والغبار وIK10 ضد الصدمات، ونطاق تشغيلها من -30 إلى 60 درجة مئوية، مع حماية من التآكل بمعيار NEMA 4X.",
+      "question_en": "Can it handle outdoor conditions in Kuwait?",
+      "answer_en": "It is rated IP67 for water and dust, IK10 for impact, NEMA 4X for corrosion, and operates from -30 °C to 60 °C."
+    }
+  ],
+  "seo_title_ar": "كاميرا دوم 4 ميجا PTRZ هيكفيجن DS-2CD2143G2-LIPTRZS2UY",
+  "seo_title_en": "Hikvision DS-2CD2143G2-LIPTRZS2UY 4MP PTRZ Dome Camera",
+  "seo_description_ar": "كاميرا مراقبة دوم 4 ميجا من Hikvision بتحكم PTRZ عن بُعد وعدسة 2.8-4 مم، تمييز الإنسان والمركبة، رؤية ليلية 30 م، IP67 وIK10.",
+  "seo_description_en": "Hikvision 4MP AcuSense dome with remote PTRZ and 2.8-4 mm motorized lens, human/vehicle detection, 30 m night light, dual mics, IP67/IK10.",
+  "mpn": "DS-2CD2143G2-LIPTRZS2UY",
+  "source_url": "https://assets.hikvision.com/prd/normal/all/doc/sm000106619/DS-2CD2143G2-LIPTRZS2UY_Datasheet_20251229.pdf",
+  "sources": [
+    "https://assets.hikvision.com/prd/normal/all/doc/sm000106619/DS-2CD2143G2-LIPTRZS2UY_Datasheet_20251229.pdf"
+  ],
+  "notes": "Store SKU suffix '(2.8/4)O-STDBLACK' maps to official variant DS-2CD2143G2-LIPTRZS2UY(2.8/4mm)BLACK (black housing) listed in the datasheet. Lens is a single 2.8-4 mm motorized varifocal; datasheet gives no optical zoom factor, so optical_zoom omitted. field_of_view gives horizontal FOV at 2.8 mm and 4 mm. Audio: S2U has 2 built-in microphones but no speaker, so audio = mic. No strobe/speaker deterrence. Datasheet calls it 3 supplemental lighting modes (Smart/IR/White Light); mapped to smart_hybrid + ir. Image sensor 1/3\", 120 dB WDR, PoE 802.3at Class 4 max 16 W, 12 VDC max 15 W. Old title wording 'Dome' matches datasheet."
+}

@@ -1,0 +1,99 @@
+{
+  "handle": "smart-floodlight-camera-tapo-c720",
+  "botble_id": "699",
+  "title_ar": "كاميرا واي فاي خارجية بكشاف إضاءة 2K من Tapo C720",
+  "title_en": "Tapo C720 2K Smart Floodlight Wi-Fi Camera",
+  "subtitle_ar": "كشاف 2800 لومن، رؤية ليلية ملونة، كشف الأشخاص والسيارات والحيوانات، سرينة وصوت باتجاهين، IP65",
+  "subtitle_en": "2800-lumen floodlight, colour night vision, person/vehicle/pet detection, siren, two-way audio, IP65",
+  "description_ar": "Tapo C720 كاميرا واي فاي خارجية من TP-Link تجمع بين كاميرا بدقة 2K QHD (2560×1440) وكشافين إضاءة بقوة إجمالية 2800 لومن. زاوية الرؤية الأفقية 134 درجة (153 درجة قطريًا)، وثلاثة حساسات حركة PIR تغطي 270 درجة لتشغيل الكشاف تلقائيًا عند رصد حركة.\n\nفي الليل تعطي الكاميرا صورة ملونة بمساعدة الكشاف، أو صورة بالأشعة تحت الحمراء بمدى يقارب 30 مترًا. تميز الكاميرا بين الأشخاص والحيوانات الأليفة والسيارات لتقليل التنبيهات غير المهمة، وتدعم مناطق نشاط مخصصة وكشف عبور الخط. وفيها سرينة بقوة 93 ديسيبل وإمكانية تسجيل رسالة تحذير خاصة، وصوت باتجاهين للتحدث مع الزائر.\n\nالتركيب يكون بتوصيل سلكي مباشر بكهرباء 110–240 فولت على الجدار أو السقف، وليست بطارية. تتصل بواي فاي 2.4GHz وتدار من تطبيق Tapo حيث تضبط سطوع الكشاف وجدول التشغيل. للتسجيل تحتاج كرت microSD حتى 512 جيجابايت (يباع منفصلًا) أو اشتراك Tapo Care السحابي. تعمل مع Amazon Alexa وGoogle Assistant، ومحمية بمعيار IP65 ضد الغبار والماء.\n\nمناسبة لمداخل البيوت والحدائق والكراجات.",
+  "description_en": "The Tapo C720 is an outdoor Wi-Fi camera from TP-Link that combines 2K QHD (2560×1440) video with two floodlights totalling 2800 lumens. It has a 134° horizontal field of view (153° diagonal), and three PIR sensors covering 270° switch the floodlight on when motion is detected.\n\nAt night it shows colour video with the floodlight, or IR video up to about 30 m. AI detection separates people, pets and vehicles, with activity zones and line-crossing alerts. A 93 dB siren, custom recorded warnings and two-way audio help deter intruders.\n\nIt is hardwired to 110–240 V mains for wall or ceiling mounting, not battery powered. It connects over 2.4 GHz Wi-Fi and is set up in the Tapo app, where you adjust brightness and schedules. Record to a microSD card up to 512 GB (sold separately) or a Tapo Care cloud subscription. Works with Amazon Alexa and Google Assistant, IP65 rated. Suited to entrances, gardens and garages.",
+  "highlights_ar": [
+    "فيديو 2K QHD بدقة 2560×1440 وزاوية أفقية 134°",
+    "كشاف 2800 لومن يعمل تلقائيًا بحساسات حركة تغطي 270°",
+    "رؤية ليلية ملونة وأشعة تحت الحمراء حتى 30 متر تقريبًا",
+    "كشف الأشخاص والحيوانات والسيارات مع سرينة 93 ديسيبل",
+    "صوت باتجاهين وكرت microSD حتى 512GB أو Tapo Care",
+    "حماية IP65 وتوصيل كهرباء سلكي مباشر"
+  ],
+  "highlights_en": [
+    "2K QHD 2560×1440 video, 134° horizontal view",
+    "2800-lumen floodlight triggered by 270° PIR sensors",
+    "Colour night vision plus IR up to about 30 m",
+    "Person, pet and vehicle detection with 93 dB siren",
+    "Two-way audio, microSD up to 512 GB or Tapo Care",
+    "IP65 weatherproof, hardwired mains power"
+  ],
+  "specs": {
+    "resolution_mp": 4,
+    "video_resolution": "2560×1440 (2K QHD)",
+    "pan_tilt": false,
+    "dual_lens": false,
+    "placement": "outdoor",
+    "power_source": [
+      "plug"
+    ],
+    "connectivity": [
+      "wifi_2_4"
+    ],
+    "night_vision": [
+      "ir",
+      "color"
+    ],
+    "night_range_m": 30,
+    "smart_detection": [
+      "person",
+      "vehicle",
+      "pet"
+    ],
+    "two_way_audio": true,
+    "siren": true,
+    "storage_options": [
+      "microsd",
+      "cloud"
+    ],
+    "max_microsd_gb": 512,
+    "protection": "IP65"
+  },
+  "faq": [
+    {
+      "question_ar": "هل تعمل الكاميرا بالبطارية؟",
+      "answer_ar": "لا، مصدر الطاقة توصيل سلكي مباشر بكهرباء 110–240 فولت، لذلك تحتاج نقطة كهرباء في مكان التركيب.",
+      "question_en": "Is it battery powered?",
+      "answer_en": "No. It is hardwired to 110–240 V mains, so you need a power point at the mounting location."
+    },
+    {
+      "question_ar": "هل أحتاج اشتراكًا للتسجيل؟",
+      "answer_ar": "لا يشترط ذلك، يمكنك التسجيل على كرت microSD حتى 512 جيجابايت يباع منفصلًا. التخزين السحابي Tapo Care اختياري ويحتاج اشتراكًا.",
+      "question_en": "Do I need a subscription to record?",
+      "answer_en": "No. You can record to a microSD card up to 512 GB, sold separately. Tapo Care cloud storage is optional and requires a subscription."
+    },
+    {
+      "question_ar": "هل تدعم واي فاي 5GHz؟",
+      "answer_ar": "لا، الكاميرا تتصل بشبكة واي فاي 2.4GHz فقط.",
+      "question_en": "Does it support 5 GHz Wi-Fi?",
+      "answer_en": "No, it connects to 2.4 GHz Wi-Fi only."
+    },
+    {
+      "question_ar": "هل تعمل مع Alexa وGoogle؟",
+      "answer_ar": "نعم، تدعم Amazon Alexa وGoogle Assistant.",
+      "question_en": "Does it work with Alexa and Google?",
+      "answer_en": "Yes, it works with Amazon Alexa and Google Assistant."
+    },
+    {
+      "question_ar": "هل تتحمل المطر والغبار؟",
+      "answer_ar": "نعم، الكاميرا مصنفة IP65 ضد الغبار والماء، ونطاق حرارة التشغيل الرسمي من -20 إلى 45 درجة مئوية.",
+      "question_en": "Can it handle rain and dust?",
+      "answer_en": "It is IP65 rated against dust and water; the official operating temperature range is -20 to 45 °C."
+    }
+  ],
+  "seo_title_ar": "كاميرا Tapo C720 بكشاف إضاءة 2K واي فاي خارجية",
+  "seo_title_en": "Tapo C720 2K Floodlight Wi-Fi Camera",
+  "seo_description_ar": "كاميرا Tapo C720 الخارجية بدقة 2K وكشاف 2800 لومن، رؤية ليلية ملونة، كشف الأشخاص والسيارات، سرينة، IP65 وmicroSD حتى 512GB. في الكويت.",
+  "seo_description_en": "Tapo C720 outdoor floodlight camera: 2K QHD, 2800-lumen light, colour night vision, person/vehicle/pet detection, siren, IP65, microSD up to 512 GB.",
+  "mpn": "Tapo C720",
+  "source_url": "https://www.tp-link.com/ae/home-networking/cloud-camera/tapo-c720/",
+  "sources": [
+    "https://www.tp-link.com/ae/home-networking/cloud-camera/tapo-c720/"
+  ],
+  "notes": "resolution_mp=4 mapped from 2560x1440 (2K QHD, ~3.7 MP; Tapo graphic labels it '2K QHD 4MP'). Official page inconsistent on night range: overview says 'sees up to 30 feet' in one line and '30 meters' in another; spec table says IR LED 98 ft / 29.9 m - used 30 m. Horizontal FOV 134° per spec table; marketing text says 150°. Power 'Hardwired Only' 110-240 V mapped to power_source=plug (mains). Video compression H.264, 15 fps. Spec also lists line-crossing and tamper detection. Operating temp -20 to 45 °C (relevant for Kuwait summer)."
+}

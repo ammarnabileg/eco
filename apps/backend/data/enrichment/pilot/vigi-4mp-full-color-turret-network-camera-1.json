@@ -1,0 +1,93 @@
+{
+  "handle": "vigi-4mp-full-color-turret-network-camera-1",
+  "botble_id": "713",
+  "title_ar": "كاميرا مراقبة تريت 4MP برؤية ليلية ملونة وصوت باتجاهين VIGI C440",
+  "title_en": "VIGI C440 4MP Full-Color Turret Network Camera, 2.8 mm",
+  "subtitle_ar": "دقة 2560×1440، رؤية ليلية ملونة حتى 30 متر، PoE أو 12V، كشف عبور الخط واقتحام المنطقة",
+  "subtitle_en": "2560×1440, 24h colour with 30 m LEDs, PoE or 12 V DC, two-way audio, line-crossing and intrusion alerts",
+  "description_ar": "VIGI C440 كاميرا مراقبة شبكية (IP) من TP-Link بتصميم تريت ودقة 4 ميجابكسل (2560×1440). النسخة المتوفرة لدينا بعدسة ثابتة 2.8 مم تعطي زاوية رؤية أفقية 102 درجة، وهي مناسبة لتغطية مدخل أو ممر أو غرفة.\n\nالكاميرا مزودة بمصباحين LED أبيض ومصباحين للأشعة تحت الحمراء بمدى 30 مترًا، فتستطيع عرض الصورة بالألوان ليلًا حتى في الظلام التام عند تشغيل الإضاءة البيضاء، أو التحول إلى الأشعة تحت الحمراء حسب الإعداد. وتدعم كشف الحركة وعبور الخط واقتحام المنطقة وتغطية العدسة، مع إنذار صوتي وضوء وامض لتحذير المتسللين، وصوت باتجاهين عبر مايك وسماعة مدمجين.\n\nتعمل الكاميرا بكيبل شبكة واحد ينقل البيانات والكهرباء معًا (PoE) من جهاز تسجيل VIGI NVR أو سويتش PoE، أو بمحول 12V DC يباع منفصلًا. للتسجيل المتواصل تحتاج جهاز NVR مع هارد ديسك، ويمكن أيضًا التسجيل على كرت microSD حتى 256 جيجابايت داخل الكاميرا. تدعم ضغط H.265+ لتقليل مساحة التخزين، والمشاهدة عن بعد عبر تطبيق VIGI أو برنامج VIGI Security Manager، ومعيار ONVIF للتوافق مع أجهزة تسجيل أخرى.\n\nمناسبة للمحلات والمكاتب والمنازل التي تحتاج صورة ملونة واضحة في الليل. لا تذكر الصفحة الرسمية تصنيف حماية من الماء والغبار، لذلك يفضل تركيبها في مكان داخلي أو مسقوف.",
+  "description_en": "The VIGI C440 is a TP-Link turret IP camera with 4MP (2560×1440) resolution. The unit we stock has a fixed 2.8 mm lens with a 102° horizontal field of view, suited to entrances, corridors and rooms.\n\nTwo white LEDs and two infrared LEDs reach 30 m, so the camera can show colour images at night, even in total darkness, or switch to IR depending on your settings. It supports motion, line-crossing, area-intrusion and tamper detection, can sound an audible warning and flash its white light, and offers two-way audio through a built-in mic and speaker.\n\nPower comes over a single network cable (PoE) from a VIGI NVR or PoE switch, or from a 12 V DC adapter sold separately. For continuous recording you need an NVR with a hard drive; the camera also records to a microSD card up to 256 GB. H.265+ saves storage, the VIGI app and VIGI Security Manager give remote viewing, and ONVIF support helps with other recorders. The official page lists no ingress-protection rating, so indoor or sheltered mounting is advisable.",
+  "highlights_ar": [
+    "دقة 4 ميجابكسل (2560×1440) بعدسة 2.8 مم وزاوية أفقية 102°",
+    "رؤية ليلية ملونة بإضاءة LED بيضاء وأشعة تحت الحمراء حتى 30 متر",
+    "كشف عبور الخط واقتحام المنطقة مع إنذار صوتي وضوء وامض",
+    "صوت باتجاهين عبر مايك وسماعة مدمجين",
+    "تشغيل عبر PoE أو 12V DC وضغط فيديو H.265+",
+    "كرت microSD حتى 256 جيجابايت وتطبيق VIGI للمشاهدة عن بعد"
+  ],
+  "highlights_en": [
+    "4MP (2560×1440) with 2.8 mm lens and 102° horizontal view",
+    "24-hour colour imaging with white and IR LEDs up to 30 m",
+    "Line-crossing and area-intrusion alerts with sound and light warning",
+    "Two-way audio via built-in mic and speaker",
+    "PoE or 12 V DC power, H.265+ compression",
+    "microSD up to 256 GB, remote viewing in the VIGI app"
+  ],
+  "specs": {
+    "resolution_mp": 4,
+    "form_factor": "turret",
+    "lens_type": "fixed",
+    "focal_length": "2.8 mm",
+    "field_of_view": "102°",
+    "night_technologies": [
+      "colorvu",
+      "ir"
+    ],
+    "night_range_m": 30,
+    "ai_features": [
+      "perimeter"
+    ],
+    "audio": "two_way",
+    "active_deterrence": true,
+    "power": [
+      "poe",
+      "12v_dc"
+    ],
+    "video_compression": "H.265+/H.265/H.264+/H.264",
+    "onboard_storage": "microSD up to 256 GB",
+    "operating_temperature": "-30 to 60 °C"
+  },
+  "faq": [
+    {
+      "question_ar": "هل أحتاج جهاز تسجيل NVR لتشغيل الكاميرا؟",
+      "answer_ar": "لا يشترط ذلك، فالكاميرا تسجل على كرت microSD حتى 256 جيجابايت وتعمل مع تطبيق VIGI. لكن للتسجيل المتواصل لفترات طويلة يُنصح بجهاز VIGI NVR مع هارد ديسك.",
+      "question_en": "Do I need an NVR to use this camera?",
+      "answer_en": "Not necessarily: it records to a microSD card up to 256 GB and works with the VIGI app. For long continuous recording, a VIGI NVR with a hard drive is recommended."
+    },
+    {
+      "question_ar": "كيف أوصل الكهرباء للكاميرا؟",
+      "answer_ar": "عبر كيبل شبكة واحد من جهاز NVR أو سويتش يدعم PoE (802.3af/at)، أو عبر محول 12V DC يباع منفصلًا.",
+      "question_en": "How is the camera powered?",
+      "answer_en": "Over one network cable from a PoE (802.3af/at) NVR or switch, or with a 12 V DC adapter sold separately."
+    },
+    {
+      "question_ar": "هل الصورة ملونة في الليل؟",
+      "answer_ar": "نعم، تحتوي الكاميرا على إضاءة LED بيضاء بمدى 30 مترًا تعطي صورة ملونة حتى في الظلام التام، ويمكن ضبط الإضاءة لتعمل تلقائيًا أو حسب جدول.",
+      "question_en": "Is the night image in colour?",
+      "answer_en": "Yes. White LEDs with a 30 m range provide colour images even in total darkness, and the lights can run automatically or on a schedule."
+    },
+    {
+      "question_ar": "هل تعمل مع أجهزة تسجيل من ماركات أخرى؟",
+      "answer_ar": "الكاميرا تدعم معيار ONVIF، وهذا يسهل إضافتها إلى أجهزة تسجيل تدعم المعيار نفسه.",
+      "question_en": "Does it work with other brands' recorders?",
+      "answer_en": "It supports ONVIF, which makes it easier to add to recorders that support the same standard."
+    },
+    {
+      "question_ar": "هل يمكن تركيبها في الخارج؟",
+      "answer_ar": "الصفحة الرسمية لا تذكر تصنيف حماية من الماء والغبار لهذه الكاميرا، لذلك يفضل تركيبها في مكان داخلي أو مسقوف.",
+      "question_en": "Can it be installed outdoors?",
+      "answer_en": "The official page lists no water or dust protection rating for this camera, so indoor or sheltered mounting is advisable."
+    }
+  ],
+  "seo_title_ar": "كاميرا VIGI C440 تريت 4MP رؤية ليلية ملونة",
+  "seo_title_en": "VIGI C440 4MP Full-Color Turret Camera 2.8mm",
+  "seo_description_ar": "كاميرا مراقبة VIGI C440 بدقة 4MP وعدسة 2.8 مم، رؤية ليلية ملونة حتى 30 متر، PoE، صوت باتجاهين وكرت microSD حتى 256GB. متوفرة في الكويت.",
+  "seo_description_en": "VIGI C440 4MP full-color turret IP camera, 2.8 mm lens, 30 m colour night vision, PoE or 12V, two-way audio, microSD up to 256 GB. Available in Kuwait.",
+  "mpn": "VIGI C440",
+  "source_url": "https://www.tp-link.com/ae/business-networking/vigi-network-camera/vigi-c440/",
+  "sources": [
+    "https://www.tp-link.com/ae/business-networking/vigi-network-camera/vigi-c440/",
+    "https://www.vigi.com/ae/business-networking/vigi-network-camera/vigi-c440/"
+  ],
+  "notes": "Official model VIGI C440 is 4MP (2560x1440); variant SKU 'VIGI C440(2.8MM)' = 2.8 mm lens (C440 also exists with 4 mm; no -W Wi-Fi variant in input). Data issue: the separate 'VIGI 3MP Turret' product whose variants claim part no C440 is wrong - C440 is 4MP; VIGI's 3MP full-color turret is VIGI C430 (tp-link.com/ae/.../vigi-c430/). Official page shows WDR as DWDR with no dB figure, so wdr_db omitted. Protection listed 'N/A' (no IP rating) so protection omitted and no outdoor claim made; vandal_proof not stated, omitted. Spec page has two blocks: one lists Smart Event incl. 'People Detection', the other only area intrusion/line-crossing (likely different hardware versions) - ai_features set to perimeter only, human_vehicle not set. night_technologies: page describes 24h full-colour via white LEDs plus 2x 850nm IR LEDs (VIGI 'LightPro'); mapped to colorvu (colour at night) + ir. The tp-link.com URL redirects to vigi.com."
+}

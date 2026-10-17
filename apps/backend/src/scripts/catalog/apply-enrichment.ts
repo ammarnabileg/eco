@@ -9,7 +9,9 @@ import { FaqEntry } from "../../modules/catalog/specs"
 import { updateProductCatalogWorkflow } from "../../workflows/catalog/product-catalog"
 
 type Enrichment = {
-  product_id: string
+  /** The product handle (stable across databases); product_id also works. */
+  handle?: string
+  product_id?: string
   title_ar: string
   title_en: string
   subtitle_ar?: string
@@ -34,7 +36,7 @@ type Enrichment = {
  * description on the product, everything else on its catalog detail. Specs
  * are validated against the category templates, so a bad file fails alone.
  *
- *   npx medusa exec ./src/scripts/catalog/apply-enrichment.ts <dir-or-file.json>
+ *   npx medusa exec ./src/scripts/catalog/apply-enrichment.ts data/enrichment/pilot
  */
 export default async function applyEnrichment({ container, args }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
@@ -48,13 +50,22 @@ export default async function applyEnrichment({ container, args }: ExecArgs) {
         .filter((f) => f.endsWith(".json") && !f.endsWith(".input.json"))
         .map((f) => join(target, f))
 
+  const query = container.resolve(ContainerRegistrationKeys.QUERY)
   let applied = 0
   for (const file of files) {
     const e = JSON.parse(readFileSync(file, "utf8")) as Enrichment
     try {
+      if (!e.product_id && e.handle) {
+        const { data } = await query.graph({ entity: "product", fields: ["id"], filters: { handle: e.handle } })
+        e.product_id = data[0]?.id
+      }
+      if (!e.product_id) {
+        throw new MedusaError(MedusaError.Types.NOT_FOUND, `no product with handle ${e.handle}`)
+      }
+      const productId = e.product_id
       await updateProductCatalogWorkflow(container).run({
         input: {
-          product_id: e.product_id,
+          product_id: productId,
           detail: {
             title_en: e.title_en,
             subtitle_ar: e.subtitle_ar ?? null,
@@ -77,7 +88,7 @@ export default async function applyEnrichment({ container, args }: ExecArgs) {
       // product.updated, which re-indexes it for search.
       await updateProductsWorkflow(container).run({
         input: {
-          selector: { id: e.product_id },
+          selector: { id: productId },
           update: { title: e.title_ar, subtitle: e.subtitle_ar ?? null, description: e.description_ar },
         },
       })

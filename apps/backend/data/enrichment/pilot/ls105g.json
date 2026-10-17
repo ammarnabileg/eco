@@ -1,0 +1,73 @@
+{
+  "handle": "ls105g",
+  "botble_id": "530",
+  "title_ar": "سويتش شبكة 5 منافذ جيجابت بهيكل معدني من TP-Link LS105G",
+  "title_en": "TP-Link LS105G 5-Port Gigabit Desktop Switch, Metal Case",
+  "subtitle_ar": "زد منافذ الإنترنت السلكية بسرعة جيجابت بدون أي إعدادات – وصّل وشغّل",
+  "subtitle_en": "Add Gigabit wired ports to your network instantly, with no setup needed",
+  "description_ar": "LS105G سويتش شبكة غير مُدار من سلسلة LiteWave من TP-Link بخمسة منافذ 10/100/1000 ميجابت/ث. فكرته بسيطة: إذا كانت منافذ الراوتر لا تكفي، توصل السويتش بالراوتر بكابل ثم توصل به التلفزيون والكمبيوتر وجهاز الألعاب والطابعة وجهاز IPTV، بدون أي إعدادات (Plug and Play).\n\nجميع المنافذ تدعم Auto-MDI/MDIX فلا تحتاج نوع كابل خاص، وتدعم التفاوض التلقائي على السرعة. يدعم أولوية الحركة 802.1p/DSCP QoS لإعطاء الأولوية لبيانات مثل الصوت والفيديو، والتحكم بالتدفق IEEE 802.3x لنقل بيانات أكثر ثباتاً، وتقنية Green Ethernet التي تخفض استهلاك الكهرباء حسب حالة الاتصال وطول الكابل.\n\nالهيكل معدني (فولاذ) بمقاس صغير 99.8 × 98 × 25 ملم، ويمكن وضعه على المكتب أو تثبيته على الجدار، وهو بدون مروحة فيعمل بصمت. مناسب للبيوت والمكاتب الصغيرة وغرف الألعاب وأنظمة المراقبة. ملاحظة: المنافذ لا توفر طاقة PoE، لذلك تحتاج الكاميرات أو الأجهزة الأخرى مصدر كهرباء خاصاً بها.\n\nمحتويات العلبة: السويتش، محول طاقة، ودليل التثبيت.",
+  "description_en": "LS105G is an unmanaged TP-Link LiteWave switch with five 10/100/1000 Mbps ports. If your router runs out of ports, connect the switch to it with one cable and plug in your TV, PC, console, printer or IPTV box, with no configuration needed.\n\nAll ports support auto-negotiation and Auto-MDI/MDIX, so any standard cable works. It supports 802.1p/DSCP QoS to prioritize traffic such as voice and video, IEEE 802.3x flow control for reliable transfers, and Green Ethernet, which adjusts power use by link status and cable length.\n\nThe steel case is compact at 99.8 × 98 × 25 mm, sits on a desk or mounts on a wall, and is fanless for silent operation. It suits homes, small offices, gaming setups and surveillance networks. Note that the ports do not supply PoE, so cameras and other devices need their own power.\n\nIn the box: the switch, power adapter and installation guide.",
+  "highlights_ar": [
+    "5 منافذ جيجابت 10/100/1000 ميجابت/ث",
+    "وصّل وشغّل بدون إعدادات مع Auto-MDI/MDIX",
+    "هيكل معدني صغير يوضع على المكتب أو يُثبت على الجدار",
+    "بدون مروحة لتشغيل هادئ",
+    "دعم 802.1p/DSCP QoS والتحكم بالتدفق 802.3x",
+    "تقنية Green Ethernet لتوفير الكهرباء"
+  ],
+  "highlights_en": [
+    "5× 10/100/1000 Mbps Gigabit ports",
+    "Plug and play with Auto-MDI/MDIX",
+    "Compact steel case, desktop or wall-mountable",
+    "Fanless, silent operation",
+    "802.1p/DSCP QoS and IEEE 802.3x flow control",
+    "Green Ethernet power saving"
+  ],
+  "specs": {
+    "ports_total": 5,
+    "port_speed": "1g",
+    "poe_ports": 0,
+    "sfp_ports": 0,
+    "management": "unmanaged",
+    "form_factor": "desktop",
+    "housing": "metal"
+  },
+  "faq": [
+    {
+      "question_ar": "هل يحتاج السويتش إلى إعداد أو برنامج؟",
+      "answer_ar": "لا، هو سويتش غير مُدار يعمل بنظام وصّل وشغّل: توصله بالكهرباء وبالراوتر ثم توصل أجهزتك مباشرة.",
+      "question_en": "Does the switch need any setup or software?",
+      "answer_en": "No. It is an unmanaged plug-and-play switch: connect power and a cable from your router, then plug in your devices."
+    },
+    {
+      "question_ar": "هل يزيد سرعة الإنترنت؟",
+      "answer_ar": "لا يزيد سرعة اشتراك الإنترنت، لكنه يضيف منافذ سلكية بسرعة جيجابت ويشارك اتصال الراوتر مع أجهزة أكثر، والاتصال السلكي عادة أثبت من الواي فاي.",
+      "question_en": "Will it make my internet faster?",
+      "answer_en": "It doesn't raise your plan's speed, but it adds Gigabit wired ports that share your router's connection with more devices, and wired links are usually more stable than Wi-Fi."
+    },
+    {
+      "question_ar": "هل يشغّل كاميرات المراقبة بالكهرباء عبر الكابل (PoE)؟",
+      "answer_ar": "لا، منافذ LS105G لا تدعم PoE. يمكن استخدامه لنقل بيانات الكاميرات، لكنها تحتاج مصدر كهرباء منفصل.",
+      "question_en": "Can it power security cameras over the cable (PoE)?",
+      "answer_en": "No, the LS105G ports do not provide PoE. It can carry camera data, but the cameras need a separate power source."
+    },
+    {
+      "question_ar": "هل يمكن تثبيته على الجدار؟",
+      "answer_ar": "نعم، تصميمه يسمح بوضعه على المكتب أو تثبيته على الجدار، وهيكله المعدني صغير بمقاس 99.8 × 98 × 25 ملم.",
+      "question_en": "Can it be wall-mounted?",
+      "answer_en": "Yes, it is designed for desktop or wall mounting, in a compact 99.8 × 98 × 25 mm metal case."
+    }
+  ],
+  "seo_title_ar": "سويتش TP-Link LS105G خمسة منافذ جيجابت معدني",
+  "seo_title_en": "TP-Link LS105G 5-Port Gigabit Desktop Switch",
+  "seo_description_ar": "سويتش TP-Link LS105G بخمسة منافذ جيجابت، وصّل وشغّل بدون إعداد، هيكل معدني بدون مروحة للمكتب أو الجدار مع QoS وتوفير الطاقة. للبيت والمكتب الصغير.",
+  "seo_description_en": "TP-Link LS105G 5-port Gigabit unmanaged switch: plug and play, fanless steel case for desk or wall, 802.1p QoS and Green Ethernet. For home and office.",
+  "mpn": "LS105G",
+  "source_url": "https://www.tp-link.com/ae/business-networking/unmanaged-switch/ls105g/",
+  "sources": [
+    "https://www.tp-link.com/ae/business-networking/unmanaged-switch/ls105g/",
+    "https://www.tp-link.com/ae/business-networking/unmanaged-switch/ls105g/#specifications",
+    "https://www.tp-link.com/ae/business-networking/unmanaged-switch/ls1005g/"
+  ],
+  "notes": "Input variants/options contain only LS105G (single 'Default' variant, SKU LS105G); no LS1005G variant exists in the input, so content covers LS105G only. If an LS1005G variant is added later: it is the plastic-case model (90 × 72 × 23 mm, 3.7 W max) and its feature list does not include 802.1p QoS, so 'housing' must be removed from specs and the metal/QoS/dimension wording made variant-specific; ports_total, port_speed, management, form_factor, poe/sfp=0 are common to both. Official LS105G page has a typo '10/100/1000Mbos'. poe_budget_w omitted (no PoE). Hardware version not stated."
+}

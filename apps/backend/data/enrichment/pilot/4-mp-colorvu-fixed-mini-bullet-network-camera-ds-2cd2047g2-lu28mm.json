@@ -1,0 +1,94 @@
+{
+  "handle": "4-mp-colorvu-fixed-mini-bullet-network-camera-ds-2cd2047g2-lu28mm",
+  "botble_id": "278",
+  "title_ar": "كاميرا مراقبة بولت 4 ميجا ColorVu ملونة ليلاً بميكروفون Hikvision DS-2CD2047G2-LU",
+  "title_en": "Hikvision DS-2CD2047G2-LU 4 MP ColorVu Fixed Mini Bullet Network Camera (2.8 mm)",
+  "subtitle_ar": "صورة ملونة على مدار 24 ساعة بعدسة F1.0 وضوء أبيض حتى 40 متراً، مع ميكروفون مدمج",
+  "subtitle_en": "24/7 colour imaging with an F1.0 lens and white light up to 40 m, plus a built-in microphone",
+  "description_ar": "كاميرا Hikvision DS-2CD2047G2-LU هي كاميرا مراقبة شبكية (IP) صغيرة من نوع بولت بدقة 4 ميجابكسل (2688 × 1520)، من سلسلة Pro، بعدسة ثابتة 2.8 مم. صُممت لمن يريد صورة ملونة في الليل بدل الصورة بالأبيض والأسود، مثل مداخل البيوت والفلل وواجهات المحلات ومواقف السيارات.\n\nتعتمد على تقنية ColorVu: عدسة بفتحة F1.0 تجمع ضوءاً أكثر مع مستشعر 1/1.8 بوصة، فتبقى الصورة ملونة حتى 0.0005 لوكس، وفي الظلام التام يعمل ضوء أبيض مدمج بمدى يصل إلى 40 متراً. تقنية WDR بقوة 130 dB توضح التفاصيل عند المداخل المواجهة للشمس.\n\nتميّز الإنسان والمركبة بالتعلم العميق لتقليل الإنذارات الكاذبة، وتدعم عبور الخط والتسلل. الحرف U في اسم الموديل يعني وجود ميكروفون مدمج لتسجيل الصوت مع الفيديو. هيكلها مصنف IP67 ضد الماء والغبار. ضغط H.265+ يقلل حجم التسجيلات.\n\nتعمل عبر كيبل شبكة PoE أو محول 12 فولت. يمكن ربطها بجهاز NVR من Hikvision مع قرص صلب أو التسجيل على بطاقة microSD داخل الكاميرا، والمشاهدة من الجوال عبر تطبيق Hik-Connect. لا تحتوي هذه النسخة على ضوء وامض أو سماعة للإنذار؛ هذه الميزات موجودة في نسخة DS-2CD2047G2-LU/SL.",
+  "description_en": "The Hikvision DS-2CD2047G2-LU is a 4 MP (2688 × 1520) Pro Series fixed mini bullet network camera with a 2.8 mm lens. It is meant for anyone who wants colour video at night instead of black and white: home and villa entrances, shop fronts and car parks.\n\nColorVu combines an F1.0 lens with a 1/1.8\" sensor to keep images in colour down to 0.0005 lux, and a built-in white light covers up to 40 m in total darkness. 130 dB WDR handles strong backlight.\n\nDeep learning classifies humans and vehicles to reduce false alarms, with line crossing and intrusion detection. The 'U' means a built-in microphone records audio with video. The housing is IP67 rated, and H.265+ reduces storage use.\n\nPower it by PoE or 12 VDC. Record to a Hikvision NVR with a hard drive or to an on-board microSD card, and view remotely with Hik-Connect. This version has no strobe light or speaker; those are on the DS-2CD2047G2-LU/SL.",
+  "highlights_ar": [
+    "دقة 4 ميجابكسل (2688 × 1520) بعدسة ثابتة 2.8 مم",
+    "رؤية ليلية ملونة ColorVu بفتحة F1.0 وضوء أبيض حتى 40 متراً",
+    "تمييز الإنسان والمركبة مع عبور الخط والتسلل",
+    "ميكروفون مدمج لتسجيل الصوت",
+    "WDR بقوة 130 dB وضغط H.265+",
+    "تصنيف IP67 للتركيب الخارجي، وتعمل بكيبل PoE أو محول 12 فولت"
+  ],
+  "highlights_en": [
+    "4 MP (2688 × 1520), fixed 2.8 mm lens",
+    "ColorVu colour night vision, F1.0 aperture, white light up to 40 m",
+    "Human/vehicle classification with line crossing and intrusion",
+    "Built-in microphone",
+    "130 dB WDR and H.265+ compression",
+    "IP67 outdoor rating, PoE or 12 VDC power"
+  ],
+  "specs": {
+    "resolution_mp": 4,
+    "form_factor": "bullet",
+    "lens_type": "fixed",
+    "focal_length": "2.8 mm",
+    "wdr_db": 130,
+    "night_technologies": [
+      "colorvu"
+    ],
+    "night_range_m": 40,
+    "ai_features": [
+      "human_vehicle",
+      "perimeter"
+    ],
+    "audio": "mic",
+    "active_deterrence": false,
+    "power": [
+      "poe",
+      "12v_dc"
+    ],
+    "video_compression": "H.265+, H.265, H.264+, H.264",
+    "protection": "IP67",
+    "operating_temperature": "-30 °C to 60 °C"
+  },
+  "faq": [
+    {
+      "question_ar": "هل الصورة ملونة في الليل؟ وما المدى؟",
+      "answer_ar": "نعم، هذه فكرة تقنية ColorVu: تبقى الصورة ملونة حتى 0.0005 لوكس، وفي الظلام التام يعمل الضوء الأبيض المدمج بمدى يصل إلى 40 متراً.",
+      "question_en": "Is the image in colour at night, and what is the range?",
+      "answer_en": "Yes, that is the point of ColorVu: colour down to 0.0005 lux, and the built-in white light covers up to 40 m in total darkness."
+    },
+    {
+      "question_ar": "هل تسجل الصوت؟ وهل فيها سماعة للتحدث؟",
+      "answer_ar": "فيها ميكروفون مدمج لتسجيل الصوت، لكن لا توجد سماعة. إذا كنت تحتاج تحدثاً ثنائياً وضوءاً وامضاً للردع فاختر نسخة DS-2CD2047G2-LU/SL.",
+      "question_en": "Does it record audio, and does it have a speaker?",
+      "answer_en": "It has a built-in microphone but no speaker. For two-way audio and a strobe light, choose the DS-2CD2047G2-LU/SL."
+    },
+    {
+      "question_ar": "هل تعمل بدون جهاز تسجيل NVR؟",
+      "answer_ar": "نعم، فيها منفذ لبطاقة microSD للتسجيل داخل الكاميرا، ويمكن مشاهدتها عبر تطبيق Hik-Connect. لعدة كاميرات أو حفظ أطول يُنصح بجهاز NVR مع قرص صلب.",
+      "question_en": "Does it work without an NVR?",
+      "answer_en": "Yes. It has a microSD slot for on-camera recording and works with Hik-Connect. For several cameras or longer retention, use an NVR with a hard drive."
+    },
+    {
+      "question_ar": "هل تحتاج إلى محول كهرباء؟",
+      "answer_ar": "لا يلزم إذا استخدمت سويتش أو NVR يدعم PoE، فكيبل الشبكة يوصل الكهرباء والبيانات معاً. وتقبل أيضاً محول 12 فولت DC.",
+      "question_en": "Do I need a power adapter?",
+      "answer_en": "Not with a PoE switch or NVR, since the network cable carries both power and data. It also accepts 12 VDC."
+    },
+    {
+      "question_ar": "هل تصلح للتركيب الخارجي؟",
+      "answer_ar": "نعم، الكاميرا مصنفة IP67 ضد الماء والغبار ومخصصة للاستخدام الخارجي.",
+      "question_en": "Is it suitable for outdoor use?",
+      "answer_en": "Yes, it is rated IP67 against water and dust for outdoor installation."
+    }
+  ],
+  "seo_title_ar": "كاميرا بولت 4 ميجا ColorVu هيكفيجن DS-2CD2047G2-LU",
+  "seo_title_en": "Hikvision DS-2CD2047G2-LU 4MP ColorVu Mini Bullet Camera",
+  "seo_description_ar": "كاميرا مراقبة بولت 4 ميجا من Hikvision بتقنية ColorVu: صورة ملونة ليلاً، ضوء أبيض حتى 40 م، ميكروفون مدمج، تمييز الإنسان والمركبة، IP67.",
+  "seo_description_en": "Hikvision DS-2CD2047G2-LU 4MP ColorVu mini bullet: colour night video, F1.0 lens, 40 m white light, built-in mic, human/vehicle detection, IP67.",
+  "mpn": "DS-2CD2047G2-LU",
+  "source_url": "https://assets.hikvision.com/prd/normal/all/doc/sm000058370/DS-2CD2047G2-LU_SL-C_Datasheet_20260105.pdf",
+  "sources": [
+    "https://assets.hikvision.com/prd/normal/all/doc/sm000058370/DS-2CD2047G2-LU_SL-C_Datasheet_20260105.pdf",
+    "https://www.hikvision.com/content/dam/hikvision/products/S000000001/S000000002/S000000003/S000000025/OFR007893/M000032053/SM000058321/Data_Sheet/DS-2CD2047G2-LU-C_Datasheet_V5.5.112_20230418.pdf",
+    "https://www.hikvision.com/en/products/IP-Products/Network-Cameras/Pro-Series-EasyIP-/ds-2cd2047g2-l-u-/"
+  ],
+  "notes": "LOWER CONFIDENCE - needs a check. The official datasheet for the plain DS-2CD2047G2-LU(C) exists on hikvision.com (content/dam V5.5.112, listed in sources) and the global product page DS-2CD2047G2-L(U), but both returned 403/empty to the fetch tools and could not be read. The only readable official sheet was the sister model DS-2CD2047G2-LU/SL (C) (adds strobe light + speaker), dated 2026-01-05. Specs filled are only those that the LU/SL(C) sheet states AND that search excerpts of the Hikvision L(U) page/sheet also confirm for the plain LU: 2688x1520, 1/1.8\" sensor, F1.0, 0.0005 lux, 130 dB WDR, white light up to 40 m, built-in mic (-U), fixed 2.8/4/6 mm lens, PoE (802.3af) / 12 VDC, IP67, human/vehicle classification. Operating temperature (-30 to 60 °C) and compression list come from the LU/SL(C) sheet only. Omitted on purpose: field_of_view (LU/SL(C) gives 111.9° at 2.8 mm, not verified for plain LU), onboard_storage capacity (official sheets differ by revision: 256 GB in older, 512 GB in the (C)/LU-SL sheet), face capture, vandal_proof. The plain LU is marked Discontinued on Hikvision's site per search results. No strobe/speaker on plain LU, so active_deterrence = false and audio = mic."
+}

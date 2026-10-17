@@ -1,0 +1,83 @@
+{
+  "handle": "be3600-dual-band-wi-fi-7-router-archer-be230",
+  "botble_id": "587",
+  "title_ar": "راوتر واي فاي 7 ثنائي النطاق BE3600 من TP-Link Archer BE230",
+  "title_en": "TP-Link Archer BE230 BE3600 Dual-Band Wi-Fi 7 Router",
+  "subtitle_ar": "واي فاي 7 بسرعة حتى 3.6 جيجابت/ث مع منفذي 2.5 جيجابت للإنترنت والشبكة",
+  "subtitle_en": "Wi-Fi 7 speeds up to 3.6 Gbps with 2.5 Gbps WAN and LAN ports",
+  "description_ar": "Archer BE230 راوتر واي فاي 7 ثنائي النطاق من TP-Link بفئة سرعة BE3600: حتى 2882 ميجابت/ث على تردد 5 GHz و688 ميجابت/ث على تردد 2.4 GHz. يدعم تقنية Multi-Link Operation (MLO) التي تسمح للجهاز الحديث بالاتصال على الترددين معاً لسرعة أعلى وتأخير أقل، وتقنية 4K-QAM التي تحمل بيانات أكثر في كل إشارة، وهو متوافق مع كل أجيال الواي فاي السابقة.\n\nمناسب للشقق والبيوت المتوسطة (تصنفه TP-Link لبيوت من 3 غرف نوم) ولمن لديه اشتراك فايبر سريع، فمنفذ الإنترنت WAN بسرعة 2.5 جيجابت يتجاوز حد الجيجابت، ومعه منفذ LAN بسرعة 2.5 جيجابت و3 منافذ LAN جيجابت للكمبيوتر وجهاز الألعاب والتلفزيون. 4 هوائيات خارجية مع Beamforming توجه الإشارة نحو أجهزتك.\n\nللفلل أو الأدوار المتعددة يدعم EasyMesh، فتضيف راوتر أو مقوي متوافق مع EasyMesh لتكوين شبكة ميش باسم واحد. منفذ USB 3.0 لمشاركة الملفات من قرص خارجي، ودعم VPN كخادم وعميل بما فيها WireGuard وOpenVPN، وحماية TP-Link HomeShield (الخطة الأساسية مجانية) مع رقابة أبوية وشبكة ضيوف. الإعداد سهل من تطبيق Tether أو صفحة الويب، ويعمل مع Alexa وGoogle Assistant.",
+  "description_en": "Archer BE230 is a TP-Link dual-band Wi-Fi 7 router in the BE3600 class: up to 2882 Mbps on 5 GHz and 688 Mbps on 2.4 GHz. Multi-Link Operation (MLO) lets newer devices use both bands at once for higher speed and lower latency, 4K-QAM packs more data into each signal, and it stays compatible with all older Wi-Fi generations.\n\nIt suits apartments and mid-size homes (TP-Link rates it for 3-bedroom houses) and fast fiber plans: the 2.5 Gbps WAN port goes beyond the Gigabit limit, alongside a 2.5 Gbps LAN port and 3 Gigabit LAN ports for a PC, console or TV. Four external antennas with beamforming focus signal toward your devices.\n\nFor villas or several floors it is EasyMesh-compatible, so you can add an EasyMesh router or extender for one seamless network. A USB 3.0 port shares files from an external drive, VPN server and client support includes WireGuard and OpenVPN, and TP-Link HomeShield (free Basic plan) adds parental controls and protection. Set it up in the Tether app or web interface; works with Alexa and Google Assistant.",
+  "highlights_ar": [
+    "واي فاي 7 بفئة BE3600: حتى 2882 ميجابت/ث على 5 GHz و688 ميجابت/ث على 2.4 GHz",
+    "منفذ إنترنت WAN بسرعة 2.5 جيجابت ومنفذ LAN بسرعة 2.5 جيجابت و3 منافذ LAN جيجابت",
+    "تقنيات Multi-Link Operation و4K-QAM لسرعة أعلى وتأخير أقل",
+    "4 هوائيات خارجية مع Beamforming",
+    "متوافق مع EasyMesh لتوسيع التغطية بشبكة ميش",
+    "منفذ USB 3.0 ودعم VPN بما فيه WireGuard وإعداد من تطبيق Tether"
+  ],
+  "highlights_en": [
+    "BE3600 Wi-Fi 7: up to 2882 Mbps on 5 GHz and 688 Mbps on 2.4 GHz",
+    "2.5 Gbps WAN, 2.5 Gbps LAN and 3× Gigabit LAN ports",
+    "Multi-Link Operation and 4K-QAM for higher speed and lower latency",
+    "4 external antennas with beamforming",
+    "EasyMesh-compatible for whole-home mesh expansion",
+    "USB 3.0, VPN server/client incl. WireGuard, Tether app setup"
+  ],
+  "specs": {
+    "wifi_standard": "wifi7",
+    "speed_class": "BE3600",
+    "bands": "dual",
+    "max_speed_mbps": 3570,
+    "internet_connection": [
+      "fiber"
+    ],
+    "wan_speed": "2_5g",
+    "lan_ports": 4,
+    "mesh": [
+      "easymesh"
+    ],
+    "mounting": "desktop",
+    "gaming": false,
+    "poe_powered": false,
+    "vpn": true,
+    "usb_ports": "1× USB 3.0"
+  },
+  "faq": [
+    {
+      "question_ar": "هل يعمل مع خط الفايبر من مزود الإنترنت؟",
+      "answer_ar": "نعم، يوصل منفذ WAN بجهاز الألياف (ONT) أو المودم، ويدعم Dynamic IP وStatic IP وPPPoE وPPTP وL2TP. ومنفذ WAN بسرعة 2.5 جيجابت يستفيد من الباقات الأسرع من 1 جيجابت.",
+      "question_en": "Does it work with my fiber internet provider?",
+      "answer_en": "Yes. Its WAN port connects to your fiber ONT or modem and supports Dynamic IP, Static IP, PPPoE, PPTP and L2TP. The 2.5 Gbps WAN port can take advantage of plans faster than 1 Gbps."
+    },
+    {
+      "question_ar": "هل يكفي لتغطية فيلا من عدة أدوار؟",
+      "answer_ar": "تصنفه TP-Link لبيوت من 3 غرف نوم، لذلك يناسب الشقق والبيوت المتوسطة. للفلل متعددة الأدوار أضف راوتر أو مقوي متوافق مع EasyMesh لتكوين شبكة ميش باسم واحد.",
+      "question_en": "Will it cover a multi-floor villa?",
+      "answer_en": "TP-Link rates it for 3-bedroom homes, so it fits apartments and mid-size houses. For a multi-floor villa, add an EasyMesh-compatible router or extender to build one mesh network."
+    },
+    {
+      "question_ar": "هل أحتاج أجهزة تدعم واي فاي 7 للاستفادة منه؟",
+      "answer_ar": "يعمل مع جميع أجيال الواي فاي السابقة. لكن سرعات واي فاي 7 وتقنية MLO تحتاج أجهزة تدعم واي فاي 7.",
+      "question_en": "Do I need Wi-Fi 7 devices to use it?",
+      "answer_en": "It works with all earlier Wi-Fi generations. Wi-Fi 7 speeds and MLO need client devices that support Wi-Fi 7."
+    },
+    {
+      "question_ar": "كيف أعدّه وأديره؟",
+      "answer_ar": "وصّله بالمودم أو جهاز الفايبر، ثم استخدم تطبيق Tether على الجوال أو صفحة الويب واتبع الخطوات. من التطبيق تتحكم في الرقابة الأبوية وشبكة الضيوف والأجهزة المتصلة.",
+      "question_en": "How do I set it up and manage it?",
+      "answer_en": "Connect it to your modem or ONT, then follow the steps in the Tether app or the web interface. The app also handles parental controls, guest network and connected devices."
+    }
+  ],
+  "seo_title_ar": "راوتر TP-Link Archer BE230 واي فاي 7 BE3600",
+  "seo_title_en": "TP-Link Archer BE230 BE3600 Wi-Fi 7 Router",
+  "seo_description_ar": "راوتر TP-Link Archer BE230 واي فاي 7 بسرعة حتى 3.6 جيجابت/ث ومنفذي 2.5 جيجابت و4 هوائيات ودعم EasyMesh وVPN وUSB 3.0. مناسب لخطوط الفايبر.",
+  "seo_description_en": "TP-Link Archer BE230 Wi-Fi 7 router: up to 3.6 Gbps, 2.5G WAN and LAN ports, 4 antennas, EasyMesh, VPN and USB 3.0. Ready for fast fiber plans.",
+  "mpn": "Archer BE230",
+  "source_url": "https://www.tp-link.com/ae/home-networking/wifi-router/archer-be230/",
+  "sources": [
+    "https://www.tp-link.com/ae/home-networking/wifi-router/archer-be230/",
+    "https://www.tp-link.com/ae/home-networking/wifi-router/archer-be230/#specifications",
+    "https://www.tp-link.com/en/home-networking/wifi-router/archer-be230/"
+  ],
+  "notes": "Official page gives coverage only as '3 Bedroom Houses' and no device count, so coverage_sqm and max_devices are omitted. max_speed_mbps = 2882 + 688 = 3570 (page also states 3570 Mbps). lan_ports = 1× 2.5G LAN + 3× 1G LAN. EasyMesh only (OneMesh not listed). Official spec page has no package-contents list, so in-the-box is not described. Hardware version not stated on page."
+}

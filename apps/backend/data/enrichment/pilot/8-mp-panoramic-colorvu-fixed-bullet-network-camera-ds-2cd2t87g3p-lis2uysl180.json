@@ -1,0 +1,96 @@
+{
+  "handle": "8-mp-panoramic-colorvu-fixed-bullet-network-camera-ds-2cd2t87g3p-lis2uysl180",
+  "botble_id": "245",
+  "title_ar": "كاميرا بانوراما 180° بدقة 8 ميجا ColorVu مع ضوء تحذيري Hikvision DS-2CD2T87G3P-LIS2UY/SL",
+  "title_en": "Hikvision DS-2CD2T87G3P-LIS2UY/SL 8 MP Panoramic ColorVu Fixed Bullet Network Camera (180°)",
+  "subtitle_ar": "كاميرا واحدة تغطي 180 درجة بصورة ملونة ليلاً، مع ضوء وامض وإنذار صوتي وتحدث ثنائي الاتجاه",
+  "subtitle_en": "One camera covers 180° in colour day and night, with strobe light, audible warning and two-way audio",
+  "description_ar": "كاميرا Hikvision DS-2CD2T87G3P-LIS2UY/SL هي كاميرا مراقبة شبكية (IP) بانورامية من نوع بولت بدقة 8 ميجابكسل (4256 × 1888)، من سلسلة Pro. عدستها الثابتة 2.8 مم تعطي زاوية رؤية أفقية 182.6 درجة، فتغطي بكاميرا واحدة واجهة فيلا أو ساحة مواقف أو ساحة مستودع كانت تحتاج عادة إلى أكثر من كاميرا، مع خاصية تصحيح التشوه.\n\nتقنية ColorVu 3.0 مع فتحة F1.0 ومعالج HikAI-ISP تعطي صورة ملونة في الإضاءة الضعيفة حتى 0.0005 لوكس. وعند الظلام توفر ثلاثة أوضاع إضاءة: ضوء أبيض أو أشعة تحت حمراء أو إضاءة هجينة ذكية، بمدى يصل إلى 40 متراً. تقنية WDR بقوة 130 dB توضح الصورة أمام الإضاءة الخلفية القوية.\n\nتميّز الإنسان والمركبة بالتعلم العميق وتدعم عبور الخط والتسلل ودخول المنطقة والخروج منها. عند رصد متسلل يمكنها تشغيل ضوء أبيض وامض (نسخة /SL) وإنذار صوتي عبر السماعة المدمجة، كما تدعم التحدث ثنائي الاتجاه بفضل ميكروفونين مدمجين.\n\nالهيكل معدني بتصنيف IP67 وحماية من التآكل NEMA 4X، ونطاق تشغيل من -30 إلى 60 درجة مئوية. تعمل عبر PoE بمعيار 802.3at أو محول 12 فولت، وتسجل على جهاز NVR أو بطاقة microSD حتى 512 GB، مع المشاهدة عبر تطبيق Hik-Connect.",
+  "description_en": "The Hikvision DS-2CD2T87G3P-LIS2UY/SL is an 8 MP (4256 × 1888) Pro Series panoramic fixed bullet network camera. Its 2.8 mm lens covers 182.6° horizontally, so one camera can watch a villa frontage, car park or warehouse yard, with distortion correction.\n\nColorVu 3.0 with an F1.0 aperture and HikAI-ISP delivers colour images down to 0.0005 lux. White light, IR and Smart Hybrid Light modes reach up to 40 m. 130 dB WDR handles strong backlight.\n\nDeep learning classifies humans and vehicles, with line crossing, intrusion, region entrance and exiting detection. On an alarm it can trigger a white strobe light (/SL) and an audible warning from the built-in speaker, and the arrayed dual microphones allow two-way audio.\n\nThe metal housing is IP67 and NEMA 4X rated for -30 °C to 60 °C. Power it by 802.3at PoE or 12 VDC, record to an NVR or a microSD card up to 512 GB, and view remotely with Hik-Connect.",
+  "highlights_ar": [
+    "رؤية بانورامية 182.6 درجة بدقة 8 ميجابكسل (4256 × 1888)",
+    "صورة ملونة ليلاً بتقنية ColorVu 3.0 وفتحة F1.0",
+    "إضاءة هجينة ذكية (ضوء أبيض وأشعة تحت حمراء) حتى 40 متراً",
+    "تمييز الإنسان والمركبة مع ضوء وامض وإنذار صوتي للردع",
+    "تحدث ثنائي الاتجاه: ميكروفونان مدمجان وسماعة",
+    "هيكل معدني IP67 وNEMA 4X ويعمل من -30 إلى 60 درجة مئوية"
+  ],
+  "highlights_en": [
+    "182.6° panoramic view at 8 MP (4256 × 1888)",
+    "ColorVu 3.0 colour night imaging with F1.0 aperture",
+    "Smart Hybrid Light (white light + IR) up to 40 m",
+    "Human/vehicle classification with strobe light and audible warning",
+    "Two-way audio: arrayed dual mics and built-in speaker",
+    "Metal housing, IP67 and NEMA 4X, -30 °C to 60 °C"
+  ],
+  "specs": {
+    "resolution_mp": 8,
+    "form_factor": "panoramic",
+    "lens_type": "fixed",
+    "focal_length": "2.8 mm",
+    "field_of_view": "182.6°",
+    "wdr_db": 130,
+    "night_technologies": [
+      "colorvu",
+      "smart_hybrid"
+    ],
+    "night_range_m": 40,
+    "ai_features": [
+      "human_vehicle",
+      "perimeter"
+    ],
+    "audio": "two_way",
+    "active_deterrence": true,
+    "power": [
+      "poe",
+      "12v_dc"
+    ],
+    "video_compression": "H.265+, H.265, H.264+, H.264",
+    "onboard_storage": "microSD up to 512 GB",
+    "protection": "IP67, NEMA 4X",
+    "operating_temperature": "-30 °C to 60 °C"
+  },
+  "faq": [
+    {
+      "question_ar": "كم كاميرا عادية تعوّض هذه الكاميرا البانورامية؟",
+      "answer_ar": "زاوية الرؤية الأفقية 182.6 درجة من عدسة واحدة، أي أنها تغطي نصف دائرة كاملة أمامها. العدد الذي تعوضه يعتمد على المكان، لكنها مصممة لتغطية المساحات العريضة بكاميرا واحدة.",
+      "question_en": "How many standard cameras does this panoramic camera replace?",
+      "answer_en": "It covers 182.6° horizontally from a single lens, a full half-circle. How many cameras it replaces depends on the site, but it is designed to cover wide areas with one unit."
+    },
+    {
+      "question_ar": "هل الصورة ملونة في الليل؟ وما المدى؟",
+      "answer_ar": "نعم، بفضل ColorVu 3.0 تبقى الصورة ملونة حتى 0.0005 لوكس، ومع الضوء الأبيض تكون ملونة حتى في الظلام التام. مدى الإضاءة التكميلية يصل إلى 40 متراً.",
+      "question_en": "Is the image in colour at night, and what is the range?",
+      "answer_en": "Yes. ColorVu 3.0 keeps colour down to 0.0005 lux, and with white light it stays in colour even in total darkness. Supplemental light reaches up to 40 m."
+    },
+    {
+      "question_ar": "كيف يعمل الردع الفعّال (الضوء الوامض والإنذار الصوتي)؟",
+      "answer_ar": "عند رصد إنسان أو مركبة في منطقة محددة يمكن للكاميرا تشغيل ضوء أبيض وامض وإنذار صوتي من السماعة المدمجة، ويمكنك التحدث مع الزائر عبر الميكروفونين والسماعة.",
+      "question_en": "How does active deterrence work?",
+      "answer_en": "When a human or vehicle is detected in a defined zone, the camera can trigger a white strobe light and an audible warning, and you can speak through the built-in speaker and microphones."
+    },
+    {
+      "question_ar": "هل تعمل بدون NVR؟ وما نوع التغذية؟",
+      "answer_ar": "نعم، يمكن التسجيل على بطاقة microSD حتى 512 GB والمشاهدة عبر تطبيق Hik-Connect. التغذية عبر PoE بمعيار 802.3at (حتى 24 واط) أو محول 12 فولت، فتأكد أن السويتش يدعم 802.3at.",
+      "question_en": "Does it work without an NVR, and how is it powered?",
+      "answer_en": "Yes, it records to microSD up to 512 GB and can be viewed in Hik-Connect. Power is 802.3at PoE (max. 24 W) or 12 VDC, so make sure your switch supports 802.3at."
+    },
+    {
+      "question_ar": "هل تتحمل المطر والغبار والحرارة؟",
+      "answer_ar": "الكاميرا مصنفة IP67 ضد الماء والغبار وNEMA 4X ضد التآكل، ونطاق تشغيلها من -30 إلى 60 درجة مئوية.",
+      "question_en": "Can it handle rain, dust and heat?",
+      "answer_en": "It is rated IP67 for water and dust, NEMA 4X for corrosion, and operates from -30 °C to 60 °C."
+    }
+  ],
+  "seo_title_ar": "كاميرا بانوراما 8 ميجا ColorVu هيكفيجن DS-2CD2T87G3P",
+  "seo_title_en": "Hikvision DS-2CD2T87G3P-LIS2UY/SL 8MP 180° ColorVu",
+  "seo_description_ar": "كاميرا مراقبة بانوراما 180° بدقة 8 ميجا من Hikvision، صورة ملونة ليلاً ColorVu، ضوء وامض وإنذار صوتي، صوت ثنائي، PoE وIP67.",
+  "seo_description_en": "Hikvision 8MP 180° panoramic ColorVu bullet: colour night imaging, 40 m hybrid light, strobe and audible warning, two-way audio, PoE, IP67.",
+  "mpn": "DS-2CD2T87G3P-LIS2UY/SL",
+  "source_url": "https://assets.hikvision.com/prd/normal/all/doc/sm000107025/DS-2CD2T87G3P-LIS2UY_SRB_Datasheet_20260711.pdf",
+  "sources": [
+    "https://assets.hikvision.com/prd/normal/all/doc/sm000107025/DS-2CD2T87G3P-LIS2UY_SRB_Datasheet_20260711.pdf",
+    "https://www.hikvision.com/sg/products/IP-Products/Network-Cameras/Pro-Series-EasyIP-/ds-2cd2t87g3p-lis2uy-s-l--rb-"
+  ],
+  "notes": "The official datasheet found is titled DS-2CD2T87G3P-LIS2UY/SRB but covers both variants (official product page is 'DS-2CD2T87G3P-LIS2UY/S(L)(RB)'); its 'Flashing Light' row states /SRB = red and blue light, /SL = white light. All other specs are shared, so the /SL product uses this sheet. Resolution is 4256 × 1888 (about 8 MP, panoramic aspect). Main stream max 20 fps. Field is 'panoramic' though physically a fixed bullet housing. Face capture: No per datasheet. No IK rating listed, so vandal_proof omitted. Store title suffix '(180°)' matches 182.6° horizontal FOV. Hikvision product page could not be rendered (JS); datasheet PDF was the source of every value."
+}

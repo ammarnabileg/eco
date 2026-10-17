@@ -33,6 +33,15 @@ synonyms (`language.ts`), phrase rewriting, and a word-by-word fallback for
 conversational queries. Offers re-index their products every 5 minutes
 (`src/jobs/sync-offer-search-prices.ts`).
 
+Catalogue: category tree, spec templates (filters), brands, add-ons (RAM/SSD/
+HDD...), price-on-request with quote requests, and the Botble import and
+content pipeline. How the products were built and how to continue:
+[docs/CATALOG.md](docs/CATALOG.md).
+
+Payments: KNET, Visa/Mastercard and Apple/Google/Samsung Pay via KlickPay,
+plus Taly and Deema instalments. Setup, webhooks, test cards and the open
+questions for each gateway: [docs/PAYMENTS.md](docs/PAYMENTS.md).
+
 Google Merchant Center feeds: `/feeds/google/ar` and `/feeds/google/en` on the
 backend (set `STOREFRONT_URL`). Google does not accept SVG images, so real
 product photos (JPG/PNG/WebP) are required before submitting the feed.

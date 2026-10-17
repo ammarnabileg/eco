@@ -1,0 +1,83 @@
+{
+  "handle": "vigi-4-channel-poe-network-video-recorder",
+  "botble_id": "773",
+  "title_ar": "جهاز تسجيل كاميرات NVR بـ4 قنوات و4 منافذ PoE+ من VIGI NVR1004H-4P",
+  "title_en": "VIGI NVR1004H-4P 4-Channel PoE+ Network Video Recorder",
+  "subtitle_ar": "4 منافذ PoE+ بقدرة 53 واط، تسجيل حتى 8MP، مخرج HDMI 4K، هارد واحد حتى 10TB",
+  "subtitle_en": "4 PoE+ ports with 53 W budget, up to 8MP recording, 4K HDMI output, one SATA bay up to 10 TB",
+  "description_ar": "VIGI NVR1004H-4P جهاز تسجيل شبكي (NVR) من TP-Link يدير حتى 4 كاميرات IP، ومزود بأربعة منافذ PoE+ تنقل الكهرباء والبيانات للكاميرا عبر كيبل شبكة واحد، فلا تحتاج محول كهرباء لكل كاميرا. ميزانية PoE الإجمالية 53 واط وحتى 30 واط لكل منفذ.\n\nيسجل الجهاز بدقة تصل إلى 8 ميجابكسل، وقدرة فك الترميز 2 قناة بدقة 8MP أو 4 قنوات بدقة 4MP، مع عرض نطاق وارد 80 ميجابت/ثانية. يدعم ضغط H.265+ لتوفير مساحة التخزين، والتشغيل المتزامن لأربع قنوات، والبحث في التسجيلات حسب الأحداث.\n\nللعرض المحلي يوجد مخرج HDMI بدقة حتى 4K ومخرج VGA يعملان معًا، ويمكن المتابعة عن بعد عبر تطبيق VIGI أو واجهة الويب أو برنامج VIGI Security Manager. يدعم معيار ONVIF لإضافة كاميرات من ماركات أخرى، والإضافة التلقائية لكاميرات VIGI الجديدة.\n\nما تحتاجه معه: هارد ديسك SATA واحد بسعة تصل إلى 10 تيرابايت (لا يأتي مع الجهاز)، وكاميرات IP تدعم PoE، وكيبلات شبكة، وشاشة إن أردت المشاهدة المحلية. الجهاز مناسب للمحلات والمطاعم والمستودعات الصغيرة والمنازل.",
+  "description_en": "The VIGI NVR1004H-4P is a TP-Link network video recorder for up to 4 IP cameras. Its four PoE+ ports carry power and data to each camera over one network cable, with a 53 W total budget and up to 30 W per port, so no separate camera adapters are needed.\n\nIt records up to 8MP, decodes 2 channels at 8MP or 4 channels at 4MP, and accepts 80 Mbps of incoming bandwidth. H.265+ saves disk space, and you can play back 4 channels at once and search footage by event.\n\nHDMI (up to 4K) and VGA outputs work simultaneously, and remote viewing is available through the VIGI app, web UI and VIGI Security Manager. ONVIF support lets you add other brands' cameras, and new VIGI cameras can be added automatically.\n\nYou will need one SATA hard drive up to 10 TB (not included), PoE IP cameras, network cables and a monitor for local viewing. Suitable for shops, restaurants, small warehouses and homes.",
+  "highlights_ar": [
+    "4 قنوات مع 4 منافذ PoE+ بميزانية 53 واط",
+    "تسجيل حتى 8MP وضغط H.265+",
+    "مخرج HDMI بدقة 4K ومخرج VGA",
+    "منفذ هارد SATA واحد حتى 10 تيرابايت (الهارد غير مرفق)",
+    "عرض نطاق وارد 80 ميجابت/ثانية وتشغيل متزامن لأربع قنوات",
+    "متابعة عن بعد عبر تطبيق VIGI ودعم ONVIF"
+  ],
+  "highlights_en": [
+    "4 channels with 4 PoE+ ports, 53 W budget",
+    "Records up to 8MP with H.265+",
+    "4K HDMI plus VGA output",
+    "One SATA bay up to 10 TB (drive not included)",
+    "80 Mbps incoming bandwidth, 4-channel synchronous playback",
+    "Remote viewing in the VIGI app, ONVIF support"
+  ],
+  "specs": {
+    "recorder_type": "nvr",
+    "channels": 4,
+    "poe_ports": 4,
+    "max_resolution_mp": 8,
+    "incoming_bandwidth_mbps": 80,
+    "hdd_bays": 1,
+    "max_hdd_tb": 10,
+    "video_outputs": "1× HDMI (up to 3840×2160), 1× VGA",
+    "ai_features": {
+      "ar": "كشف الحركة، عبور الخط، الاقتحام، الدخول والخروج من المنطقة، التسكع، كشف الإنسان والمركبة، الصوت غير الطبيعي",
+      "en": "Motion, line-crossing, intrusion, region entering/exiting, loitering, human and vehicle detection, abnormal sound"
+    }
+  },
+  "faq": [
+    {
+      "question_ar": "هل يأتي الجهاز مع هارد ديسك؟",
+      "answer_ar": "لا، محتويات العلبة تشمل براغي الهارد فقط. يدعم الجهاز هارد SATA واحدًا بسعة حتى 10 تيرابايت.",
+      "question_en": "Does it come with a hard drive?",
+      "answer_en": "No, the box includes HDD screws only. It takes one SATA drive up to 10 TB."
+    },
+    {
+      "question_ar": "هل أحتاج محول كهرباء لكل كاميرا؟",
+      "answer_ar": "لا إذا كانت الكاميرات تدعم PoE، فالجهاز يغذي حتى 4 كاميرات عبر منافذ PoE+ بميزانية إجمالية 53 واط.",
+      "question_en": "Do I need a power adapter for each camera?",
+      "answer_en": "Not for PoE cameras: the recorder powers up to 4 cameras through its PoE+ ports with a 53 W total budget."
+    },
+    {
+      "question_ar": "هل يعمل مع كاميرات من ماركات أخرى؟",
+      "answer_ar": "يدعم الجهاز معيار ONVIF، ما يتيح إضافة كاميرات IP من ماركات أخرى تدعم المعيار.",
+      "question_en": "Does it work with other brands' cameras?",
+      "answer_en": "It supports ONVIF, so IP cameras from other brands that support ONVIF can be added."
+    },
+    {
+      "question_ar": "هل أستطيع مشاهدة الكاميرات من الجوال؟",
+      "answer_ar": "نعم، عبر تطبيق VIGI على Android وiOS، أو عبر واجهة الويب وبرنامج VIGI Security Manager على الكمبيوتر.",
+      "question_en": "Can I watch the cameras on my phone?",
+      "answer_en": "Yes, through the VIGI app on Android and iOS, or via the web UI and VIGI Security Manager on a PC."
+    },
+    {
+      "question_ar": "ما أعلى دقة كاميرا يدعمها؟",
+      "answer_ar": "يسجل حتى 8 ميجابكسل، وقدرة فك الترميز قناتان بدقة 8MP أو 4 قنوات بدقة 4MP.",
+      "question_en": "What is the highest camera resolution supported?",
+      "answer_en": "It records up to 8MP; decoding capacity is 2 channels at 8MP or 4 channels at 4MP."
+    }
+  ],
+  "seo_title_ar": "جهاز تسجيل VIGI NVR1004H-4P بـ4 قنوات PoE+",
+  "seo_title_en": "VIGI NVR1004H-4P 4-Channel PoE+ NVR",
+  "seo_description_ar": "جهاز تسجيل كاميرات VIGI NVR1004H-4P بأربع قنوات و4 منافذ PoE+، تسجيل حتى 8MP، مخرج HDMI 4K وهارد حتى 10TB. متوفر في الكويت.",
+  "seo_description_en": "VIGI NVR1004H-4P 4-channel NVR with 4 PoE+ ports (53 W), up to 8MP recording, 4K HDMI output and one HDD bay up to 10 TB. Available in Kuwait.",
+  "mpn": "VIGI NVR1004H-4P",
+  "source_url": "https://www.tp-link.com/ae/business-networking/vigi-network-video-recorder/vigi-nvr1004h-4p/",
+  "sources": [
+    "https://www.tp-link.com/ae/business-networking/vigi-network-video-recorder/vigi-nvr1004h-4p/",
+    "https://www.vigi.com/ae/business-networking/vigi-network-video-recorder/vigi-nvr1004h-4p/"
+  ],
+  "notes": "All specs from official VIGI page (tp-link.com/ae redirects to vigi.com/ae). HDD not included. ai_features text reflects the NVR's listed alarm types; the page does not state which events require compatible VIGI cameras, so check per camera. Official overview says '80 Mbps... can manage up to four 4MP cameras' while decoding capability is 2-ch@8MP / 4-ch@4MP. The page's remote-monitoring diagram mislabels the model as NVR1104H-4P (page typo)."
+}

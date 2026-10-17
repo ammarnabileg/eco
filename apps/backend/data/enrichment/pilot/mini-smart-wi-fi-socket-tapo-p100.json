@@ -1,0 +1,80 @@
+{
+  "handle": "mini-smart-wi-fi-socket-tapo-p100",
+  "botble_id": "677",
+  "title_ar": "مقبس ذكي صغير واي فاي من Tapo P100 يعمل مع Alexa وGoogle",
+  "title_en": "Tapo P100 Mini Smart Wi-Fi Plug",
+  "subtitle_ar": "تحكم من الجوال وجدولة ومؤقت ووضع الغياب، بدون هب، حتى 2300 واط",
+  "subtitle_en": "App control, schedules, timer and Away Mode, no hub needed, up to 2300 W",
+  "description_ar": "Tapo P100 مقبس ذكي صغير من TP-Link يتصل بشبكة الواي فاي في البيت مباشرة دون الحاجة إلى هب. تركّبه في فيش الجدار ثم توصل فيه الجهاز الذي تريد التحكم به، مثل لمبة أباجورة أو مروحة أو غلاية، فتستطيع تشغيله وإطفاءه من تطبيق Tapo من أي مكان.\n\nيتيح التطبيق ضبط جدول تشغيل يومي، ومؤقت عد تنازلي، ومؤقت إطفاء تلقائي حتى لا يبقى الجهاز شغالًا لفترة طويلة، ووضع الغياب الذي يشغل ويطفئ الجهاز في أوقات مختلفة ليبدو أن أحدًا في البيت. يمكنك أيضًا مشاركة التحكم مع أفراد العائلة، وإنشاء مشاهد تتحكم بعدة أجهزة معًا، والتحكم بالصوت عبر Amazon Alexa أو Google Assistant، كما يدعم Samsung SmartThings. وعند انقطاع الإنترنت يبقى التحكم متاحًا عبر الشبكة المحلية.\n\nيتحمل المقبس حتى 2300 واط (10 أمبير)، وحجمه صغير (51×72×40 مم) حتى لا يغطي الفيش المجاور. مصنوع من مادة مقاومة للاشتعال UL94-V0، ومزود بغطاء حماية للأطفال. الإعداد يتم عبر البلوتوث ثم يعمل على واي فاي 2.4GHz فقط.\n\nملاحظة: هذا الموديل لا يقيس استهلاك الكهرباء.",
+  "description_en": "The Tapo P100 is a compact TP-Link smart plug that connects straight to your home Wi-Fi, with no hub needed. Plug it into a wall socket, connect a lamp, fan or kettle, and switch it on or off from the Tapo app wherever you are.\n\nThe app offers schedules, countdown timers, an auto-off timer, and Away Mode, which switches the device on and off at different times so the home looks occupied. You can share control with family, create scenes, and use voice control with Amazon Alexa or Google Assistant; Samsung SmartThings is also supported. Devices stay controllable over your local network if the internet goes down.\n\nIt handles up to 2300 W (10 A), and its small 51 × 72 × 40 mm body avoids blocking the neighbouring socket. It uses UL94-V0 flame-retardant material and has a child safety shutter. Setup uses Bluetooth, then it runs on 2.4 GHz Wi-Fi only. This model does not measure energy use.",
+  "highlights_ar": [
+    "تحكم من تطبيق Tapo من أي مكان بدون هب",
+    "جدولة ومؤقت وإطفاء تلقائي ووضع الغياب",
+    "تحكم صوتي عبر Alexa وGoogle Assistant ودعم SmartThings",
+    "حمل أقصى 2300 واط / 10 أمبير",
+    "تصميم صغير لا يغطي الفيش المجاور",
+    "مادة مقاومة للاشتعال وغطاء حماية للأطفال"
+  ],
+  "highlights_en": [
+    "Control from the Tapo app anywhere, no hub needed",
+    "Schedules, timers, auto-off and Away Mode",
+    "Voice control with Alexa and Google Assistant, SmartThings support",
+    "Max load 2300 W / 10 A",
+    "Compact design that leaves the next socket free",
+    "Flame-retardant housing and child safety shutter"
+  ],
+  "specs": {
+    "device_type": "plug",
+    "works_with": [
+      "alexa",
+      "google",
+      "smartthings"
+    ],
+    "connectivity": "wifi",
+    "requires_hub": false,
+    "energy_monitoring": false,
+    "max_load_w": 2300
+  },
+  "faq": [
+    {
+      "question_ar": "هل أحتاج هب لتشغيل المقبس؟",
+      "answer_ar": "لا، يتصل المقبس بشبكة الواي فاي مباشرة ويُدار من تطبيق Tapo المجاني.",
+      "question_en": "Do I need a hub?",
+      "answer_en": "No. It connects directly to Wi-Fi and is managed in the free Tapo app."
+    },
+    {
+      "question_ar": "هل يعمل بدون إنترنت؟",
+      "answer_ar": "عند انقطاع الإنترنت يبقى التحكم متاحًا عبر تطبيق Tapo طالما أنك متصل بنفس الشبكة المحلية في البيت.",
+      "question_en": "Does it work without internet?",
+      "answer_en": "If the internet drops, you can still control it in the Tapo app while connected to the same home network."
+    },
+    {
+      "question_ar": "هل يعمل مع Alexa وGoogle؟",
+      "answer_ar": "نعم، يدعم التحكم الصوتي عبر Amazon Alexa وGoogle Assistant، ويدعم أيضًا Samsung SmartThings.",
+      "question_en": "Does it work with Alexa and Google?",
+      "answer_en": "Yes, it supports voice control through Amazon Alexa and Google Assistant, and also works with Samsung SmartThings."
+    },
+    {
+      "question_ar": "هل يقيس استهلاك الكهرباء؟",
+      "answer_ar": "لا، صفحة المنتج الرسمية لا تذكر خاصية قياس الاستهلاك لهذا الموديل.",
+      "question_en": "Does it monitor energy use?",
+      "answer_en": "No, the official product page lists no energy-monitoring feature for this model."
+    },
+    {
+      "question_ar": "هل يدعم واي فاي 5GHz؟",
+      "answer_ar": "لا، يعمل على واي فاي 2.4GHz فقط، ويستخدم البلوتوث أثناء الإعداد فقط.",
+      "question_en": "Does it support 5 GHz Wi-Fi?",
+      "answer_en": "No, it works on 2.4 GHz Wi-Fi only and uses Bluetooth for setup only."
+    }
+  ],
+  "seo_title_ar": "مقبس ذكي Tapo P100 واي فاي يعمل مع Alexa",
+  "seo_title_en": "Tapo P100 Mini Smart Wi-Fi Plug",
+  "seo_description_ar": "مقبس ذكي Tapo P100 صغير الحجم، تحكم من الجوال وجدولة ومؤقت ووضع الغياب، يعمل مع Alexa وGoogle بدون هب، حتى 2300 واط. متوفر في الكويت.",
+  "seo_description_en": "Tapo P100 mini smart Wi-Fi plug: app control, schedules, timers and Away Mode, works with Alexa and Google Assistant, no hub, up to 2300 W. In Kuwait.",
+  "mpn": "Tapo P100",
+  "source_url": "https://www.tp-link.com/ae/home-networking/smart-plug/tapo-p100/",
+  "sources": [
+    "https://www.tp-link.com/ae/home-networking/smart-plug/tapo-p100/"
+  ],
+  "notes": "Specs from tp-link.com/ae Tapo P100 page (rated 220-240 V, 2300 W / 10 A, 2.4 GHz + Bluetooth setup, Alexa/Google Assistant/SmartThings). Plug/socket standard (UK type G vs EU) not stated on page - confirm the stocked regional version. energy_monitoring=false because the official page lists no energy monitoring (that is the P110). Input variant is single 1-pack; page also shows 2-pack/4-pack."
+}

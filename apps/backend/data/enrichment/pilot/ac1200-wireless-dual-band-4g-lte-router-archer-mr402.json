@@ -1,0 +1,87 @@
+{
+  "handle": "ac1200-wireless-dual-band-4g-lte-router-archer-mr402",
+  "botble_id": "565",
+  "title_ar": "راوتر شريحة 4G LTE واي فاي ثنائي النطاق AC1200 من TP-Link Archer MR402",
+  "title_en": "TP-Link Archer MR402 AC1200 Dual-Band 4G LTE Router with SIM Slot",
+  "subtitle_ar": "أدخل شريحة 4G وشارك الإنترنت مع حتى 64 جهازاً عبر واي فاي ثنائي النطاق",
+  "subtitle_en": "Insert a 4G SIM and share the internet with up to 64 devices over dual-band Wi-Fi",
+  "description_ar": "Archer MR402 راوتر 4G LTE من TP-Link بمنفذ شريحة Nano SIM مدمج: تضع الشريحة وتشغل الجهاز ليعمل بدون إعدادات معقدة. يوفر سرعة تحميل عبر 4G حتى 150 ميجابت/ث، وينشر واي فاي ثنائي النطاق بفئة AC1200 (حتى 867 ميجابت/ث على 5 GHz و300 ميجابت/ث على 2.4 GHz) لحتى 64 جهازاً لاسلكياً.\n\nيدعم نطاقات 4G التالية: FDD-LTE B1/B3/B5/B7/B8/B20/B28 وTDD-LTE B38/B40/B41، ومنها النطاقان 3 و20 المستخدمان في شبكات 4G في الكويت، لذلك يعمل مع شرائح بيانات زين وstc وأوريدو على شبكة 4G. هوائيان خارجيان قابلان للفك يساعدان على استقبال أثبت.\n\nمناسب للشاليهات والمزارع والمكاتب المؤقتة والمحلات وأي مكان بدون خط أرضي. فيه 3 منافذ LAN ومنفذ LAN/WAN بسرعة 10/100 ميجابت؛ وعند توصيل منفذ WAN بمودم أو جهاز فايبر يعمل كراوتر عادي وتصبح شريحة 4G اتصالاً احتياطياً تلقائياً. يدعم OneMesh مع مقويات TP-Link المتوافقة، ورقابة أبوية وQoS وشبكة ضيوف وVPN (OpenVPN وPPTP)، ويُدار من تطبيق Tether أو صفحة الويب.\n\nمحتويات العلبة: الراوتر Archer MR402، كابل إيثرنت RJ45، محول طاقة، ودليل التثبيت السريع.",
+  "description_en": "Archer MR402 is a TP-Link 4G LTE router with a built-in Nano SIM slot: insert the SIM, power it on and you are online without complex setup. It delivers 4G downloads of up to 150 Mbps and shares them over AC1200 dual-band Wi-Fi (867 Mbps on 5 GHz plus 300 Mbps on 2.4 GHz) with up to 64 wireless devices.\n\nSupported 4G bands are FDD-LTE B1/B3/B5/B7/B8/B20/B28 and TDD-LTE B38/B40/B41, including bands 3 and 20 used by Kuwait's 4G networks, so it works with Zain, stc and Ooredoo data SIMs on 4G. Two detachable external antennas help keep reception stable.\n\nIt suits chalets, farms, temporary offices and shops, or anywhere without a fixed line. It has 3 LAN ports and 1 LAN/WAN port at 10/100 Mbps; connect the WAN port to a modem or fiber ONT and it works as a regular router with 4G as automatic backup. It supports OneMesh extenders, parental controls, QoS, guest Wi-Fi and VPN (OpenVPN, PPTP), managed via the Tether app or web.\n\nIn the box: Archer MR402, RJ45 Ethernet cable, power adapter, quick installation guide.",
+  "highlights_ar": [
+    "منفذ Nano SIM مدمج: ضع الشريحة وشغّل بدون إعدادات",
+    "تحميل عبر 4G LTE حتى 150 ميجابت/ث ويدعم النطاقين 3 و20 المستخدمين في الكويت",
+    "واي فاي ثنائي النطاق AC1200 لحتى 64 جهازاً",
+    "هوائيان خارجيان قابلان للفك لاستقبال 4G أثبت",
+    "منفذ WAN لخط أرضي مع تحويل تلقائي إلى 4G كاتصال احتياطي",
+    "دعم OneMesh ورقابة أبوية وVPN وإدارة من تطبيق Tether"
+  ],
+  "highlights_en": [
+    "Built-in Nano SIM slot: insert SIM and go",
+    "4G LTE downloads up to 150 Mbps; supports LTE bands 3 and 20 used in Kuwait",
+    "AC1200 dual-band Wi-Fi for up to 64 devices",
+    "Two detachable external LTE antennas",
+    "WAN port for fixed-line internet with automatic 4G failover",
+    "OneMesh, parental controls, VPN and Tether app management"
+  ],
+  "specs": {
+    "wifi_standard": "wifi5",
+    "speed_class": "AC1200",
+    "bands": "dual",
+    "max_speed_mbps": 1167,
+    "internet_connection": [
+      "4g",
+      "fiber"
+    ],
+    "wan_speed": "100m",
+    "lan_ports": 4,
+    "mesh": [
+      "onemesh"
+    ],
+    "max_devices": 64,
+    "mounting": "desktop",
+    "gaming": false,
+    "poe_powered": false,
+    "vpn": true,
+    "usb_ports": {
+      "ar": "لا يوجد",
+      "en": "None"
+    }
+  },
+  "faq": [
+    {
+      "question_ar": "هل يعمل مع شرائح زين وstc وأوريدو في الكويت؟",
+      "answer_ar": "نعم على شبكة 4G، فهو يدعم نطاقات LTE منها النطاق 3 (1800 MHz) والنطاق 20 (800 MHz) المستخدمان في الكويت. يحتاج شريحة بحجم Nano SIM عليها باقة بيانات.",
+      "question_en": "Does it work with Zain, stc and Ooredoo SIMs in Kuwait?",
+      "answer_en": "Yes on 4G: its LTE bands include band 3 (1800 MHz) and band 20 (800 MHz) used in Kuwait. You need a Nano SIM with a data plan."
+    },
+    {
+      "question_ar": "هل يدعم شبكة 5G؟",
+      "answer_ar": "لا، هو راوتر 4G LTE وأقصى سرعة تحميل عبر الشريحة 150 ميجابت/ث. يمكن استخدام شريحة باقة 5G لكنه سيتصل عبر شبكة 4G فقط.",
+      "question_en": "Does it support 5G?",
+      "answer_en": "No. It is a 4G LTE router with up to 150 Mbps download over the SIM. A 5G-plan SIM will connect over the 4G network only."
+    },
+    {
+      "question_ar": "كم جهازاً يمكن توصيله؟",
+      "answer_ar": "حتى 64 جهازاً لاسلكياً حسب TP-Link، بالإضافة إلى منافذ LAN للأجهزة السلكية مثل الكمبيوتر.",
+      "question_en": "How many devices can connect?",
+      "answer_en": "Up to 64 wireless devices per TP-Link, plus the LAN ports for wired devices such as a desktop PC."
+    },
+    {
+      "question_ar": "هل يمكن استخدامه مع خط فايبر أو مودم؟",
+      "answer_ar": "نعم، منفذ LAN/WAN يسمح بتوصيله بمودم أو جهاز فايبر ليعمل كراوتر لاسلكي، وتبقى شريحة 4G اتصالاً احتياطياً. لاحظ أن المنافذ السلكية بسرعة 100 ميجابت/ث، فلا تناسب الاستفادة الكاملة من باقات الفايبر الأسرع.",
+      "question_en": "Can I use it with a fiber line or modem?",
+      "answer_en": "Yes. The LAN/WAN port connects to a modem or fiber ONT so it works as a wireless router with 4G as backup. Note the wired ports are 10/100 Mbps, so faster fiber plans will be capped."
+    }
+  ],
+  "seo_title_ar": "راوتر شريحة 4G TP-Link Archer MR402 واي فاي AC1200",
+  "seo_title_en": "TP-Link Archer MR402 4G LTE SIM Router AC1200",
+  "seo_description_ar": "راوتر TP-Link Archer MR402 بشريحة 4G LTE حتى 150 ميجابت/ث وواي فاي AC1200 لحتى 64 جهازاً، يدعم نطاقات 4G في الكويت مع منفذ WAN واتصال احتياطي.",
+  "seo_description_en": "TP-Link Archer MR402 4G LTE SIM router: up to 150 Mbps, AC1200 dual-band Wi-Fi for 64 devices, LTE bands 3 and 20 for Kuwait, WAN port with 4G failover.",
+  "mpn": "Archer MR402",
+  "source_url": "https://www.tp-link.com/ae/home-networking/3g-4g-router/archer-mr402/",
+  "sources": [
+    "https://www.tp-link.com/ae/home-networking/3g-4g-router/archer-mr402/",
+    "https://www.tp-link.com/ae/home-networking/3g-4g-router/archer-mr402/#specifications"
+  ],
+  "notes": "Only the /ae/ official page exists (en/uk return 404). Carrier mention based on official LTE band list (FDD B1/B3/B5/B7/B8/B20/B28, TDD B38/B40/B41; 3G B1/B5/B8) which covers Kuwait's LTE bands 3 and 20. All Ethernet ports are 10/100 Mbps (wan_speed=100m). lan_ports=4 = 3 LAN + 1 LAN/WAN (all 4 usable as LAN in 4G mode; 3 when WAN is used). internet_connection includes fiber because the WAN port supports cable/fiber/DSL modems (via external modem/ONT), not built-in fiber. 4G download 150 Mbps per page (category not stated). max_speed_mbps = 867 + 300 Wi-Fi. No coverage figure on official page. Package list on page reads 'RJ45 Ethernet Cable1.5m Power Adapter' (ambiguous whether 1.5 m refers to cable); length omitted. Hardware version not stated."
+}

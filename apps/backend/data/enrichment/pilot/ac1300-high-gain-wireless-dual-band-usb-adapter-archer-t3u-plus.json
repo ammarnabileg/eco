@@ -1,0 +1,72 @@
+{
+  "handle": "ac1300-high-gain-wireless-dual-band-usb-adapter-archer-t3u-plus",
+  "botble_id": "600",
+  "title_ar": "وصلة واي فاي USB ثنائية النطاق AC1300 بهوائي عالي الكسب من TP-Link Archer T3U Plus",
+  "title_en": "TP-Link Archer T3U Plus AC1300 High Gain Dual-Band USB Wi-Fi Adapter",
+  "subtitle_ar": "أضف واي فاي 5 GHz سريع لكمبيوترك عبر USB 3.0 مع هوائي عالي الكسب قابل للتوجيه",
+  "subtitle_en": "Add fast dual-band Wi-Fi to your PC over USB 3.0 with an adjustable high-gain antenna",
+  "description_ar": "Archer T3U Plus وصلة (أدابتر) واي فاي USB من TP-Link تضيف واي فاي ثنائي النطاق لكمبيوتر مكتبي لا يحتوي على واي فاي، أو لابتوب إشارته الداخلية ضعيفة. تعمل بفئة AC1300: حتى 867 ميجابت/ث على تردد 5 GHz للألعاب وبث الفيديو بدقة عالية وتحميل الملفات الكبيرة، أو حتى 400 ميجابت/ث على تردد 2.4 GHz للتصفح ومسافة أبعد.\n\nتتصل بمنفذ USB 3.0 لنقل بيانات أسرع، وفيها هوائي خارجي عالي الكسب يجمع هوائيين في هوائي واحد لتحسين الاستقبال والإرسال، خصوصاً عندما يكون الكمبيوتر بعيداً عن الراوتر أو تفصله جدران. الهوائي قابل للتدوير والتوجيه لتحصل على أفضل إشارة في مكانك. تقنية MU-MIMO ترفع كفاءة الشبكة عند استخدامها مع راوتر يدعم MU-MIMO.\n\nتدعم التشفير WPA/WPA2، وتعمل مع Windows 11 و10 و8.1 و8 و7 (32/64 بت) وmacOS 10.15 وما قبله. الوصلة للواي فاي فقط ولا تحتوي على بلوتوث.\n\nمحتويات العلبة: وصلة Archer T3U Plus، دليل التثبيت السريع، وقرص تعريفات.",
+  "description_en": "Archer T3U Plus is a TP-Link USB Wi-Fi adapter that adds dual-band Wi-Fi to a desktop PC without wireless, or upgrades a laptop with weak built-in Wi-Fi. It runs in the AC1300 class: up to 867 Mbps on 5 GHz for gaming, HD streaming and large downloads, or up to 400 Mbps on 2.4 GHz for browsing and longer range.\n\nIt connects over USB 3.0 for fast data transfer and uses an external high-gain antenna, two antennas built into one, to improve reception and transmission when the PC is far from the router or behind walls. The antenna rotates so you can aim it for the best signal. MU-MIMO improves network efficiency with a compatible MU-MIMO router.\n\nIt supports WPA/WPA2 security and works with Windows 11/10/8.1/8/7 (32/64-bit) and macOS 10.15 and earlier. It is Wi-Fi only, with no Bluetooth.\n\nIn the box: Archer T3U Plus adapter, quick installation guide and resource CD.",
+  "highlights_ar": [
+    "واي فاي ثنائي النطاق AC1300: حتى 867 ميجابت/ث على 5 GHz أو 400 ميجابت/ث على 2.4 GHz",
+    "منفذ USB 3.0 لنقل بيانات سريع",
+    "هوائي خارجي عالي الكسب قابل للتدوير",
+    "تقنية MU-MIMO مع الراوترات المتوافقة",
+    "يدعم Windows 11/10/8.1/8/7 وmacOS 10.15 وما قبله"
+  ],
+  "highlights_en": [
+    "AC1300 dual-band: up to 867 Mbps on 5 GHz or 400 Mbps on 2.4 GHz",
+    "USB 3.0 interface for fast transfers",
+    "Adjustable external high-gain antenna",
+    "MU-MIMO with compatible routers",
+    "Supports Windows 11/10/8.1/8/7 and macOS 10.15 and earlier"
+  ],
+  "specs": {
+    "interface": "usb3",
+    "wifi_standard": "wifi5",
+    "max_speed_mbps": 867,
+    "bluetooth": "none",
+    "antenna": "high_gain",
+    "os_support": {
+      "ar": "Windows 11/10/8.1/8/7، macOS 10.15 وما قبله",
+      "en": "Windows 11/10/8.1/8/7, macOS 10.15 and earlier"
+    }
+  },
+  "faq": [
+    {
+      "question_ar": "هل تعمل على Windows 11؟",
+      "answer_ar": "نعم، تذكر TP-Link دعم Windows 11 و10 و8.1 و8 و7 بنسختي 32 و64 بت.",
+      "question_en": "Does it work on Windows 11?",
+      "answer_en": "Yes. TP-Link lists support for Windows 11/10/8.1/8/7, both 32- and 64-bit."
+    },
+    {
+      "question_ar": "هل تعمل مع أجهزة ماك الحديثة؟",
+      "answer_ar": "الصفحة الرسمية تذكر دعم macOS 10.15 وما قبله فقط، لذلك لا يُضمن عملها على إصدارات macOS الأحدث.",
+      "question_en": "Will it work on a recent Mac?",
+      "answer_en": "The official page lists macOS 10.15 and earlier only, so newer macOS versions are not officially supported."
+    },
+    {
+      "question_ar": "هل السرعة 1300 ميجابت/ث في نفس الوقت؟",
+      "answer_ar": "لا، الرقم AC1300 هو مجموع الترددين؛ الوصلة تتصل على تردد واحد في كل مرة: حتى 867 ميجابت/ث على 5 GHz أو حتى 400 ميجابت/ث على 2.4 GHz.",
+      "question_en": "Do I get 1300 Mbps at once?",
+      "answer_en": "No. AC1300 is the combined class rating; the adapter connects on one band at a time, up to 867 Mbps on 5 GHz or 400 Mbps on 2.4 GHz."
+    },
+    {
+      "question_ar": "هل فيها بلوتوث؟",
+      "answer_ar": "لا، Archer T3U Plus وصلة واي فاي فقط ولا تدعم البلوتوث.",
+      "question_en": "Does it include Bluetooth?",
+      "answer_en": "No, Archer T3U Plus is a Wi-Fi-only adapter with no Bluetooth."
+    }
+  ],
+  "seo_title_ar": "وصلة واي فاي USB TP-Link Archer T3U Plus AC1300",
+  "seo_title_en": "TP-Link Archer T3U Plus AC1300 USB Wi-Fi Adapter",
+  "seo_description_ar": "وصلة واي فاي USB 3.0 من TP-Link Archer T3U Plus بسرعة AC1300 ثنائية النطاق وهوائي عالي الكسب قابل للتوجيه، تدعم Windows 11 وmacOS 10.15 وما قبله.",
+  "seo_description_en": "TP-Link Archer T3U Plus AC1300 dual-band USB 3.0 Wi-Fi adapter with adjustable high-gain antenna and MU-MIMO. Supports Windows 11/10 and macOS 10.15.",
+  "mpn": "Archer T3U Plus",
+  "source_url": "https://www.tp-link.com/ae/home-networking/adapter/archer-t3u-plus/",
+  "sources": [
+    "https://www.tp-link.com/ae/home-networking/adapter/archer-t3u-plus/",
+    "https://www.tp-link.com/ae/home-networking/adapter/archer-t3u-plus/#specifications"
+  ],
+  "notes": "Input mpn is 'Archer T3U PLUS'; official name is 'Archer T3U Plus'. max_speed_mbps=867 (5 GHz); adapter uses one band at a time (867 or 400 Mbps), AC1300 is the class rating. Official spec lists '1 External High Gain Antenna' while marketing says 'two antennas built in one' — copy follows that wording. Bluetooth not present on official spec (Wi-Fi only adapter) -> 'none'. OS support per spec: Windows 11/10/8.1/8/7 (32/64-bit), Mac OS 10.15 and earlier; Linux not officially listed. ethernet_speed not applicable, omitted. Hardware version not stated."
+}
