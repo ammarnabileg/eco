@@ -10,6 +10,7 @@ import {
   GatewayStatus,
   RedirectOptions,
   RedirectPaymentProvider,
+  SessionData,
   sessionFromReference,
   StatusResult,
   WebhookResult,
@@ -61,6 +62,15 @@ export function deemaStatus(status: string | undefined): GatewayStatus {
   }
 }
 
+/**
+ * Deema's "Return Invoice ID": one per refund on the order. Numbered from
+ * the refunds already made, so a failed refund retried keeps its reference.
+ */
+export function deemaRefundReference(data: SessionData) {
+  const done = (data as { refunds?: unknown[] }).refunds?.length ?? 0
+  return `${data.session_id ?? "refund"}-R${done + 1}`.slice(0, 255)
+}
+
 class DeemaProviderService extends RedirectPaymentProvider<DeemaOptions> {
   static identifier = "deema"
   protected readonly currencies = ["kwd"]
@@ -97,8 +107,7 @@ class DeemaProviderService extends RedirectPaymentProvider<DeemaOptions> {
     }
     const { status, body } = await this.request<{
       message?: string
-      error_code?: number
-      data?: { order_reference?: string; redirect_link?: string }
+      data?: { order_reference?: string; redirect_link?: string; error_code?: number } | null
     }>("POST", "/purchase", {
       amount: input.amount,
       currency_code: input.currency.toUpperCase(),
@@ -132,11 +141,11 @@ class DeemaProviderService extends RedirectPaymentProvider<DeemaOptions> {
     }
   }
 
-  protected async refund(externalId: string, amount: number) {
+  protected async refund(externalId: string, amount: number, _full: boolean, data: SessionData) {
     const { status, body } = await this.request<{ success?: boolean; message?: string; data?: Record<string, unknown> }>(
       "POST",
       `/order/${encodeURIComponent(externalId)}/refund`,
-      { amount, currency: "KWD", comment: "Refund from Laly", merchant_reference: externalId }
+      { amount, currency: "KWD", comment: "Refund from Laly", merchant_reference: deemaRefundReference(data) }
     )
     if (status >= 400 || body?.success === false) {
       throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, `Deema refund failed: ${body?.message ?? status}`)

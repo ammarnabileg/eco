@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto"
 
-import { deemaStatus } from "../../payment-deema/service"
+import { deemaRefundReference, deemaStatus } from "../../payment-deema/service"
 import { KlickPayClient, klickPayStatus, verifyKlickPaySignature } from "../../payment-klickpay/client"
 import { talyPhone, talyStatus } from "../../payment-taly/service"
 import {
@@ -128,6 +128,11 @@ describe("BNPL status mapping", () => {
     expect(deemaStatus("declined_by_deema")).toBe("failed")
     expect(deemaStatus("expired")).toBe("canceled")
     expect(deemaStatus("pending")).toBe("pending")
+    expect(deemaStatus("partially_captured")).toBe("paid")
+    expect(deemaStatus("fully_refunded")).toBe("refunded")
+    // One Return Invoice ID per refund; a retried refund keeps its own.
+    expect(deemaRefundReference({ session_id: "payses_1" })).toBe("payses_1-R1")
+    expect(deemaRefundReference({ session_id: "payses_1", refunds: [{}] } as never)).toBe("payses_1-R2")
   })
 
   it("Taly", () => {
