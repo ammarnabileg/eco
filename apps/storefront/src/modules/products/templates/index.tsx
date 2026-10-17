@@ -189,7 +189,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           />
         </div>
       ) : (
-        <div className="content-container grid grid-cols-[1.05fr_1fr] gap-10 items-start">
+        <div className="content-container grid grid-cols-1 small:grid-cols-[1.05fr_1fr] gap-6 small:gap-10 items-start">
           <div className="sticky top-28">
             <Gallery images={images} title={product.title} layout="desktop" />
           </div>
