@@ -1,8 +1,21 @@
 import {
+  allowFields,
+  authenticate,
   configureStoreSearch,
   defineMiddlewares,
   validateAndTransformBody,
 } from "@medusajs/framework/http"
+
+import {
+  CreateAddonGroup,
+  CreateBrand,
+  CreateSpecTemplate,
+  UpdateAddonGroup,
+  UpdateBrand,
+  UpdateProductCatalog,
+  UpdateQuoteRequest,
+  UpdateSpecTemplate,
+} from "./admin/catalog/validators"
 
 import {
   CreateHeroSlide,
@@ -11,6 +24,17 @@ import {
   UpdateSiteSettings,
   UpdateTrustBadge,
 } from "./admin/content/validators"
+import { guardLineItems } from "./store/carts/guards"
+import { AddConfiguredItem, CreateQuoteRequest } from "./store/catalog/validators"
+
+// Request them as stars: +brand.*,+product_detail.*,+addon_groups.options.*
+const CATALOG_PRODUCT_FIELDS = ["brand", "product_detail", "addon_groups", "addon_groups.options"]
+
+const body = (matcher: string, schema: Parameters<typeof validateAndTransformBody>[0]) => ({
+  method: ["POST" as const],
+  matcher,
+  middlewares: [validateAndTransformBody(schema)],
+})
 
 export default defineMiddlewares({
   routes: [
@@ -52,5 +76,38 @@ export default defineMiddlewares({
       matcher: "/admin/content/trust-badges/:id",
       middlewares: [validateAndTransformBody(UpdateTrustBadge)],
     },
+    // Catalog: brands, spec templates, add-ons, quotes, per-product data.
+    body("/admin/catalog/brands", CreateBrand),
+    body("/admin/catalog/brands/:id", UpdateBrand),
+    body("/admin/catalog/spec-templates", CreateSpecTemplate),
+    body("/admin/catalog/spec-templates/:id", UpdateSpecTemplate),
+    body("/admin/catalog/addon-groups", CreateAddonGroup),
+    body("/admin/catalog/addon-groups/:id", UpdateAddonGroup),
+    body("/admin/catalog/quote-requests/:id", UpdateQuoteRequest),
+    body("/admin/catalog/products/:id", UpdateProductCatalog),
+    body("/store/carts/:id/configured-items", AddConfiguredItem),
+    {
+      method: ["POST"],
+      matcher: "/store/quote-requests",
+      middlewares: [
+        authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true }),
+        validateAndTransformBody(CreateQuoteRequest),
+      ],
+    },
+    {
+      method: ["POST"],
+      matcher: "/store/carts/:id/line-items",
+      middlewares: [guardLineItems],
+    },
+    {
+      method: ["POST"],
+      matcher: "/store/carts/:id/line-items/:line_id",
+      middlewares: [guardLineItems],
+    },
+    // Linked catalog data on the core product routes (?fields=+brand.*...).
+    ...["/store/products", "/store/products/:id"].map((matcher) => ({
+      matcher,
+      middlewares: [allowFields(...CATALOG_PRODUCT_FIELDS)],
+    })),
   ],
 })

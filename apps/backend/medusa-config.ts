@@ -109,5 +109,10 @@ module.exports = defineConfig({
     disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
     backendUrl: process.env.MEDUSA_BACKEND_URL,
   },
-  modules: [{ resolve: "./src/modules/store-content" }, ...meilisearch, ...redisModules],
+  modules: [
+    { resolve: "./src/modules/store-content" },
+    { resolve: "./src/modules/catalog" },
+    ...meilisearch,
+    ...redisModules,
+  ],
 })
