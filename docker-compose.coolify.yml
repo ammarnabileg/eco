@@ -1,0 +1,128 @@
+# Backend stack for Coolify (Docker Compose build pack): Postgres, Redis,
+# Meilisearch and the Medusa server + admin. The storefront is a separate
+# Coolify application (apps/storefront/Dockerfile) because it needs the
+# publishable key at build time, which exists only after this stack has run.
+# Step by step: docs/DEPLOY-COOLIFY.md
+#
+# SERVICE_* variables are generated once by Coolify and kept across deploys.
+# ${VAR:?} blocks the deploy until a value is entered in Environment Variables.
+# No `ports:`: Coolify's proxy routes the domain set on the backend service.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medusa
+      POSTGRES_USER: ${SERVICE_USER_POSTGRES}
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # pg_dump output from the scheduled backup task (docs/DEPLOY-COOLIFY.md).
+      - postgres-backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.55.0
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: production
+      MEILI_MASTER_KEY: ${SERVICE_PASSWORD_64_MEILI}
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meili-data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:7700/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    volumes:
+      # Admin uploads when S3_BUCKET is not set.
+      - uploads:/app/static
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://${SERVICE_USER_POSTGRES}:${SERVICE_PASSWORD_POSTGRES}@postgres:5432/medusa?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      MEILISEARCH_HOST: http://meilisearch:7700
+      MEILISEARCH_API_KEY: ${SERVICE_PASSWORD_64_MEILI}
+      JWT_SECRET: ${SERVICE_PASSWORD_64_JWT}
+      COOKIE_SECRET: ${SERVICE_PASSWORD_64_COOKIE}
+
+      # Public URLs, with https and no trailing slash.
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:?}
+      STOREFRONT_URL: ${STOREFRONT_URL:?}
+      STORE_CORS: ${STORE_CORS:-${STOREFRONT_URL}}
+      ADMIN_CORS: ${ADMIN_CORS:-${MEDUSA_BACKEND_URL}}
+      AUTH_CORS: ${AUTH_CORS:-${MEDUSA_BACKEND_URL},${STOREFRONT_URL}}
+      MEDUSA_WORKER_MODE: shared
+
+      # Uploads on Cloudflare R2 / S3 (optional; leave S3_BUCKET empty to use the volume).
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_REGION: ${S3_REGION:-auto}
+      S3_FILE_URL: ${S3_FILE_URL}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      S3_PREFIX: ${S3_PREFIX}
+
+      # Payments: each gateway turns on when its keys are set.
+      KLICKPAY_CLIENT_ID: ${KLICKPAY_CLIENT_ID}
+      KLICKPAY_CLIENT_SECRET: ${KLICKPAY_CLIENT_SECRET}
+      KLICKPAY_WEBHOOK_SECRET: ${KLICKPAY_WEBHOOK_SECRET}
+      KLICKPAY_BASE_URL: ${KLICKPAY_BASE_URL}
+      KLICKPAY_METHODS: ${KLICKPAY_METHODS:-knet,card,apple_pay}
+      TALY_USERNAME: ${TALY_USERNAME}
+      TALY_PASSWORD: ${TALY_PASSWORD}
+      TALY_BASE_URL: ${TALY_BASE_URL}
+      DEEMA_API_KEY: ${DEEMA_API_KEY}
+      DEEMA_BASE_URL: ${DEEMA_BASE_URL}
+      DEEMA_WEBHOOK_HEADER: ${DEEMA_WEBHOOK_HEADER:-x-deema-signature}
+      DEEMA_WEBHOOK_SECRET: ${DEEMA_WEBHOOK_SECRET}
+
+      # QuickBooks (optional). The key encrypts stored tokens: keep it.
+      QUICKBOOKS_CLIENT_ID: ${QUICKBOOKS_CLIENT_ID}
+      QUICKBOOKS_CLIENT_SECRET: ${QUICKBOOKS_CLIENT_SECRET}
+      QUICKBOOKS_ENVIRONMENT: ${QUICKBOOKS_ENVIRONMENT:-sandbox}
+      QUICKBOOKS_ENCRYPTION_KEY: ${SERVICE_HEX_64_QUICKBOOKS}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
+
+volumes:
+  postgres-data:
+  postgres-backups:
+  redis-data:
+  meili-data:
+  uploads:

@@ -42,6 +42,10 @@ Payments: KNET, Visa/Mastercard and Apple/Google/Samsung Pay via KlickPay,
 plus Taly and Deema instalments. Setup, webhooks, test cards and the open
 questions for each gateway: [docs/PAYMENTS.md](docs/PAYMENTS.md).
 
+Deploying on Coolify (backend stack from `docker-compose.coolify.yml`,
+storefront as a Dockerfile app, first-run commands, uploads, backups):
+[docs/DEPLOY-COOLIFY.md](docs/DEPLOY-COOLIFY.md).
+
 Accounting: products, orders, payments and refunds sync to QuickBooks Online
 (connect from Settings > QuickBooks). QuickBooks keeps 2 decimals, so KWD fils
 are rounded with an explicit rounding line: [docs/QUICKBOOKS.md](docs/QUICKBOOKS.md).

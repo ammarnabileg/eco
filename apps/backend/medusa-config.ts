@@ -2,6 +2,13 @@ import { loadEnv, defineConfig, MedusaError } from "@medusajs/framework/utils"
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
+// An empty variable means "not set". Hosting panels (Coolify, Docker Compose
+// `${VAR}`) pass declared-but-blank variables as "", which would otherwise
+// override every default below.
+for (const [key, value] of Object.entries(process.env)) {
+  if (value === "") delete process.env[key]
+}
+
 const isProduction = process.env.NODE_ENV === "production"
 const redisUrl = process.env.REDIS_URL
 
@@ -156,6 +163,40 @@ const paymentProviders = [
       ]
     : []),
 ]
+// Uploaded files (admin images, imports). S3-compatible storage (Cloudflare
+// R2, S3) when configured; otherwise the server's disk under ./static, which
+// must be a persistent volume in Docker or uploads vanish on redeploy.
+const backendUrl = (env.MEDUSA_BACKEND_URL ?? "http://localhost:9000").replace(/\/$/, "")
+const files = [
+  {
+    resolve: "@medusajs/medusa/file",
+    options: {
+      providers: [
+        env.S3_BUCKET
+          ? {
+              resolve: "@medusajs/medusa/file-s3",
+              id: "s3",
+              options: {
+                file_url: env.S3_FILE_URL,
+                bucket: env.S3_BUCKET,
+                region: env.S3_REGION ?? "auto",
+                endpoint: env.S3_ENDPOINT,
+                access_key_id: env.S3_ACCESS_KEY_ID,
+                secret_access_key: env.S3_SECRET_ACCESS_KEY,
+                prefix: env.S3_PREFIX,
+                additional_client_config: { forcePathStyle: true },
+              },
+            }
+          : {
+              resolve: "@medusajs/medusa/file-local",
+              id: "local",
+              options: { upload_dir: "static", backend_url: `${backendUrl}/static` },
+            },
+      ],
+    },
+  },
+]
+
 const payments = paymentProviders.length
   ? [{ resolve: "@medusajs/medusa/payment", options: { providers: paymentProviders } }]
   : []
@@ -193,6 +234,7 @@ module.exports = defineConfig({
         encryptionKey: env.QUICKBOOKS_ENCRYPTION_KEY,
       },
     },
+    ...files,
     ...meilisearch,
     ...payments,
     ...redisModules,
