@@ -1,11 +1,13 @@
-import { Logger, ProviderWebhookPayload } from "@medusajs/framework/types"
+import { ProviderWebhookPayload } from "@medusajs/framework/types"
 import { MedusaError } from "@medusajs/framework/utils"
 
+import { IntegrationValues } from "../integrations/definitions"
 import {
   Checkout,
   CheckoutRequest,
   gatewayFetch,
   GatewayStatus,
+  ProviderContainer,
   RedirectOptions,
   RedirectPaymentProvider,
   SessionData,
@@ -24,8 +26,8 @@ export const TALY_SANDBOX_URL = "https://api.dev-taly.io"
 const TALY_CLIENT_AUTH = "Basic bWVyY2hhbnQtYXBpOnNlY3JldA=="
 
 export type TalyOptions = RedirectOptions & {
-  username: string
-  password: string
+  username?: string
+  password?: string
   baseUrl?: string
   /** Public backend URL; Taly posts order updates to its webhook route. */
   backendUrl: string
@@ -57,32 +59,46 @@ let token: { value: string; expires: number; key: string } | null = null
 class TalyProviderService extends RedirectPaymentProvider<TalyOptions> {
   static identifier = "taly"
   protected readonly currencies = ["kwd"]
+  protected readonly integration = "taly"
 
   static validateOptions(options: Record<string, unknown>) {
-    if (!options.username || !options.password || !options.backendUrl) {
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, "Taly needs username, password and backendUrl")
+    if (!options.backendUrl) {
+      throw new MedusaError(MedusaError.Types.INVALID_DATA, "Taly needs backendUrl")
     }
   }
 
-  constructor(container: { logger: Logger }, options: TalyOptions) {
+  constructor(container: ProviderContainer, options: TalyOptions) {
     super(container, options)
   }
 
-  private get base() {
-    return (this.options_.baseUrl || TALY_SANDBOX_URL).replace(/\/$/, "")
+  protected fromSettings(values: IntegrationValues): Partial<TalyOptions> {
+    return {
+      username: values.username as string | undefined,
+      password: values.password as string | undefined,
+      baseUrl: values.base_url as string | undefined,
+    }
+  }
+
+  private async base() {
+    return ((await this.opts()).baseUrl || TALY_SANDBOX_URL).replace(/\/$/, "")
   }
 
   private async accessToken(force = false) {
-    const key = `${this.base}|${this.options_.username}`
+    const { username, password } = await this.opts()
+    if (!username || !password) {
+      throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "Taly is not configured")
+    }
+    const base = await this.base()
+    const key = `${base}|${username}|${password}`
     if (!force && token && token.key === key && token.expires > Date.now()) {
       return token.value
     }
-    const { status, body } = await gatewayFetch<Record<string, unknown>>("Taly", `${this.base}/uaa/oauth/token`, {
+    const { status, body } = await gatewayFetch<Record<string, unknown>>("Taly", `${base}/uaa/oauth/token`, {
       method: "POST",
       headers: { Authorization: TALY_CLIENT_AUTH, "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
-        username: this.options_.username,
-        password: this.options_.password,
+        username,
+        password,
         grant_type: "password",
         scope: "api",
       }).toString(),
@@ -101,7 +117,7 @@ class TalyProviderService extends RedirectPaymentProvider<TalyOptions> {
 
   private async request<T>(method: "GET" | "POST" | "PUT", path: string, body?: unknown) {
     for (const retry of [false, true]) {
-      const res = await gatewayFetch<T>("Taly", `${this.base}${path}`, {
+      const res = await gatewayFetch<T>("Taly", `${await this.base()}${path}`, {
         method,
         headers: {
           Authorization: `Bearer ${await this.accessToken(retry)}`,

@@ -1,9 +1,11 @@
-import { Logger, ProviderWebhookPayload } from "@medusajs/framework/types"
+import { ProviderWebhookPayload } from "@medusajs/framework/types"
 import { MedusaError } from "@medusajs/framework/utils"
 
+import { IntegrationValues } from "../integrations/definitions"
 import {
   Checkout,
   CheckoutRequest,
+  ProviderContainer,
   RedirectOptions,
   RedirectPaymentProvider,
   sessionFromReference,
@@ -13,14 +15,20 @@ import {
 import { KLICKPAY_STAGING_URL, KlickPayClient, KlickPayMethod, klickPayStatus, verifyKlickPaySignature } from "./client"
 
 export type KlickPayOptions = RedirectOptions & {
-  clientId: string
-  clientSecret: string
+  clientId?: string
+  clientSecret?: string
   /** Secret saved as secret_key in KlickPay's webhook settings. */
   webhookSecret?: string
   baseUrl?: string
   /** Which KlickPay checkout this provider instance opens. */
   method: KlickPayMethod
+  /** The provider id in Medusa (knet, card, apple_pay, ...), as listed in the admin. */
+  methodId?: string
 }
+
+/** The admin stores a list; the environment a comma-separated string. */
+export const listOf = (v: unknown) =>
+  (Array.isArray(v) ? v : String(v ?? "").split(",")).map((x) => String(x).trim()).filter(Boolean)
 
 const METHODS: KlickPayMethod[] = ["knet", "mpgs", "apple-pay", "google-pay", "samsung-pay", "general-link"]
 
@@ -31,36 +39,56 @@ const clients = new Map<string, KlickPayClient>()
 /**
  * KNET, cards (MPGS) and wallets through KlickPay. One class, registered once
  * per method in medusa-config (pp_klickpay_knet, pp_klickpay_card, ...).
+ * Keys come from the admin's integrations settings (or the environment).
  */
 class KlickPayProviderService extends RedirectPaymentProvider<KlickPayOptions> {
   static identifier = "klickpay"
   protected readonly currencies = ["kwd"]
-  private readonly client: KlickPayClient
+  protected readonly integration = "klickpay"
 
   static validateOptions(options: Record<string, unknown>) {
-    if (!options.clientId || !options.clientSecret) {
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, "KlickPay needs clientId and clientSecret")
-    }
     if (!METHODS.includes(options.method as KlickPayMethod)) {
       throw new MedusaError(MedusaError.Types.INVALID_DATA, `KlickPay method must be one of ${METHODS.join(", ")}`)
     }
   }
 
-  constructor(container: { logger: Logger }, options: KlickPayOptions) {
+  constructor(container: ProviderContainer, options: KlickPayOptions) {
     super(container, options)
-    const baseUrl = (options.baseUrl || KLICKPAY_STAGING_URL).replace(/\/$/, "")
-    const key = `${baseUrl}|${options.clientId}`
-    if (!clients.has(key)) {
-      clients.set(key, new KlickPayClient(baseUrl, options.clientId, options.clientSecret))
+  }
+
+  protected fromSettings(values: IntegrationValues): Partial<KlickPayOptions> {
+    return {
+      clientId: values.client_id as string | undefined,
+      clientSecret: values.client_secret as string | undefined,
+      webhookSecret: values.webhook_secret as string | undefined,
+      baseUrl: values.base_url as string | undefined,
     }
-    this.client = clients.get(key)!
+  }
+
+  // Each method can be switched off on its own in the admin.
+  protected async available() {
+    const settings = await this.settings()
+    return settings.active && (!this.options_.methodId || listOf(settings.values.methods).includes(this.options_.methodId))
+  }
+
+  private async client(): Promise<KlickPayClient> {
+    const { baseUrl, clientId, clientSecret } = await this.opts()
+    if (!clientId || !clientSecret) {
+      throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "KlickPay is not configured")
+    }
+    const base = (baseUrl || KLICKPAY_STAGING_URL).replace(/\/$/, "")
+    const key = `${base}|${clientId}|${clientSecret}`
+    if (!clients.has(key)) {
+      clients.set(key, new KlickPayClient(base, clientId, clientSecret))
+    }
+    return clients.get(key)!
   }
 
   protected async createCheckout(input: CheckoutRequest): Promise<Checkout> {
     if (!input.customer.email || !input.customer.phone) {
       throw new MedusaError(MedusaError.Types.INVALID_DATA, "Email and phone are required to pay with KlickPay")
     }
-    const link = await this.client.createPayment(this.options_.method, {
+    const link = await (await this.client()).createPayment(this.options_.method, {
       reference: input.reference,
       amount: input.amount,
       name: input.customer.name,
@@ -74,7 +102,7 @@ class KlickPayProviderService extends RedirectPaymentProvider<KlickPayOptions> {
   }
 
   protected async fetchStatus(externalId: string): Promise<StatusResult> {
-    const res = await this.client.status(externalId)
+    const res = await (await this.client()).status(externalId)
     if (!res.success && !res.data) {
       // Unknown to KlickPay or a transient error: never treat as paid.
       return { status: "pending", raw: { code: res.code, message: res.message } }
@@ -88,7 +116,7 @@ class KlickPayProviderService extends RedirectPaymentProvider<KlickPayOptions> {
   }
 
   protected async refund(externalId: string, amount: number, full: boolean) {
-    const res = await this.client.refund(externalId, full ? null : amount)
+    const res = await (await this.client()).refund(externalId, full ? null : amount)
     if (res.code === "INSUFFICIENT_BALANCE") {
       // Queued by KlickPay until the merchant wallet is funded; the refund
       // webhook reports the outcome. Recorded so staff can follow up.
@@ -105,7 +133,7 @@ class KlickPayProviderService extends RedirectPaymentProvider<KlickPayOptions> {
   }
 
   protected async parseWebhook(payload: ProviderWebhookPayload["payload"]): Promise<WebhookResult | null> {
-    const secret = this.options_.webhookSecret ?? ""
+    const secret = (await this.opts()).webhookSecret ?? ""
     if (!verifyKlickPaySignature(payload.rawData, payload.headers, secret)) {
       throw new MedusaError(MedusaError.Types.UNAUTHORIZED, "bad or missing X-KlickPay-Signature")
     }

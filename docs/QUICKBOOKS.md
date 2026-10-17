@@ -45,7 +45,12 @@
    لازم يطابق الحرف بالحرف (http/https، والشرطة في الآخر). للتجربة المحلية: `http://localhost:9000/quickbooks/callback`.
 3. انسخ Client ID وClient Secret. مفاتيح Development للـ sandbox، ومفاتيح Production للشركة الحقيقية. **Production محتاج Intuit توافق على التطبيق** (استبيان الـ App assessment).
 
-### 2. متغيرات السيرفر (`apps/backend/.env`)
+### 2. المفاتيح: من الأدمن
+ادخل **التكاملات ← المحاسبة ← QuickBooks Online**، وحط Client ID وClient Secret، واختار البيئة، وفعّل، واحفظ.
+- مفتاح تشفير التوكنز **مش محتاج تدخله**: السيرفر بيولّده لوحده.
+- الـ Redirect URI المطلوب بيظهر في نفس الكارت.
+
+### أو: متغيرات السيرفر (`apps/backend/.env`)
 ```bash
 QUICKBOOKS_CLIENT_ID=...
 QUICKBOOKS_CLIENT_SECRET=...

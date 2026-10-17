@@ -35,7 +35,8 @@ const docs = [
 
 suite("Meilisearch provider (live)", () => {
   jest.setTimeout(60_000)
-  const provider = new MeilisearchSearchService({}, { host: host!, apiKey })
+  // describe.skip still runs this body, so only build the provider when live.
+  const provider = host ? new MeilisearchSearchService({}, { host, apiKey }) : (null as never)
   const search = (q: string | undefined, extra: Partial<SearchTypes.ProviderSearchQuery> = {}) =>
     provider.search({ index, q, attributes_to_retrieve: ["title", "price", "created_at"], ...extra })
   const titles = (r: SearchTypes.SearchResult) => r.hits.map((h) => String(h.document.title))

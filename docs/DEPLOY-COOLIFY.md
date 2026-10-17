@@ -109,6 +109,15 @@ npx medusa exec ./src/scripts/setup-payments.js
 
 ## 3) بعد ما الاتنين يشتغلوا
 
+**المفاتيح كلها من الأدمن:** صفحة **التكاملات** (`/app/integrations`). فيها:
+- **الدفع:** KlickPay وTaly وDeema.
+- **المحاسبة:** QuickBooks.
+- **التسويق:** Google Merchant (كود التحقق)، وGoogle AdSense (Publisher ID، و`/ads.txt` بيتعمل لوحده)، وMicrosoft Clarity.
+
+أي تغيير هنا مش محتاج Redeploy.
+
+⚠️ **المفاتيح بتتشفّر بـ `SETTINGS_ENCRYPTION_KEY`.** لو مش متحدد، الكود بيستخدم `QUICKBOOKS_ENCRYPTION_KEY` اللي Coolify بيولّده. **متغيرش القيمة دي أبداً بعد ما تحفظ أي مفاتيح**، لأن لو اتغيرت مش هيبقى ممكن تقرا المفاتيح المحفوظة، وهتضطر تدخلها كلها من جديد.
+
 - **روابط الـ Webhooks اللي بتتحط عند البوابات:**
   - KlickPay: `https://api.laly.kw/hooks/payment/klickpay_knet` (وبنفس الشكل لكل طريقة دفع)
   - Taly: `https://api.laly.kw/hooks/payment/taly_taly`

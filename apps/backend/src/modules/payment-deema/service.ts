@@ -1,13 +1,15 @@
 import { timingSafeEqual } from "node:crypto"
 
-import { Logger, ProviderWebhookPayload } from "@medusajs/framework/types"
+import { ProviderWebhookPayload } from "@medusajs/framework/types"
 import { MedusaError } from "@medusajs/framework/utils"
 
+import { IntegrationValues } from "../integrations/definitions"
 import {
   Checkout,
   CheckoutRequest,
   gatewayFetch,
   GatewayStatus,
+  ProviderContainer,
   RedirectOptions,
   RedirectPaymentProvider,
   SessionData,
@@ -22,7 +24,7 @@ import {
 export const DEEMA_SANDBOX_URL = "https://sandbox-api.deema.me/api/merchant/v1"
 
 export type DeemaOptions = RedirectOptions & {
-  apiKey: string
+  apiKey?: string
   baseUrl?: string
   /** Header name and value set in Deema's merchant portal for webhooks. */
   webhookHeader?: string
@@ -74,26 +76,31 @@ export function deemaRefundReference(data: SessionData) {
 class DeemaProviderService extends RedirectPaymentProvider<DeemaOptions> {
   static identifier = "deema"
   protected readonly currencies = ["kwd"]
+  protected readonly integration = "deema"
 
-  static validateOptions(options: Record<string, unknown>) {
-    if (!options.apiKey) {
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, "Deema needs apiKey")
-    }
-  }
-
-  constructor(container: { logger: Logger }, options: DeemaOptions) {
+  constructor(container: ProviderContainer, options: DeemaOptions) {
     super(container, options)
   }
 
-  private get base() {
-    return (this.options_.baseUrl || DEEMA_SANDBOX_URL).replace(/\/$/, "")
+  protected fromSettings(values: IntegrationValues): Partial<DeemaOptions> {
+    return {
+      apiKey: values.api_key as string | undefined,
+      baseUrl: values.base_url as string | undefined,
+      webhookHeader: values.webhook_header as string | undefined,
+      webhookSecret: values.webhook_secret as string | undefined,
+    }
   }
 
   private async request<T>(method: "GET" | "POST", path: string, body?: unknown) {
-    return gatewayFetch<T>("Deema", `${this.base}${path}`, {
+    const { apiKey, baseUrl } = await this.opts()
+    if (!apiKey) {
+      throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "Deema is not configured")
+    }
+    const base = (baseUrl || DEEMA_SANDBOX_URL).replace(/\/$/, "")
+    return gatewayFetch<T>("Deema", `${base}${path}`, {
       method,
       headers: {
-        Authorization: `Basic ${this.options_.apiKey}`,
+        Authorization: `Basic ${apiKey}`,
         Accept: "application/json",
         ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
       },
@@ -159,8 +166,9 @@ class DeemaProviderService extends RedirectPaymentProvider<DeemaOptions> {
 
   protected async parseWebhook(payload: ProviderWebhookPayload["payload"]): Promise<WebhookResult | null> {
     // Deema signs nothing: it sends a fixed header configured in its portal.
-    const name = (this.options_.webhookHeader ?? "x-deema-signature").toLowerCase()
-    const expected = this.options_.webhookSecret ?? ""
+    const opts = await this.opts()
+    const name = (opts.webhookHeader || "x-deema-signature").toLowerCase()
+    const expected = opts.webhookSecret ?? ""
     const raw = payload.headers[name]
     const got = Array.isArray(raw) ? String(raw[0]) : String(raw ?? "")
     const a = Buffer.from(expected)

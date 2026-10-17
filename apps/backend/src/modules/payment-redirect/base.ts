@@ -24,6 +24,9 @@ import {
 } from "@medusajs/framework/types"
 import { AbstractPaymentProvider, BigNumber, MedusaError, PaymentActions } from "@medusajs/framework/utils"
 
+import { IntegrationValues } from "../integrations/definitions"
+import { readIntegration } from "../integrations/store"
+
 // Shared flow for hosted-checkout gateways (KNET via KlickPay, Taly, Deema):
 // create a checkout and send the customer there, then confirm the result
 // server-side before the order is placed. The redirect back to the store is
@@ -103,14 +106,41 @@ export const toMajor = (amount: unknown) => {
   return Math.round(n * 1000) / 1000
 }
 
+export type ProviderContainer = {
+  logger: Logger
+  /** Shared database connection, used to read keys saved in the admin. */
+  __pg_connection__?: Parameters<typeof readIntegration>[0]
+}
+
 export abstract class RedirectPaymentProvider<TOptions extends RedirectOptions> extends AbstractPaymentProvider<TOptions> {
   protected readonly logger_: Logger
   protected readonly options_: TOptions
+  private readonly pg_: ProviderContainer["__pg_connection__"]
 
-  constructor(container: { logger: Logger }, options: TOptions) {
+  constructor(container: ProviderContainer, options: TOptions) {
     super(container, options)
     this.logger_ = container.logger
     this.options_ = options
+    this.pg_ = container.__pg_connection__
+  }
+
+  /** Key of this gateway in the admin's integrations settings. */
+  protected abstract readonly integration: string
+  /** Gateway options from the values saved in the admin (or the environment). */
+  protected abstract fromSettings(values: IntegrationValues): Partial<TOptions>
+
+  protected settings() {
+    return readIntegration(this.pg_, this.integration)
+  }
+
+  /** Options as configured right now: keys can change without a restart. */
+  protected async opts(): Promise<TOptions> {
+    return { ...this.options_, ...this.fromSettings((await this.settings()).values) }
+  }
+
+  /** Whether customers may start a payment with this gateway now. */
+  protected async available(): Promise<boolean> {
+    return (await this.settings()).active
   }
 
   /** Currencies the gateway accepts (lowercase). */
@@ -143,6 +173,9 @@ export abstract class RedirectPaymentProvider<TOptions extends RedirectOptions> 
   }
 
   private async checkout(input: InitiatePaymentInput | UpdatePaymentInput, sessionId: string, retry = false) {
+    if (!(await this.available())) {
+      throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "This payment method is not available right now")
+    }
     const data = (input.data ?? {}) as SessionData
     const currency = input.currency_code.toLowerCase()
     if (!this.currencies.includes(currency)) {

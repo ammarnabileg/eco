@@ -17,7 +17,7 @@ export function encrypt(plain: string, secret: string): string {
 export function decrypt(sealed: string, secret: string): string {
   const [version, iv, tag, data] = sealed.split(".")
   if (version !== "v1" || !iv || !tag || !data) {
-    throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, "Unreadable QuickBooks token")
+    throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, "Unreadable encrypted value")
   }
   const decipher = createDecipheriv("aes-256-gcm", keyFrom(secret), Buffer.from(iv, "base64"))
   decipher.setAuthTag(Buffer.from(tag, "base64"))

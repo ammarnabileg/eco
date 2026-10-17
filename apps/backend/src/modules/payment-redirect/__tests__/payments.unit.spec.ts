@@ -19,8 +19,17 @@ const logger = { warn: jest.fn(), info: jest.fn(), error: jest.fn(), debug: jest
 class FakeGateway extends RedirectPaymentProvider<RedirectOptions> {
   static identifier = "fake"
   protected readonly currencies = ["kwd"]
+  protected readonly integration = "klickpay"
   requests: CheckoutRequest[] = []
   status: StatusResult = { status: "pending" }
+  configured = true
+
+  protected fromSettings() {
+    return {}
+  }
+  protected async available() {
+    return this.configured
+  }
 
   protected async createCheckout(input: CheckoutRequest): Promise<Checkout> {
     this.requests.push(input)
@@ -54,6 +63,13 @@ describe("redirect payment flow", () => {
     expect(g.requests[0].reference).toBe("payses_01ABC")
     expect(new URL(g.requests[0].success_url).searchParams.get("result")).toBe("success")
     expect(new URL(g.requests[0].failure_url).searchParams.get("session_id")).toBe("payses_01ABC")
+  })
+
+  it("refuses to open a checkout with a gateway that is not configured", async () => {
+    const g = gateway()
+    g.configured = false
+    await expect(initiate(g)).rejects.toThrow("not available")
+    expect(g.requests).toHaveLength(0)
   })
 
   it("refuses return URLs outside the storefront", async () => {

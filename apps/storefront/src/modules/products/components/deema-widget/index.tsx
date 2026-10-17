@@ -3,8 +3,9 @@
 import Script from "next/script"
 import { createElement, useEffect, useState } from "react"
 
-const KEY = process.env.NEXT_PUBLIC_DEEMA_WIDGET_KEY
-const URL = process.env.NEXT_PUBLIC_DEEMA_WIDGET_URL || "https://sandbox-widget.deema.me"
+import { useIntegrations } from "@modules/common/components/integrations/context"
+
+const WIDGET_URLS = ["https://sandbox-widget.deema.me", "https://widget.deema.me"]
 
 declare global {
   interface Window {
@@ -14,10 +15,15 @@ declare global {
 
 /**
  * Deema's on-site instalment widget (required by Deema before go-live).
- * Renders nothing unless NEXT_PUBLIC_DEEMA_WIDGET_KEY is set. The widget is a
- * web component, so it is mounted only after hydration.
+ * The key comes from the admin (Settings > Integrations > Deema), or from
+ * NEXT_PUBLIC_DEEMA_WIDGET_KEY. The widget is a web component, so it is
+ * mounted only after hydration.
  */
 export default function DeemaWidget({ amount }: { amount: number }) {
+  const deema = useIntegrations().deema
+  const KEY = deema?.widget_key || process.env.NEXT_PUBLIC_DEEMA_WIDGET_KEY
+  const configured = deema?.widget_url || process.env.NEXT_PUBLIC_DEEMA_WIDGET_URL || WIDGET_URLS[0]
+  const URL = WIDGET_URLS.includes(configured) ? configured : WIDGET_URLS[0]
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -25,7 +31,7 @@ export default function DeemaWidget({ amount }: { amount: number }) {
       window.deemaWidgetConfiguration = { publicKey: KEY }
       setMounted(true)
     }
-  }, [])
+  }, [KEY])
 
   if (!KEY || !mounted || !(amount > 0)) {
     return null

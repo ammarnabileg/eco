@@ -127,7 +127,11 @@ const QuickbooksPage = () => {
         </div>
         {!status.configured && (
           <Text size="small" className="text-ui-fg-error">
-            أضف QUICKBOOKS_CLIENT_ID و QUICKBOOKS_CLIENT_SECRET و QUICKBOOKS_ENCRYPTION_KEY في إعدادات السيرفر أولاً.
+            أضف Client ID و Client Secret من تطبيق Intuit وفعّل QuickBooks من{" "}
+            <a href="/app/integrations" className="text-ui-fg-interactive underline">
+              صفحة التكاملات
+            </a>{" "}
+            أولاً.
           </Text>
         )}
         {status.connection && (

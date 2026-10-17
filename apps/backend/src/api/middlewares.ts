@@ -24,6 +24,7 @@ import {
   UpdateSiteSettings,
   UpdateTrustBadge,
 } from "./admin/content/validators"
+import { SaveIntegration } from "./admin/integrations/validators"
 import { SyncQuickbooks, UpdateQuickbooksSettings } from "./admin/quickbooks/validators"
 import { guardLineItems } from "./store/carts/guards"
 import { AddConfiguredItem, CreateQuoteRequest } from "./store/catalog/validators"
@@ -51,6 +52,11 @@ export default defineMiddlewares({
           },
         }),
       ],
+    },
+    {
+      method: ["POST"],
+      matcher: "/admin/integrations/:key",
+      middlewares: [validateAndTransformBody(SaveIntegration)],
     },
     {
       method: ["POST"],

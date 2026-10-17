@@ -125,55 +125,45 @@ const KLICKPAY_METHODS: Record<string, string> = {
   google_pay: "google-pay",
   samsung_pay: "samsung-pay",
 }
+// Every gateway is registered; whether customers see it depends on its keys,
+// saved in the admin (Settings > Integrations) or set here as environment
+// variables. Saving keys in the admin attaches the gateway to the KWD regions.
 const paymentProviders = [
-  ...(env.KLICKPAY_CLIENT_ID && env.KLICKPAY_CLIENT_SECRET
-    ? (env.KLICKPAY_METHODS ?? "knet,card,apple_pay")
-        .split(",")
-        .map((id) => id.trim())
-        .filter((id) => KLICKPAY_METHODS[id])
-        .map((id) => ({
-          resolve: "./src/modules/payment-klickpay",
-          id,
-          options: {
-            clientId: env.KLICKPAY_CLIENT_ID,
-            clientSecret: env.KLICKPAY_CLIENT_SECRET,
-            webhookSecret: env.KLICKPAY_WEBHOOK_SECRET,
-            baseUrl: env.KLICKPAY_BASE_URL,
-            method: KLICKPAY_METHODS[id],
-            storefrontUrls,
-          },
-        }))
-    : []),
-  ...(env.TALY_USERNAME && env.TALY_PASSWORD
-    ? [
-        {
-          resolve: "./src/modules/payment-taly",
-          id: "taly",
-          options: {
-            username: env.TALY_USERNAME,
-            password: env.TALY_PASSWORD,
-            baseUrl: env.TALY_BASE_URL,
-            backendUrl: env.MEDUSA_BACKEND_URL ?? "http://localhost:9000",
-            storefrontUrls,
-          },
-        },
-      ]
-    : []),
-  ...(env.DEEMA_API_KEY
-    ? [
-        {
-          resolve: "./src/modules/payment-deema",
-          id: "deema",
-          options: {
-            apiKey: env.DEEMA_API_KEY,
-            baseUrl: env.DEEMA_BASE_URL,
-            webhookHeader: env.DEEMA_WEBHOOK_HEADER,
-            webhookSecret: env.DEEMA_WEBHOOK_SECRET,
-            storefrontUrls,
-          },
-        },
-      ]
-    : []),
+  ...Object.entries(KLICKPAY_METHODS).map(([id, method]) => ({
+    resolve: "./src/modules/payment-klickpay",
+    id,
+    options: {
+      clientId: env.KLICKPAY_CLIENT_ID,
+      clientSecret: env.KLICKPAY_CLIENT_SECRET,
+      webhookSecret: env.KLICKPAY_WEBHOOK_SECRET,
+      baseUrl: env.KLICKPAY_BASE_URL,
+      method,
+      methodId: id,
+      storefrontUrls,
+    },
+  })),
+  {
+    resolve: "./src/modules/payment-taly",
+    id: "taly",
+    options: {
+      username: env.TALY_USERNAME,
+      password: env.TALY_PASSWORD,
+      baseUrl: env.TALY_BASE_URL,
+      backendUrl: env.MEDUSA_BACKEND_URL ?? "http://localhost:9000",
+      storefrontUrls,
+    },
+  },
+  {
+    resolve: "./src/modules/payment-deema",
+    id: "deema",
+    options: {
+      apiKey: env.DEEMA_API_KEY,
+      baseUrl: env.DEEMA_BASE_URL,
+      webhookHeader: env.DEEMA_WEBHOOK_HEADER,
+      webhookSecret: env.DEEMA_WEBHOOK_SECRET,
+      storefrontUrls,
+    },
+  },
 ]
 // Uploaded files (admin images, imports). S3-compatible storage (Cloudflare
 // R2, S3) when configured; otherwise the server's disk under ./static, which
@@ -234,6 +224,8 @@ module.exports = defineConfig({
   modules: [
     { resolve: "./src/modules/store-content" },
     { resolve: "./src/modules/catalog" },
+    // Keys for payments, QuickBooks and marketing tools, editable in the admin.
+    { resolve: "./src/modules/integrations" },
     {
       // QuickBooks Online: optional; syncing starts once an admin connects.
       resolve: "./src/modules/quickbooks",
