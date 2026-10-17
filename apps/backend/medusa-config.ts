@@ -91,6 +91,75 @@ const meilisearch = process.env.MEILISEARCH_HOST
     ]
   : []
 
+// Payments: each gateway is enabled by its own keys. Customers are sent to
+// the gateway's hosted page and the result is confirmed server-side.
+const storefrontUrls = (process.env.STOREFRONT_URL ?? "http://localhost:8000")
+  .split(",")
+  .map((url) => url.trim())
+  .filter(Boolean)
+const env = process.env
+// KNET, cards and wallets through KlickPay; one provider per checkout page.
+const KLICKPAY_METHODS: Record<string, string> = {
+  knet: "knet",
+  card: "mpgs",
+  apple_pay: "apple-pay",
+  google_pay: "google-pay",
+  samsung_pay: "samsung-pay",
+}
+const paymentProviders = [
+  ...(env.KLICKPAY_CLIENT_ID && env.KLICKPAY_CLIENT_SECRET
+    ? (env.KLICKPAY_METHODS ?? "knet,card,apple_pay")
+        .split(",")
+        .map((id) => id.trim())
+        .filter((id) => KLICKPAY_METHODS[id])
+        .map((id) => ({
+          resolve: "./src/modules/payment-klickpay",
+          id,
+          options: {
+            clientId: env.KLICKPAY_CLIENT_ID,
+            clientSecret: env.KLICKPAY_CLIENT_SECRET,
+            webhookSecret: env.KLICKPAY_WEBHOOK_SECRET,
+            baseUrl: env.KLICKPAY_BASE_URL,
+            method: KLICKPAY_METHODS[id],
+            storefrontUrls,
+          },
+        }))
+    : []),
+  ...(env.TALY_USERNAME && env.TALY_PASSWORD
+    ? [
+        {
+          resolve: "./src/modules/payment-taly",
+          id: "taly",
+          options: {
+            username: env.TALY_USERNAME,
+            password: env.TALY_PASSWORD,
+            baseUrl: env.TALY_BASE_URL,
+            backendUrl: env.MEDUSA_BACKEND_URL ?? "http://localhost:9000",
+            storefrontUrls,
+          },
+        },
+      ]
+    : []),
+  ...(env.DEEMA_API_KEY
+    ? [
+        {
+          resolve: "./src/modules/payment-deema",
+          id: "deema",
+          options: {
+            apiKey: env.DEEMA_API_KEY,
+            baseUrl: env.DEEMA_BASE_URL,
+            webhookHeader: env.DEEMA_WEBHOOK_HEADER,
+            webhookSecret: env.DEEMA_WEBHOOK_SECRET,
+            storefrontUrls,
+          },
+        },
+      ]
+    : []),
+]
+const payments = paymentProviders.length
+  ? [{ resolve: "@medusajs/medusa/payment", options: { providers: paymentProviders } }]
+  : []
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -113,6 +182,7 @@ module.exports = defineConfig({
     { resolve: "./src/modules/store-content" },
     { resolve: "./src/modules/catalog" },
     ...meilisearch,
+    ...payments,
     ...redisModules,
   ],
 })
