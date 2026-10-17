@@ -1,3 +1,4 @@
+import { listCartPaymentMethods } from "@lib/data/payment"
 import { listProducts } from "@lib/data/products"
 import { CATALOG_PRODUCT_FIELDS } from "@lib/util/catalog"
 import { HttpTypes } from "@medusajs/types"
@@ -17,13 +18,16 @@ export default async function ProductActionsWrapper({
   layout: "mobile" | "desktop"
   whatsapp?: string | null
 }) {
-  const product = await listProducts({
+  const [product, providers] = await Promise.all([
+    listProducts({
     queryParams: {
       id: [id],
       fields: `*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.images,*variants.options,+metadata,${CATALOG_PRODUCT_FIELDS}`,
     },
     regionId: region.id,
-  }).then(({ response }) => response.products[0])
+    }).then(({ response }) => response.products[0]),
+    listCartPaymentMethods(region.id),
+  ])
 
   if (!product) {
     return null
@@ -35,6 +39,7 @@ export default async function ProductActionsWrapper({
       region={region}
       layout={layout}
       whatsapp={whatsapp}
+      talyAvailable={!!providers?.some((p) => p.id.startsWith("pp_taly_"))}
     />
   )
 }

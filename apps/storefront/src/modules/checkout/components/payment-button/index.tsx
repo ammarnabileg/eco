@@ -1,7 +1,8 @@
 "use client"
 
-import { isManual, isStripeLike } from "@lib/constants"
-import { placeOrder } from "@lib/data/cart"
+import { isBnpl, isManual, isRedirectGateway, isStripeLike } from "@lib/constants"
+import { placeOrder, startGatewayCheckout } from "@lib/data/cart"
+import { gatewaySessionData } from "@lib/util/gateway-session"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
@@ -33,6 +34,15 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <StripePaymentButton
           notReady={notReady}
           cart={cart}
+          data-testid={dataTestId}
+        />
+      )
+    case isRedirectGateway(paymentSession?.provider_id):
+      return (
+        <RedirectGatewayButton
+          cart={cart}
+          providerId={paymentSession!.provider_id}
+          notReady={notReady}
           data-testid={dataTestId}
         />
       )
@@ -151,6 +161,72 @@ const StripePaymentButton = ({
       <ErrorMessage
         error={errorMessage}
         data-testid="stripe-payment-error-message"
+      />
+    </>
+  )
+}
+
+// KNET, cards, wallets (KlickPay), Taly and Deema all pay on the gateway's
+// own page. A fresh session right before leaving makes the link match the
+// final total; the order is placed when the customer comes back to
+// /api/payment-redirect and the backend has confirmed the payment.
+const RedirectGatewayButton = ({
+  cart,
+  providerId,
+  notReady,
+  "data-testid": dataTestId,
+}: {
+  cart: HttpTypes.StoreCart
+  providerId: string
+  notReady: boolean
+  "data-testid"?: string
+}) => {
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { countryCode } = useParams() as { countryCode: string }
+
+  const handlePayment = async () => {
+    setSubmitting(true)
+    setErrorMessage(null)
+    const { url, error } = await startGatewayCheckout(
+      cart,
+      providerId,
+      gatewaySessionData(cart, countryCode, window.location.origin)
+    )
+    if (url) {
+      // Keep the spinner: the browser is leaving the page.
+      window.location.assign(url)
+      return
+    }
+    setErrorMessage(error ?? null)
+    setSubmitting(false)
+  }
+
+  const label = providerId.startsWith("pp_taly_")
+    ? "متابعة إلى Taly"
+    : providerId.startsWith("pp_deema_")
+      ? "متابعة إلى Deema"
+      : "ادفع الآن"
+
+  return (
+    <>
+      <Button
+        disabled={notReady}
+        isLoading={submitting}
+        onClick={handlePayment}
+        size="large"
+        data-testid={dataTestId}
+      >
+        {label}
+      </Button>
+      <p className="mt-2 text-xs text-laly-mut">
+        {isBnpl(providerId)
+          ? "ستكمل الموافقة والدفعة الأولى في صفحة مزوّد التقسيط ثم تعود للمتجر."
+          : "ستنتقل لصفحة الدفع الآمنة ثم تعود للمتجر لتأكيد طلبك."}
+      </p>
+      <ErrorMessage
+        error={errorMessage}
+        data-testid="gateway-payment-error-message"
       />
     </>
   )

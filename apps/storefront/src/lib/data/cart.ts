@@ -300,6 +300,36 @@ export async function initiatePaymentSession(
     .catch(medusaError)
 }
 
+/**
+ * Opens a hosted checkout (KNET/cards/wallets via KlickPay, Taly, Deema) and
+ * returns the gateway URL. Errors come back as values: production builds
+ * hide the message of anything a server action throws.
+ */
+export async function startGatewayCheckout(
+  cart: HttpTypes.StoreCart,
+  providerId: string,
+  data: Record<string, unknown>
+): Promise<{ url?: string; error?: string }> {
+  try {
+    const { payment_collection } = await initiatePaymentSession(cart, {
+      provider_id: providerId,
+      data,
+    })
+    const url = payment_collection?.payment_sessions?.find(
+      (s) => s.provider_id === providerId
+    )?.data?.redirect_url
+    if (typeof url === "string" && url.startsWith("https://")) {
+      return { url }
+    }
+  } catch (error) {
+    console.error(`Gateway checkout ${providerId} failed:`, error)
+  }
+  return {
+    error:
+      "تعذّر بدء الدفع بهذه الطريقة الآن. حاول مرة أخرى أو اختر طريقة دفع أخرى.",
+  }
+}
+
 export async function applyPromotions(codes: string[]) {
   const cartId = await getCartId()
 

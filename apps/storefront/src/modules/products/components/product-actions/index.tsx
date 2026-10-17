@@ -13,6 +13,7 @@ import { addConfiguredToCart, addToCart } from "@lib/data/cart"
 import { isPriceOnRequest, productAddonGroups } from "@lib/util/catalog"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { convertToLocale } from "@lib/util/money"
+import DeemaWidget from "@modules/products/components/deema-widget"
 import { HttpTypes } from "@medusajs/types"
 import Icon from "@modules/laly/components/icon"
 import AddonSelector, {
@@ -31,6 +32,8 @@ type ProductActionsProps = {
   disabled?: boolean
   layout?: "mobile" | "desktop"
   whatsapp?: string | null
+  /** The region offers Taly instalments. */
+  talyAvailable?: boolean
 }
 
 const optionsAsKeymap = (
@@ -49,6 +52,7 @@ export default function ProductActions({
   disabled,
   layout = "desktop",
   whatsapp,
+  talyAvailable = false,
 }: ProductActionsProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -218,6 +222,30 @@ export default function ProductActions({
   return (
     <div className="flex flex-col gap-y-5">
       <ProductPrice product={product} variant={selectedVariant} />
+      {talyAvailable && variantPrice && (
+        <p className="-mt-3 text-xs text-laly-mut" data-testid="taly-instalments">
+          أو 4 دفعات بقيمة{" "}
+          <span className="font-bold text-laly-ink tabular-nums">
+            {convertToLocale({
+              amount:
+                Math.round(
+                  ((variantPrice.calculated_price_number + extra) / 4) * 1000
+                ) / 1000,
+              currency_code: currencyCode,
+            })}
+          </span>{" "}
+          بدون فوائد مع Taly
+        </p>
+      )}
+      {variantPrice && (
+        <DeemaWidget
+          amount={
+            Math.round(
+              (variantPrice.calculated_price_number + extra) * 1000
+            ) / 1000
+          }
+        />
+      )}
 
       {(product.variants?.length ?? 0) > 1 &&
         (product.options ?? []).map((option) => (

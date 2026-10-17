@@ -1,7 +1,14 @@
 "use client"
 import { RadioGroup } from "@headlessui/react"
-import { isStripeLike, paymentInfoMap } from "@lib/constants"
-import { initiatePaymentSession } from "@lib/data/cart"
+import {
+  DEEMA_MIN_TOTAL,
+  isRedirectGateway,
+  isStripeLike,
+  paymentInfoMap,
+} from "@lib/constants"
+import { initiatePaymentSession, startGatewayCheckout } from "@lib/data/cart"
+import { gatewaySessionData } from "@lib/util/gateway-session"
+import { convertToLocale } from "@lib/util/money"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentContainer, {
@@ -16,7 +23,12 @@ import {
   clx,
 } from "@modules/common/components/ui"
 import { HttpTypes } from "@medusajs/types"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
 const Payment = ({
@@ -41,7 +53,31 @@ const Payment = ({
   const router = useRouter()
   const pathname = usePathname()
 
+  const { countryCode } = useParams() as { countryCode: string }
+
   const isOpen = searchParams.get("step") === "payment"
+  // Set by /api/payment-redirect when a gateway payment did not complete.
+  const gatewayFailed = searchParams.get("error") === "payment_failed"
+
+  // Deema does not take orders below its minimum.
+  const methods = availablePaymentMethods?.filter(
+    (m) =>
+      !(m.id.startsWith("pp_deema_") && (cart.total ?? 0) < DEEMA_MIN_TOTAL)
+  )
+
+  const bnplNote = (providerId: string) => {
+    if (providerId.startsWith("pp_taly_")) {
+      const quarter = Math.round(((cart.total ?? 0) / 4) * 1000) / 1000
+      return `ادفع على 4 دفعات بدون فوائد — ${convertToLocale({
+        amount: quarter,
+        currency_code: cart.currency_code,
+      })} الآن`
+    }
+    if (providerId.startsWith("pp_deema_")) {
+      return "قسّمها بدون فوائد مع Deema"
+    }
+    return null
+  }
 
   const setPaymentMethod = async (method: string) => {
     setError(null)
@@ -85,7 +121,18 @@ const Payment = ({
       const checkActiveSession =
         activeSession?.provider_id === selectedPaymentMethod
 
-      if (!checkActiveSession) {
+      if (isRedirectGateway(selectedPaymentMethod)) {
+        // Checks the gateway accepts this order before the review step.
+        const { error: gatewayError } = await startGatewayCheckout(
+          cart,
+          selectedPaymentMethod,
+          gatewaySessionData(cart, countryCode, window.location.origin)
+        )
+        if (gatewayError) {
+          setError(gatewayError)
+          return
+        }
+      } else if (!checkActiveSession) {
         await initiatePaymentSession(cart, {
           provider_id: selectedPaymentMethod,
         })
@@ -140,13 +187,24 @@ const Payment = ({
       </div>
       <div>
         <div className={isOpen ? "block" : "hidden"}>
-          {!paidByGiftcard && availablePaymentMethods?.length && (
+          {gatewayFailed && (
+            <div
+              className="mb-4 rounded-xl border border-laly-red/30 bg-laly-red/5 p-4 text-sm text-laly-ink"
+              role="alert"
+              data-testid="payment-failed-message"
+            >
+              لم نتمكن من تأكيد الدفع. لو تم الخصم من حسابك فسيتأكد طلبك
+              تلقائياً خلال دقائق وتصلك رسالة التأكيد، فلا تدفع مرة أخرى.
+              وإن لم يتم الخصم، جرّب مرة أخرى أو اختر طريقة دفع أخرى.
+            </div>
+          )}
+          {!paidByGiftcard && methods?.length && (
             <>
               <RadioGroup
                 value={selectedPaymentMethod}
                 onChange={(value: string) => setPaymentMethod(value)}
               >
-                {availablePaymentMethods.map((paymentMethod) => (
+                {methods.map((paymentMethod) => (
                   <div key={paymentMethod.id}>
                     {isStripeLike(paymentMethod.id) ? (
                       <StripePaymentContainer
@@ -161,7 +219,13 @@ const Payment = ({
                         paymentInfoMap={paymentInfoMap}
                         paymentProviderId={paymentMethod.id}
                         selectedPaymentOptionId={selectedPaymentMethod}
-                      />
+                      >
+                        {bnplNote(paymentMethod.id) && (
+                          <Text className="ps-9 text-xs text-laly-mut">
+                            {bnplNote(paymentMethod.id)}
+                          </Text>
+                        )}
+                      </PaymentContainer>
                     )}
                   </div>
                 ))}
@@ -233,7 +297,11 @@ const Payment = ({
                       <CreditCard />
                     )}
                   </Container>
-                  <Text>ستظهر خطوة إضافية</Text>
+                  <Text>
+                    {isRedirectGateway(activeSession?.provider_id)
+                      ? "ستنتقل لصفحة الدفع الآمنة عند تأكيد الطلب"
+                      : "ستظهر خطوة إضافية"}
+                  </Text>
                 </div>
               </div>
             </div>
