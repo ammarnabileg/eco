@@ -24,6 +24,7 @@ import {
   UpdateSiteSettings,
   UpdateTrustBadge,
 } from "./admin/content/validators"
+import { SyncQuickbooks, UpdateQuickbooksSettings } from "./admin/quickbooks/validators"
 import { guardLineItems } from "./store/carts/guards"
 import { AddConfiguredItem, CreateQuoteRequest } from "./store/catalog/validators"
 
@@ -86,6 +87,8 @@ export default defineMiddlewares({
     body("/admin/catalog/quote-requests/:id", UpdateQuoteRequest),
     body("/admin/catalog/products/:id", UpdateProductCatalog),
     body("/store/carts/:id/configured-items", AddConfiguredItem),
+    body("/admin/quickbooks/settings", UpdateQuickbooksSettings),
+    body("/admin/quickbooks/sync", SyncQuickbooks),
     {
       method: ["POST"],
       matcher: "/store/quote-requests",

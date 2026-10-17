@@ -181,6 +181,19 @@ module.exports = defineConfig({
   modules: [
     { resolve: "./src/modules/store-content" },
     { resolve: "./src/modules/catalog" },
+    {
+      // QuickBooks Online: optional; syncing starts once an admin connects.
+      resolve: "./src/modules/quickbooks",
+      options: {
+        clientId: env.QUICKBOOKS_CLIENT_ID,
+        clientSecret: env.QUICKBOOKS_CLIENT_SECRET,
+        environment: env.QUICKBOOKS_ENVIRONMENT === "production" ? "production" : "sandbox",
+        redirectUri:
+          env.QUICKBOOKS_REDIRECT_URI ?? `${env.MEDUSA_BACKEND_URL ?? "http://localhost:9000"}/quickbooks/callback`,
+        encryptionKey: env.QUICKBOOKS_ENCRYPTION_KEY,
+        amountDecimals: env.QUICKBOOKS_AMOUNT_DECIMALS ? Number(env.QUICKBOOKS_AMOUNT_DECIMALS) : 3,
+      },
+    },
     ...meilisearch,
     ...payments,
     ...redisModules,
