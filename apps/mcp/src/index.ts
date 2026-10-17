@@ -11,6 +11,7 @@ import { McpServer } from "@modelcontextprotocol/server"
 import { serveStdio } from "@modelcontextprotocol/server/stdio"
 
 import { BACKEND_URL } from "./api.js"
+import { registerCatalogContentTools } from "./tools/catalog-content.js"
 import { registerCatalogTools } from "./tools/catalog.js"
 import { registerContentTools } from "./tools/content.js"
 import { registerOrderTools } from "./tools/orders.js"
@@ -23,11 +24,13 @@ function createServer(): McpServer {
         "Tools for the Laly electronics store in Kuwait (prices in KWD, 3 decimals; Arabic is the primary language, English secondary). " +
         "Read before you write: call laly_get_store_content, laly_search_products or laly_list_offers to get IDs and current values. " +
         "Trust badges and offers are promises to customers: confirm wording, prices and dates with the user before creating or changing them. " +
-        "Dates use ISO 8601 with the Kuwait offset +03:00.",
+        "Dates use ISO 8601 with the Kuwait offset +03:00. " +
+        "Product specs come only from official manufacturer pages: call laly_get_product_catalog for the allowed fields first.",
     }
   )
   registerContentTools(server)
   registerCatalogTools(server)
+  registerCatalogContentTools(server)
   registerOrderTools(server)
   return server
 }

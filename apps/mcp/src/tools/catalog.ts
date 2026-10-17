@@ -113,21 +113,35 @@ export function registerCatalogTools(server: McpServer) {
     async ({ product: ref, title, description, en_title, en_description, brand, status }, ctx) => {
       const signal = ctx.mcpReq.signal
       const product = await findProduct(ref, signal)
-      const metaChanges = Object.fromEntries(
-        Object.entries({ en_title, en_description, brand }).filter(([, v]) => v !== undefined)
-      )
       const body = {
         ...(title !== undefined ? { title } : {}),
         ...(description !== undefined ? { description } : {}),
         ...(status !== undefined ? { status } : {}),
-        ...(Object.keys(metaChanges).length ? { metadata: { ...(product.metadata ?? {}), ...metaChanges } } : {}),
       }
-      if (!Object.keys(body).length) throw new Error("Pass at least one field to change.")
-      const { product: updated } = await api<{ product: Product }>(`/admin/products/${product.id}`, {
-        method: "POST",
-        body,
-        signal,
-      })
+      // English copy and brand live in the catalog module.
+      const detail = Object.fromEntries(
+        Object.entries({ title_en: en_title, description_en: en_description }).filter(([, v]) => v !== undefined)
+      )
+      let brand_id: string | undefined
+      if (brand !== undefined) {
+        const { brands } = await api<{ brands: { id: string; name: string }[] }>("/admin/catalog/brands", { signal })
+        const match = brands.find((b) => b.name.toLowerCase() === brand.toLowerCase())
+        if (!match) throw new Error(`Unknown brand "${brand}". Known brands: ${brands.map((b) => b.name).join(", ")}`)
+        brand_id = match.id
+      }
+      if (!Object.keys(body).length && !Object.keys(detail).length && !brand_id) {
+        throw new Error("Pass at least one field to change.")
+      }
+      if (Object.keys(detail).length || brand_id) {
+        await api(`/admin/catalog/products/${product.id}`, {
+          method: "POST",
+          body: { ...(Object.keys(detail).length ? { detail } : {}), ...(brand_id ? { brand_id } : {}) },
+          signal,
+        })
+      }
+      const updated = Object.keys(body).length
+        ? (await api<{ product: Product }>(`/admin/products/${product.id}`, { method: "POST", body, signal })).product
+        : product
       return ok(`Updated ${updated.title} (${updated.handle}).`)
     }
   )

@@ -28,7 +28,7 @@ Never commit the key. `.mcp.json` only references the environment variable.
 | Area | Tools |
 |---|---|
 | Store content | `laly_get_store_content`, `laly_update_contact`, `laly_create_hero_slide`, `laly_update_hero_slide`, `laly_delete_hero_slide`, `laly_create_trust_badge`, `laly_update_trust_badge`, `laly_delete_trust_badge` |
-| Catalogue | `laly_search_products`, `laly_update_product`, `laly_set_price` |
+| Catalogue | `laly_search_products`, `laly_update_product`, `laly_set_price`, `laly_get_product_catalog`, `laly_update_product_catalog` (specs validated against the category templates), `laly_list_quote_requests` |
 | Offers | `laly_list_offers`, `laly_create_offer`, `laly_update_offer`, `laly_delete_offer` |
 | Orders (read-only) | `laly_list_orders`, `laly_get_order` |
 

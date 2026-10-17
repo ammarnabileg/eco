@@ -46,9 +46,18 @@ assert.equal((after.structuredContent as { settings: { whatsapp: string } }).set
 await must("laly_update_contact", { whatsapp: before ?? "" })
 
 // Products and offers: create a one-day 10% offer, check it, delete it.
-const search = await must("laly_search_products", { q: "Hikvision", response_format: "json" })
+// Priced products (many Hikvision cameras are sold by quotation).
+const search = await must("laly_search_products", { q: "Archer", response_format: "json" })
 const products = (search.structuredContent as { products: { handle: string }[] }).products
-assert.ok(products.length > 0, "expected Hikvision products")
+assert.ok(products.length > 0, "expected Archer products")
+
+// Catalog: spec fields are listed, and an unknown spec key is rejected.
+const catalog = await must("laly_get_product_catalog", { product: products[0].handle, response_format: "json" })
+const fields = (catalog.structuredContent as { attributes: { key: string }[] }).attributes
+assert.ok(fields.some((f) => f.key === "wifi_standard"), "expected router spec fields")
+const badSpec = await call("laly_update_product_catalog", { product: products[0].handle, specs: { colour: "red" } })
+assert.ok(badSpec.isError && badSpec.text.includes("colour"), "unknown spec key should be rejected")
+await must("laly_list_quote_requests")
 const ends = new Date(Date.now() + 86_400_000).toISOString()
 const created = await must("laly_create_offer", {
   title: "اختبار",
