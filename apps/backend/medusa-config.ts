@@ -27,6 +27,18 @@ function requireSecret(name: string): string | undefined {
   return value
 }
 
+// Public URLs feed CORS, upload links, payment return URLs and OAuth
+// callbacks. Without them the server boots "healthy" but admin login and
+// checkout fail, so refuse to start instead.
+for (const name of ["MEDUSA_BACKEND_URL", "STOREFRONT_URL"]) {
+  if (isProduction && !/^https?:\/\//.test(process.env[name] ?? "")) {
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      `${name} must be set to the public URL (https://...) in production`
+    )
+  }
+}
+
 if (isProduction && !redisUrl) {
   throw new MedusaError(MedusaError.Types.INVALID_DATA, "REDIS_URL is required in production")
 }
