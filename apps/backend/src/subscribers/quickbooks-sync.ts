@@ -2,6 +2,7 @@ import { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 import {
+  syncCaptureToQuickbooksWorkflow,
   syncOrderToQuickbooksWorkflow,
   syncProductToQuickbooksWorkflow,
   syncRefundsToQuickbooksWorkflow,
@@ -16,6 +17,9 @@ export default async function quickbooksSync({ event, container }: SubscriberArg
     switch (event.name) {
       case "order.placed":
         await syncOrderToQuickbooksWorkflow(container).run({ input: event.data.id })
+        break
+      case "payment.captured":
+        await syncCaptureToQuickbooksWorkflow(container).run({ input: event.data.id })
         break
       case "payment.refunded":
         await syncRefundsToQuickbooksWorkflow(container).run({ input: event.data.id })
@@ -39,6 +43,7 @@ export default async function quickbooksSync({ event, container }: SubscriberArg
 export const config: SubscriberConfig = {
   event: [
     "order.placed",
+    "payment.captured",
     "payment.refunded",
     "product.created",
     "product.updated",

@@ -12,7 +12,7 @@ import { exchangeCode, QboClient, revokeToken } from "../../modules/quickbooks/c
 import { decrypt } from "../../modules/quickbooks/crypto"
 import QuickBooksModuleService from "../../modules/quickbooks/service"
 import { encryptionKey, storeTokens } from "./qbo"
-import { syncOrderToQuickBooks, syncProductToQuickBooks, syncRefundsToQuickBooks } from "./sync"
+import { syncCaptureToQuickBooks, syncOrderToQuickBooks, syncProductToQuickBooks, syncRefundsToQuickBooks } from "./sync"
 
 const resolveService = (container: MedusaContainer) => container.resolve<QuickBooksModuleService>(QUICKBOOKS_MODULE)
 
@@ -59,6 +59,7 @@ const saveQuickbooksConnectionStep = createStep(
       ...accounts,
       shipping_item_id: null,
       refund_item_id: null,
+      rounding_item_id: null,
     }
     const row = previous
       ? await svc.updateQbConnections({ ...base, id: previous.id })
@@ -165,4 +166,13 @@ const pushRefundsToQuickbooksStep = createStep("push-refunds-to-quickbooks", asy
 export const syncRefundsToQuickbooksWorkflow = createWorkflow(
   "sync-refunds-to-quickbooks",
   (paymentId: string) => new WorkflowResponse(pushRefundsToQuickbooksStep(paymentId))
+)
+
+const pushCaptureToQuickbooksStep = createStep("push-capture-to-quickbooks", async (paymentId: string, { container }) => {
+  return new StepResponse(await syncCaptureToQuickBooks(container, paymentId))
+})
+
+export const syncCaptureToQuickbooksWorkflow = createWorkflow(
+  "sync-capture-to-quickbooks",
+  (paymentId: string) => new WorkflowResponse(pushCaptureToQuickbooksStep(paymentId))
 )

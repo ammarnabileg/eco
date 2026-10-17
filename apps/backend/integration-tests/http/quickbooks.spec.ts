@@ -1,6 +1,12 @@
 import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ContainerRegistrationKeys, generateJwtToken, Modules } from "@medusajs/framework/utils"
-import { createOrderWorkflow } from "@medusajs/medusa/core-flows"
+import {
+  capturePaymentWorkflow,
+  createOrderPaymentCollectionWorkflow,
+  createOrderWorkflow,
+} from "@medusajs/medusa/core-flows"
+
+import { syncCaptureToQuickbooksWorkflow } from "../../src/workflows/quickbooks"
 
 jest.setTimeout(120 * 1000)
 
@@ -13,7 +19,7 @@ process.env.QUICKBOOKS_REDIRECT_URI = "http://localhost:9000/quickbooks/callback
 // fetch for Intuit hosts only (the test app runs in this process).
 const qbo = {
   tokenCalls: [] as Record<string, string>[],
-  creates: [] as { entity: string; body: Record<string, unknown>; requestid: string | null }[],
+  creates: [] as { entity: string; id: string; body: Record<string, unknown>; requestid: string | null }[],
   nextId: 100,
   refreshCount: 0,
 }
@@ -46,11 +52,24 @@ beforeAll(() => {
         }
         return json({ QueryResponse: {} })
       }
-      const entity = { item: "Item", customer: "Customer", paymentmethod: "PaymentMethod", invoice: "Invoice", salesreceipt: "SalesReceipt", refundreceipt: "RefundReceipt" }[path]
+      const [kind, readId] = path.split("/")
+      const entities: Record<string, string> = { item: "Item", customer: "Customer", paymentmethod: "PaymentMethod", invoice: "Invoice", salesreceipt: "SalesReceipt", refundreceipt: "RefundReceipt", payment: "Payment" }
+      if (readId && (!init?.method || init.method === "GET")) {
+        const found = qbo.creates.find((c) => c.entity === entities[kind] && c.id === readId)
+        if (found) {
+          const total = (found.body.Line as { Amount: number; DetailType: string }[]).reduce(
+            (s, l) => s + (l.DetailType === "DiscountLineDetail" ? -l.Amount : l.Amount),
+            0
+          )
+          return json({ [found.entity]: { ...found.body, Id: readId, SyncToken: "0", Balance: Math.round(total * 100) / 100 } })
+        }
+      }
+      const entity = entities[path]
       if (entity && init?.method === "POST") {
         const body = JSON.parse(String(init.body))
-        qbo.creates.push({ entity, body, requestid: url.searchParams.get("requestid") })
-        return json({ [entity]: { ...body, Id: String(body.Id ?? qbo.nextId++), SyncToken: "0" } })
+        const id = String(body.Id ?? qbo.nextId++)
+        qbo.creates.push({ entity, id, body, requestid: url.searchParams.get("requestid") })
+        return json({ [entity]: { ...body, Id: id, SyncToken: "0" } })
       }
       return json({ Fault: { Error: [{ code: "404", Message: "unknown" }] } }, 404)
     }
@@ -166,6 +185,106 @@ medusaIntegrationTestRunner({
       const before = qbo.creates.length
       await api.post("/admin/quickbooks/sync", { orders: [order.id] }, adminHeaders)
       expect(qbo.creates.length).toBe(before)
+    })
+
+    it("books a fils-priced order to 2 decimals and keeps the exact total in the note", async () => {
+      await connect()
+      const { data: region } = await api.post(
+        "/admin/regions",
+        { name: "Kuwait", currency_code: "kwd", countries: ["kw"] },
+        adminHeaders
+      )
+      const { data: product } = await api.post(
+        "/admin/products",
+        {
+          title: "Cable",
+          status: "published",
+          options: [{ title: "Default", values: ["Default"] }],
+          variants: [
+            { title: "Default", sku: "CABLE-1", manage_inventory: false, options: { Default: "Default" }, prices: [{ amount: 9.995, currency_code: "kwd" }] },
+          ],
+        },
+        adminHeaders
+      )
+      await api.post("/admin/quickbooks/sync", { products: [product.product.id] }, adminHeaders)
+      const { result: order } = await createOrderWorkflow(getContainer()).run({
+        input: {
+          region_id: region.region.id,
+          email: "buyer@laly.test",
+          currency_code: "kwd",
+          shipping_address: { first_name: "Ahmad", last_name: "Ali", country_code: "kw", phone: "+96599991234" },
+          items: [{ variant_id: product.product.variants[0].id, quantity: 1, unit_price: 9.995, title: "Cable" }],
+        },
+      })
+
+      const { data } = await api.post("/admin/quickbooks/sync", { orders: [order.id] }, adminHeaders)
+      expect(data.results[0]).toMatchObject({ ok: true })
+      // 9.995 rounds to 10.00 in QuickBooks: no rounding line, the overshoot
+      // goes to the discount; the note keeps the exact store total.
+      const invoice = qbo.creates.find((c) => c.entity === "Invoice")!
+      const lines = invoice.body.Line as { Amount: number; DetailType: string }[]
+      const total = lines.reduce((s, l) => s + (l.DetailType === "DiscountLineDetail" ? -l.Amount : l.Amount), 0)
+      expect(Math.round(total * 100) / 100).toBe(10)
+      expect(String(invoice.body.PrivateNote)).toContain("9.995 KWD")
+      expect(qbo.creates.some((c) => c.entity === "Item" && String(c.body.Name).startsWith("Rounding"))).toBe(true)
+    })
+
+    it("records a later capture as a Payment against the order's invoice", async () => {
+      await connect()
+      const container = getContainer()
+      const { data: region } = await api.post(
+        "/admin/regions",
+        { name: "Kuwait", currency_code: "kwd", countries: ["kw"] },
+        adminHeaders
+      )
+      const { data: product } = await api.post(
+        "/admin/products",
+        {
+          title: "Tapo C200",
+          status: "published",
+          options: [{ title: "Default", values: ["Default"] }],
+          variants: [
+            { title: "Default", sku: "TAPO-C200", manage_inventory: false, options: { Default: "Default" }, prices: [{ amount: 12.5, currency_code: "kwd" }] },
+          ],
+        },
+        adminHeaders
+      )
+      await api.post("/admin/quickbooks/sync", { products: [product.product.id] }, adminHeaders)
+      const { result: order } = await createOrderWorkflow(container).run({
+        input: {
+          region_id: region.region.id,
+          email: "cod@laly.test",
+          currency_code: "kwd",
+          shipping_address: { first_name: "Sara", last_name: "Ali", country_code: "kw", phone: "+96599990000" },
+          items: [{ variant_id: product.product.variants[0].id, quantity: 1, unit_price: 12.5, title: "Tapo C200" }],
+        },
+      })
+      await api.post("/admin/quickbooks/sync", { orders: [order.id] }, adminHeaders)
+      const invoice = qbo.creates.find((c) => c.entity === "Invoice")!
+
+      // Cash on delivery: the payment is captured after the order was booked.
+      const { result: collections } = await createOrderPaymentCollectionWorkflow(container).run({
+        input: { order_id: order.id, amount: 12.5 },
+      })
+      const payments = container.resolve(Modules.PAYMENT)
+      const session = await payments.createPaymentSession(collections[0].id, {
+        provider_id: "pp_system_default",
+        amount: 12.5,
+        currency_code: "kwd",
+        data: {},
+      })
+      const payment = (await payments.authorizePaymentSession(session.id, {}))!
+      await capturePaymentWorkflow(container).run({ input: { payment_id: payment.id } })
+
+      await syncCaptureToQuickbooksWorkflow(container).run({ input: payment.id })
+      await syncCaptureToQuickbooksWorkflow(container).run({ input: payment.id })
+      const booked = qbo.creates.filter((c) => c.entity === "Payment")
+      expect(booked).toHaveLength(1)
+      expect(booked[0].body).toMatchObject({
+        TotalAmt: 12.5,
+        Line: [{ Amount: 12.5, LinkedTxn: [{ TxnId: invoice.id, TxnType: "Invoice" }] }],
+      })
+      expect(booked[0].requestid).toBe(`capture-${payment.id}`.slice(0, 50))
     })
 
     it("refreshes an expired access token once and keeps the rotated refresh token", async () => {

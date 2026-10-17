@@ -16,6 +16,7 @@ const QbConnection = model.define("qb_connection", {
   deposit_account_id: model.text().nullable(),
   shipping_item_id: model.text().nullable(),
   refund_item_id: model.text().nullable(),
+  rounding_item_id: model.text().nullable(),
   currency: model.text().default("KWD"),
 })
 

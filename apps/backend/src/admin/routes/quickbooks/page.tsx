@@ -9,7 +9,6 @@ import { sdk } from "../../lib/sdk"
 type Status = {
   configured: boolean
   environment: string
-  decimals: number
   connection: {
     realm_id: string
     company_name: string | null
@@ -32,6 +31,7 @@ const ENTITY_LABEL: Record<string, string> = {
   customer: "عميل",
   refund: "استرجاع",
   payment_method: "طريقة دفع",
+  capture: "تحصيل دفعة",
 }
 
 const QuickbooksPage = () => {
@@ -139,9 +139,10 @@ const QuickbooksPage = () => {
               </Text>
             </div>
             <div>
-              <Label size="small">العملة / الكسور</Label>
-              <Text>
-                {status.connection.currency} · {status.decimals} خانات
+              <Label size="small">العملة</Label>
+              <Text>{status.connection.currency}</Text>
+              <Text size="xsmall" className="text-ui-fg-muted">
+                QuickBooks يحفظ المبالغ بخانتين عشريتين: الفلس الثالث يُقرّب ويُذكر في ملاحظة القيد.
               </Text>
             </div>
             <div>

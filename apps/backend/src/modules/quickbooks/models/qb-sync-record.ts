@@ -6,7 +6,7 @@ import { model } from "@medusajs/framework/utils"
 const QbSyncRecord = model
   .define("qb_sync_record", {
     id: model.id({ prefix: "qbs" }).primaryKey(),
-    entity: model.enum(["order", "variant", "customer", "refund", "payment_method"]),
+    entity: model.enum(["order", "variant", "customer", "refund", "payment_method", "capture"]),
     local_id: model.text(),
     qb_type: model.text().nullable(),
     qb_id: model.text().nullable(),

@@ -7,10 +7,11 @@ import {
   OrderLine,
   orderToSale,
   paymentMethodName,
+  QBO_AMOUNT_DECIMALS,
   roundTo,
   variantToItem,
 } from "../../modules/quickbooks/mapping"
-import { findOrCreateByName, QboContext, recordFailed, recordSynced, withQuickBooks } from "./qbo"
+import { exclusive, findOrCreateByName, QboContext, recordFailed, recordSynced, withQuickBooks } from "./qbo"
 
 // Store → QuickBooks. The store is the source of truth: products become
 // Items, paid orders SalesReceipts (unpaid ones Invoices), refunds
@@ -27,7 +28,11 @@ type VariantRow = {
   prices?: { amount: number; currency_code: string }[] | null
 }
 
-async function namedItem(ctx: QboContext, name: string, field: "shipping_item_id" | "refund_item_id" | null) {
+async function namedItem(
+  ctx: QboContext,
+  name: string,
+  field: "shipping_item_id" | "refund_item_id" | "rounding_item_id" | null
+) {
   if (field && ctx.connection[field]) {
     return ctx.connection[field] as string
   }
@@ -39,11 +44,18 @@ async function namedItem(ctx: QboContext, name: string, field: "shipping_item_id
     "Item",
     "Name",
     name,
-    { Name: name, Type: "Service", IncomeAccountRef: { value: ctx.connection.income_account_id } },
+    {
+      Name: name,
+      Type: "Service",
+      IncomeAccountRef: { value: ctx.connection.income_account_id },
+    },
     `item-${name}`.slice(0, 50)
   )
   if (field) {
-    await ctx.service.updateQbConnections({ id: ctx.connection.id, [field]: item.Id })
+    await ctx.service.updateQbConnections({
+      id: ctx.connection.id,
+      [field]: item.Id,
+    })
   }
   return item.Id
 }
@@ -59,24 +71,41 @@ async function upsertVariantItem(ctx: QboContext, v: VariantRow, update: boolean
   }
   const price = v.prices?.find((p) => p.currency_code === "kwd")?.amount ?? null
   const payload = variantToItem(
-    { id: v.id, sku: v.sku, title: v.title, price, product_title: v.product?.title ?? "Product" },
-    ctx.connection.income_account_id,
-    ctx.decimals
+    {
+      id: v.id,
+      sku: v.sku,
+      title: v.title,
+      price,
+      product_title: v.product?.title ?? "Product",
+    },
+    ctx.connection.income_account_id
   )
   let item: { Id: string; SyncToken?: string }
   if (existing?.qb_id) {
     try {
-      item = await ctx.client.update("Item", { ...payload, Id: existing.qb_id, SyncToken: existing.qb_sync_token ?? "0" })
+      item = await ctx.client.update("Item", {
+        ...payload,
+        Id: existing.qb_id,
+        SyncToken: existing.qb_sync_token ?? "0",
+      })
     } catch (error) {
       // Edited in QuickBooks since: re-read the SyncToken and retry once.
       if (!(error instanceof QboError && error.code === "5010")) throw error
       const fresh = await ctx.client.read<{ Id: string; SyncToken: string }>("Item", existing.qb_id)
-      item = await ctx.client.update("Item", { ...payload, Id: existing.qb_id, SyncToken: fresh.SyncToken })
+      item = await ctx.client.update("Item", {
+        ...payload,
+        Id: existing.qb_id,
+        SyncToken: fresh.SyncToken,
+      })
     }
   } else {
     item = await findOrCreateByName(ctx, "Item", "Name", payload.Name, payload, `variant-${v.id}`.slice(0, 50))
   }
-  await recordSynced(ctx, "variant", v.id, { type: "Item", id: item.Id, syncToken: item.SyncToken })
+  await recordSynced(ctx, "variant", v.id, {
+    type: "Item",
+    id: item.Id,
+    syncToken: item.SyncToken,
+  })
   return item.Id
 }
 
@@ -110,7 +139,10 @@ async function paymentMethodId(ctx: QboContext, providerId: string | null) {
   const existing = await ctx.service.findRecord("payment_method", name)
   if (existing?.qb_id) return existing.qb_id
   const pm = await findOrCreateByName(ctx, "PaymentMethod", "Name", name, { Name: name }, `pm-${name}`.slice(0, 50))
-  await recordSynced(ctx, "payment_method", name, { type: "PaymentMethod", id: pm.Id })
+  await recordSynced(ctx, "payment_method", name, {
+    type: "PaymentMethod",
+    id: pm.Id,
+  })
   return pm.Id
 }
 
@@ -124,8 +156,16 @@ type OrderRow = {
   shipping_total: number
   discount_total: number
   customer_id: string | null
-  customer?: { first_name?: string | null; last_name?: string | null; phone?: string | null } | null
-  shipping_address?: { first_name?: string | null; last_name?: string | null; phone?: string | null } | null
+  customer?: {
+    first_name?: string | null
+    last_name?: string | null
+    phone?: string | null
+  } | null
+  shipping_address?: {
+    first_name?: string | null
+    last_name?: string | null
+    phone?: string | null
+  } | null
   items?: {
     variant_id: string | null
     title: string
@@ -135,7 +175,9 @@ type OrderRow = {
     subtotal: number
     metadata?: Record<string, unknown> | null
   }[]
-  payment_collections?: { payments?: { provider_id: string; captured_at?: string | null }[] }[]
+  payment_collections?: {
+    payments?: { provider_id: string; captured_at?: string | null }[]
+  }[]
 }
 
 async function customerId(ctx: QboContext, order: OrderRow) {
@@ -156,7 +198,10 @@ async function customerId(ctx: QboContext, order: OrderRow) {
 }
 
 const addonText = (metadata?: Record<string, unknown> | null) => {
-  const addons = (metadata?.addons ?? []) as { group_ar?: string; name_ar?: string }[]
+  const addons = (metadata?.addons ?? []) as {
+    group_ar?: string
+    name_ar?: string
+  }[]
   return addons.length ? addons.map((a) => `${a.group_ar}: ${a.name_ar}`).join("، ") : null
 }
 
@@ -195,81 +240,176 @@ export async function syncOrderToQuickBooks(container: MedusaContainer, orderId:
   const order = data[0] as unknown as OrderRow | undefined
   if (!order) return null
 
-  return withQuickBooks(container, async (ctx) => {
-    const done = await ctx.service.findRecord("order", order.id)
-    if (done?.status === "synced" && done.qb_id) {
-      return done.qb_id
-    }
-    try {
-      const payments = (order.payment_collections ?? []).flatMap((pc) => pc.payments ?? [])
-      const paid = payments.some((p) => p.captured_at)
-      const provider = payments[0]?.provider_id ?? null
+  return exclusive(container, `order:${order.id}`, () =>
+    withQuickBooks(container, async (ctx) => {
+      const done = await ctx.service.findRecord("order", order.id)
+      if (done?.status === "synced" && done.qb_id) {
+        return done.qb_id
+      }
+      try {
+        const payments = (order.payment_collections ?? []).flatMap((pc) => pc.payments ?? [])
+        const paid = payments.some((p) => p.captured_at)
+        const provider = payments[0]?.provider_id ?? null
 
-      const items: Record<string, string> = {}
-      const lines: OrderLine[] = []
-      for (const line of order.items ?? []) {
-        let key = line.variant_id ?? GENERIC_ITEM
-        if (!items[key]) {
-          if (line.variant_id) {
-            const [variant] = await loadVariants(container, { id: line.variant_id })
-            items[key] = variant
-              ? await upsertVariantItem(ctx, variant, false)
-              : await namedItem(ctx, "Other items / منتجات أخرى", null)
-          } else {
-            key = GENERIC_ITEM
-            items[key] = await namedItem(ctx, "Other items / منتجات أخرى", null)
+        const items: Record<string, string> = {}
+        const lines: OrderLine[] = []
+        for (const line of order.items ?? []) {
+          let key = line.variant_id ?? GENERIC_ITEM
+          if (!items[key]) {
+            if (line.variant_id) {
+              const [variant] = await loadVariants(container, {
+                id: line.variant_id,
+              })
+              items[key] = variant
+                ? await upsertVariantItem(ctx, variant, false)
+                : await namedItem(ctx, "Other items / منتجات أخرى", null)
+            } else {
+              key = GENERIC_ITEM
+              items[key] = await namedItem(ctx, "Other items / منتجات أخرى", null)
+            }
           }
+          lines.push({
+            variant_id: key,
+            title: line.title,
+            variant_title: line.variant_title,
+            quantity: Number(line.quantity),
+            unit_price: Number(line.unit_price),
+            subtotal: Number(line.subtotal),
+            addons: addonText(line.metadata),
+          })
         }
-        lines.push({
-          variant_id: key,
-          title: line.title,
-          variant_title: line.variant_title,
-          quantity: Number(line.quantity),
-          unit_price: Number(line.unit_price),
-          subtotal: Number(line.subtotal),
-          addons: addonText(line.metadata),
-        })
-      }
 
-      const shippingItemId = Number(order.shipping_total) > 0 ? await namedItem(ctx, "Delivery / التوصيل", "shipping_item_id") : ""
-      const { payload, mismatch } = orderToSale(
-        {
-          id: order.id,
-          display_id: order.display_id,
-          created_at: order.created_at,
-          currency_code: order.currency_code,
-          email: order.email,
-          lines,
-          shipping_total: Number(order.shipping_total),
-          discount_total: Number(order.discount_total),
-          total: Number(order.total),
-          provider_id: provider,
-        },
-        {
-          items,
-          shippingItemId,
-          customerId: await customerId(ctx, order),
-          paymentMethodId: paid ? await paymentMethodId(ctx, provider) : null,
-          depositAccountId: paid ? ctx.connection.deposit_account_id : null,
-          currency: ctx.connection.currency,
-        },
-        ctx.decimals
-      )
-      if (mismatch !== 0) {
-        throw new MedusaError(MedusaError.Types.INVALID_DATA, `Lines add up to ${roundTo(Number(order.total) + mismatch, ctx.decimals)} but the order total is ${order.total}`)
+        const shippingItemId =
+          Number(order.shipping_total) > 0 ? await namedItem(ctx, "Delivery / التوصيل", "shipping_item_id") : ""
+        const { payload, mismatch } = orderToSale(
+          {
+            id: order.id,
+            display_id: order.display_id,
+            created_at: order.created_at,
+            currency_code: order.currency_code,
+            email: order.email,
+            lines,
+            shipping_total: Number(order.shipping_total),
+            discount_total: Number(order.discount_total),
+            total: Number(order.total),
+            provider_id: provider,
+          },
+          {
+            items,
+            shippingItemId,
+            roundingItemId: await namedItem(ctx, "Rounding / فرق تقريب", "rounding_item_id"),
+            customerId: await customerId(ctx, order),
+            paymentMethodId: paid ? await paymentMethodId(ctx, provider) : null,
+            depositAccountId: paid ? ctx.connection.deposit_account_id : null,
+            currency: ctx.connection.currency,
+          }
+        )
+        if (mismatch !== 0) {
+          throw new MedusaError(
+            MedusaError.Types.INVALID_DATA,
+            `Lines add up to ${roundTo(roundTo(Number(order.total), QBO_AMOUNT_DECIMALS) + mismatch, QBO_AMOUNT_DECIMALS)} but the order total is ${order.total}`
+          )
+        }
+        const type = paid ? "SalesReceipt" : "Invoice"
+        if (!paid) {
+          delete (payload as Record<string, unknown>).DepositToAccountRef
+        }
+        const created = await ctx.client.create<{
+          Id: string
+          SyncToken?: string
+        }>(type, payload, `order-${order.id}`.slice(0, 50))
+        await recordSynced(ctx, "order", order.id, {
+          type,
+          id: created.Id!,
+          syncToken: created.SyncToken,
+        })
+        return created.Id
+      } catch (error) {
+        await recordFailed(container, "order", order.id, error)
+        throw error
       }
-      const type = paid ? "SalesReceipt" : "Invoice"
-      if (!paid) {
-        delete (payload as Record<string, unknown>).DepositToAccountRef
-      }
-      const created = await ctx.client.create<{ Id: string; SyncToken?: string }>(type, payload, `order-${order.id}`.slice(0, 50))
-      await recordSynced(ctx, "order", order.id, { type, id: created.Id!, syncToken: created.SyncToken })
-      return created.Id
-    } catch (error) {
-      await recordFailed(container, "order", order.id, error)
-      throw error
-    }
+    })
+  )
+}
+
+// A payment captured after its order was booked as an Invoice (cash on
+// delivery, manual capture) becomes a QuickBooks Payment against it.
+export async function syncCaptureToQuickBooks(container: MedusaContainer, paymentId: string) {
+  const query = container.resolve(ContainerRegistrationKeys.QUERY)
+  const { data } = await query.graph({
+    entity: "payment",
+    fields: ["id", "provider_id", "captures.amount", "captured_at", "payment_collection.order.id"],
+    filters: { id: paymentId },
   })
+  const payment = data[0] as unknown as
+    | {
+        id: string
+        provider_id: string
+        captured_at?: string | null
+        captures?: { amount: number }[]
+        payment_collection?: { order?: { id: string } | null } | null
+      }
+    | undefined
+  const orderId = payment?.payment_collection?.order?.id
+  if (!payment || !orderId) return null
+
+  return exclusive(container, `capture:${payment.id}`, () =>
+    withQuickBooks(container, async (ctx) => {
+      let sale = await ctx.service.findRecord("order", orderId)
+      if (!sale?.qb_id) {
+        // Not booked yet: booking it now makes a SalesReceipt, already paid.
+        await syncOrderToQuickBooks(container, orderId)
+        sale = await ctx.service.findRecord("order", orderId)
+      }
+      if (sale?.qb_type !== "Invoice" || !sale.qb_id) return null
+      const done = await ctx.service.findRecord("capture", payment.id)
+      if (done?.status === "synced") return done.qb_id
+      try {
+        const invoice = await ctx.client.read<{
+          CustomerRef: { value: string }
+          Balance?: number
+        }>("Invoice", sale.qb_id)
+        const captured = (payment.captures ?? []).reduce((sum, c) => sum + Number(c.amount), 0)
+        // Never more than what is open on the invoice (rounding to 2 decimals).
+        const amount = Math.min(roundTo(captured, QBO_AMOUNT_DECIMALS), invoice.Balance ?? Infinity)
+        if (amount <= 0) return null
+        const pm = await paymentMethodId(ctx, payment.provider_id)
+        const created = await ctx.client.create<{ Id: string }>(
+          "Payment",
+          {
+            CustomerRef: invoice.CustomerRef,
+            TotalAmt: amount,
+            TxnDate: new Date(payment.captured_at ?? Date.now()).toISOString().slice(0, 10),
+            ...(ctx.connection.currency ? { CurrencyRef: { value: ctx.connection.currency } } : {}),
+            ...(pm ? { PaymentMethodRef: { value: pm } } : {}),
+            ...(ctx.connection.deposit_account_id
+              ? {
+                  DepositToAccountRef: {
+                    value: ctx.connection.deposit_account_id,
+                  },
+                }
+              : {}),
+            PrivateNote: `Laly payment ${payment.id} for order ${orderId}`,
+            Line: [
+              {
+                Amount: amount,
+                LinkedTxn: [{ TxnId: sale.qb_id, TxnType: "Invoice" }],
+              },
+            ],
+          },
+          `capture-${payment.id}`.slice(0, 50)
+        )
+        await recordSynced(ctx, "capture", payment.id, {
+          type: "Payment",
+          id: created.Id,
+        })
+        return created.Id
+      } catch (error) {
+        await recordFailed(container, "capture", payment.id, error)
+        throw error
+      }
+    })
+  )
 }
 
 export async function syncRefundsToQuickBooks(container: MedusaContainer, paymentId: string) {
@@ -291,61 +431,82 @@ export async function syncRefundsToQuickBooks(container: MedusaContainer, paymen
     | {
         provider_id: string
         refunds?: { id: string; amount: number; created_at: string }[]
-        payment_collection?: { order?: { id: string; display_id: number } | null } | null
+        payment_collection?: {
+          order?: { id: string; display_id: number } | null
+        } | null
       }
     | undefined
   const order = payment?.payment_collection?.order
   if (!payment || !order) return null
 
-  return withQuickBooks(container, async (ctx) => {
-    const orderRecord = await ctx.service.findRecord("order", order.id)
-    if (!orderRecord?.qb_id) {
-      // Book the sale first so the refund has something to offset.
-      await syncOrderToQuickBooks(container, order.id)
-    }
-    const { data: orders } = await query.graph({ entity: "order", fields: ["customer_id", "email"], filters: { id: order.id } })
-    const key = orders[0]?.customer_id ?? `email:${orders[0]?.email ?? order.id}`
-    const customerRecord = await ctx.service.findRecord("customer", key)
-    let count = 0
-    for (const refund of payment.refunds ?? []) {
-      const done = await ctx.service.findRecord("refund", refund.id)
-      if (done?.status === "synced") continue
-      try {
-        if (!customerRecord?.qb_id) {
-          throw new MedusaError(MedusaError.Types.INVALID_DATA, `Order ${order.id} is not in QuickBooks yet`)
-        }
-        const amount = roundTo(Number(refund.amount), ctx.decimals)
-        const receipt = await ctx.client.create<{ Id: string }>(
-          "RefundReceipt",
-          {
-            DocNumber: `LALY-${order.display_id}-R`.slice(0, 21),
-            TxnDate: new Date(refund.created_at).toISOString().slice(0, 10),
-            CustomerRef: { value: customerRecord?.qb_id },
-            ...(ctx.connection.currency ? { CurrencyRef: { value: ctx.connection.currency } } : {}),
-            ...(ctx.connection.deposit_account_id ? { DepositToAccountRef: { value: ctx.connection.deposit_account_id } } : {}),
-            PaymentMethodRef: { value: await paymentMethodId(ctx, payment.provider_id) },
-            PrivateNote: `Refund ${refund.id} for Laly order ${order.id}`,
-            Line: [
-              {
-                DetailType: "SalesItemLineDetail",
-                Amount: amount,
-                Description: `Refund — order #${order.display_id}`,
-                SalesItemLineDetail: {
-                  ItemRef: { value: await namedItem(ctx, "Refunds / مرتجعات", "refund_item_id") },
-                  Qty: 1,
-                  UnitPrice: amount,
-                },
-              },
-            ],
-          },
-          `refund-${refund.id}`.slice(0, 50)
-        )
-        await recordSynced(ctx, "refund", refund.id, { type: "RefundReceipt", id: receipt.Id })
-        count++
-      } catch (error) {
-        await recordFailed(container, "refund", refund.id, error)
+  return exclusive(container, `refund:${paymentId}`, () =>
+    withQuickBooks(container, async (ctx) => {
+      const orderRecord = await ctx.service.findRecord("order", order.id)
+      if (!orderRecord?.qb_id) {
+        // Book the sale first so the refund has something to offset.
+        await syncOrderToQuickBooks(container, order.id)
       }
-    }
-    return count
-  })
+      const { data: orders } = await query.graph({
+        entity: "order",
+        fields: ["customer_id", "email"],
+        filters: { id: order.id },
+      })
+      const key = orders[0]?.customer_id ?? `email:${orders[0]?.email ?? order.id}`
+      const customerRecord = await ctx.service.findRecord("customer", key)
+      let count = 0
+      for (const refund of payment.refunds ?? []) {
+        const done = await ctx.service.findRecord("refund", refund.id)
+        if (done?.status === "synced") continue
+        try {
+          if (!customerRecord?.qb_id) {
+            throw new MedusaError(MedusaError.Types.INVALID_DATA, `Order ${order.id} is not in QuickBooks yet`)
+          }
+          const amount = roundTo(Number(refund.amount), QBO_AMOUNT_DECIMALS)
+          const receipt = await ctx.client.create<{ Id: string }>(
+            "RefundReceipt",
+            {
+              DocNumber: `LALY-${order.display_id}-R`.slice(0, 21),
+              TxnDate: new Date(refund.created_at).toISOString().slice(0, 10),
+              CustomerRef: { value: customerRecord?.qb_id },
+              ...(ctx.connection.currency ? { CurrencyRef: { value: ctx.connection.currency } } : {}),
+              ...(ctx.connection.deposit_account_id
+                ? {
+                    DepositToAccountRef: {
+                      value: ctx.connection.deposit_account_id,
+                    },
+                  }
+                : {}),
+              PaymentMethodRef: {
+                value: await paymentMethodId(ctx, payment.provider_id),
+              },
+              PrivateNote: `Refund ${refund.id} for Laly order ${order.id}`,
+              Line: [
+                {
+                  DetailType: "SalesItemLineDetail",
+                  Amount: amount,
+                  Description: `Refund — order #${order.display_id} (${Number(refund.amount).toFixed(3)} ${ctx.connection.currency})`,
+                  SalesItemLineDetail: {
+                    ItemRef: {
+                      value: await namedItem(ctx, "Refunds / مرتجعات", "refund_item_id"),
+                    },
+                    Qty: 1,
+                    UnitPrice: amount,
+                  },
+                },
+              ],
+            },
+            `refund-${refund.id}`.slice(0, 50)
+          )
+          await recordSynced(ctx, "refund", refund.id, {
+            type: "RefundReceipt",
+            id: receipt.Id,
+          })
+          count++
+        } catch (error) {
+          await recordFailed(container, "refund", refund.id, error)
+        }
+      }
+      return count
+    })
+  )
 }

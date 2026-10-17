@@ -12,7 +12,6 @@ export type QboContext = {
   client: QboClient
   connection: Connection
   service: QuickBooksModuleService
-  decimals: number
 }
 
 const service = (container: MedusaContainer) => container.resolve<QuickBooksModuleService>(QUICKBOOKS_MODULE)
@@ -90,7 +89,7 @@ export async function withQuickBooks<T>(
     const connection = await freshAccessToken(container, force)
     const client = new QboClient(connection.environment, connection.realm_id, decrypt(connection.access_token, key))
     try {
-      return await fn({ client, connection, service: svc, decimals: options.amountDecimals ?? 3 })
+      return await fn({ client, connection, service: svc })
     } catch (error) {
       if (!force && error instanceof QboError && error.status === 401) {
         continue
@@ -103,7 +102,15 @@ export async function withQuickBooks<T>(
 
 // --- sync bookkeeping ----------------------------------------------------
 
-type Entity = "order" | "variant" | "customer" | "refund" | "payment_method"
+/**
+ * Runs one record's sync at a time: an event and the retry job (or two
+ * events) reaching the same order would otherwise both create it.
+ */
+export async function exclusive<T>(container: MedusaContainer, key: string, fn: () => Promise<T>): Promise<T> {
+  return container.resolve(Modules.LOCKING).execute(`quickbooks:${key}`, fn, { timeout: 60 })
+}
+
+type Entity = "order" | "variant" | "customer" | "refund" | "payment_method" | "capture"
 
 export async function recordSynced(
   ctx: QboContext,
@@ -124,8 +131,15 @@ export async function recordSynced(
   }
   if (existing) {
     await ctx.service.updateQbSyncRecords({ ...data, id: existing.id, attempts: existing.attempts + 1 })
-  } else {
+    return
+  }
+  try {
     await ctx.service.createQbSyncRecords({ ...data, attempts: 1 })
+  } catch (error) {
+    // Recorded concurrently by another order sharing this customer or item.
+    const again = await ctx.service.findRecord(entity, localId)
+    if (!again) throw error
+    await ctx.service.updateQbSyncRecords({ ...data, id: again.id, attempts: again.attempts + 1 })
   }
 }
 

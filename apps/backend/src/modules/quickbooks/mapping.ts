@@ -30,15 +30,17 @@ export type ItemRefs = {
   /** QuickBooks Item id per variant id. */
   items: Record<string, string>
   shippingItemId: string
+  roundingItemId?: string | null
   customerId: string
   paymentMethodId?: string | null
   depositAccountId?: string | null
   currency?: string | null
 }
 
+// Half-up, immune to binary float (29.985 * 100 = 2998.4999...).
 export const roundTo = (n: number, decimals: number) => {
   const f = 10 ** decimals
-  return Math.round(n * f) / f
+  return Math.sign(n) * (Math.round(Math.abs(n) * f + 1e-7) / f)
 }
 
 const clip = (s: string, max: number) => (s.length > max ? `${s.slice(0, max - 1)}…` : s)
@@ -57,14 +59,27 @@ export function paymentMethodName(providerId: string | null): string | null {
   return providerId.slice(0, 31)
 }
 
+// QuickBooks keeps line amounts to 2 decimals (rounded half-up) and unit
+// prices to 7. KWD has 3, so fils cannot be booked: unit prices go as they
+// are, line amounts are rounded to 2, and a rounding line makes the
+// QuickBooks total equal the store total rounded to 2 decimals.
+export const QBO_AMOUNT_DECIMALS = 2
+
 /**
  * A SalesReceipt (paid) or Invoice (unpaid) body for an order: one line per
- * item, then delivery and the order-level discount. QuickBooks computes the
- * total from the lines, so it must equal the store total.
+ * item, then delivery, the order-level discount and any rounding.
  */
-export function orderToSale(order: OrderInput, refs: ItemRefs, decimals = 3) {
-  const r = (n: number) => roundTo(n, decimals)
+export function orderToSale(order: OrderInput, refs: ItemRefs, priceDecimals = 3) {
+  const amount = (n: number) => roundTo(n, QBO_AMOUNT_DECIMALS)
+  const price = (n: number) => roundTo(n, priceDecimals)
   const Line: Record<string, unknown>[] = []
+  const sale = (itemId: string, qty: number, unitPrice: number, description: string) =>
+    Line.push({
+      DetailType: "SalesItemLineDetail",
+      Amount: amount(unitPrice * qty),
+      Description: clip(description, 4000),
+      SalesItemLineDetail: { ItemRef: { value: itemId }, Qty: qty, UnitPrice: price(unitPrice) },
+    })
   for (const line of order.lines) {
     const itemId = line.variant_id ? refs.items[line.variant_id] : undefined
     if (!itemId) {
@@ -73,31 +88,34 @@ export function orderToSale(order: OrderInput, refs: ItemRefs, decimals = 3) {
     const description = [line.title, line.variant_title && line.variant_title !== "Default" ? line.variant_title : null, line.addons]
       .filter(Boolean)
       .join(" — ")
-    Line.push({
-      DetailType: "SalesItemLineDetail",
-      Amount: r(line.subtotal),
-      Description: clip(description, 4000),
-      SalesItemLineDetail: { ItemRef: { value: itemId }, Qty: line.quantity, UnitPrice: r(line.unit_price) },
-    })
+    sale(itemId, line.quantity, line.unit_price, description)
   }
   if (order.shipping_total > 0) {
-    Line.push({
-      DetailType: "SalesItemLineDetail",
-      Amount: r(order.shipping_total),
-      Description: "Delivery / التوصيل",
-      SalesItemLineDetail: { ItemRef: { value: refs.shippingItemId }, Qty: 1, UnitPrice: r(order.shipping_total) },
-    })
+    sale(refs.shippingItemId, 1, order.shipping_total, "Delivery / التوصيل")
   }
-  if (order.discount_total > 0) {
-    Line.push({
-      DetailType: "DiscountLineDetail",
-      Amount: r(order.discount_total),
-      DiscountLineDetail: { PercentBased: false },
-    })
+
+  const target = amount(order.total)
+  const sales = Line.reduce((sum, l) => sum + (l.Amount as number), 0)
+  let discount = amount(order.discount_total)
+  const diff = amount(target - (sales - discount))
+  if (diff < 0) {
+    // The rounded lines overshoot: absorb it in the discount.
+    discount = amount(discount - diff)
+  } else if (diff > 0) {
+    if (!refs.roundingItemId) {
+      throw new MedusaError(MedusaError.Types.INVALID_DATA, "No QuickBooks rounding item")
+    }
+    sale(refs.roundingItemId, 1, diff, "Rounding / فرق تقريب")
   }
-  const computed = r(
+  if (discount > 0) {
+    Line.push({ DetailType: "DiscountLineDetail", Amount: discount, DiscountLineDetail: { PercentBased: false } })
+  }
+
+  const booked = amount(
     Line.reduce((sum, l) => sum + (l.DetailType === "DiscountLineDetail" ? -1 : 1) * (l.Amount as number), 0)
   )
+  // What QuickBooks cannot hold: the third decimal of the store total.
+  const fils = roundTo(order.total - target, 3)
   return {
     payload: {
       DocNumber: clip(`LALY-${order.display_id}`, 21),
@@ -107,11 +125,17 @@ export function orderToSale(order: OrderInput, refs: ItemRefs, decimals = 3) {
       ...(refs.paymentMethodId ? { PaymentMethodRef: { value: refs.paymentMethodId } } : {}),
       ...(refs.depositAccountId ? { DepositToAccountRef: { value: refs.depositAccountId } } : {}),
       ...(order.email ? { BillEmail: { Address: order.email } } : {}),
-      PrivateNote: clip(`Laly order ${order.id}${order.provider_id ? ` · ${order.provider_id}` : ""}`, 4000),
+      PrivateNote: clip(
+        `Laly order ${order.id} · total ${order.total.toFixed(3)} ${order.currency_code.toUpperCase()}` +
+          (fils !== 0 ? ` (QuickBooks rounds to 2 decimals: ${fils > 0 ? "-" : "+"}${Math.abs(fils).toFixed(3)})` : "") +
+          (order.provider_id ? ` · ${order.provider_id}` : ""),
+        4000
+      ),
       Line,
     },
-    /** Difference between QuickBooks' sum and the store total (should be 0). */
-    mismatch: r(computed - order.total),
+    /** QuickBooks' total minus the store total rounded to 2 decimals (always 0). */
+    mismatch: amount(booked - target),
+    fils,
   }
 }
 

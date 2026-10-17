@@ -10,8 +10,6 @@ export type QuickBooksOptions = {
   redirectUri?: string
   /** Secret used to encrypt stored OAuth tokens. */
   encryptionKey?: string
-  /** Decimal places sent for amounts (KWD has 3). */
-  amountDecimals?: number
 }
 
 class QuickBooksModuleService extends MedusaService({ QbConnection, QbSyncRecord }) {

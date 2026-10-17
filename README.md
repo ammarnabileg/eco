@@ -42,6 +42,10 @@ Payments: KNET, Visa/Mastercard and Apple/Google/Samsung Pay via KlickPay,
 plus Taly and Deema instalments. Setup, webhooks, test cards and the open
 questions for each gateway: [docs/PAYMENTS.md](docs/PAYMENTS.md).
 
+Accounting: products, orders, payments and refunds sync to QuickBooks Online
+(connect from Settings > QuickBooks). QuickBooks keeps 2 decimals, so KWD fils
+are rounded with an explicit rounding line: [docs/QUICKBOOKS.md](docs/QUICKBOOKS.md).
+
 Google Merchant Center feeds: `/feeds/google/ar` and `/feeds/google/en` on the
 backend (set `STOREFRONT_URL`). Google does not accept SVG images, so real
 product photos (JPG/PNG/WebP) are required before submitting the feed.

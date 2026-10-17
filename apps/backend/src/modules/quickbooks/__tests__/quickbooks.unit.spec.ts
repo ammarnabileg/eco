@@ -1,6 +1,6 @@
 import { decrypt, encrypt } from "../crypto"
 import { authorizeUrl, qboString, signState, verifyState } from "../client"
-import { customerPayload, orderToSale, paymentMethodName, variantToItem } from "../mapping"
+import { customerPayload, orderToSale, paymentMethodName, roundTo, variantToItem } from "../mapping"
 
 describe("QuickBooks tokens and OAuth state", () => {
   it("encrypts tokens and refuses a wrong key", () => {
@@ -31,6 +31,12 @@ describe("QuickBooks tokens and OAuth state", () => {
 })
 
 describe("QuickBooks mapping", () => {
+  it("rounds half-up despite binary floats", () => {
+    expect(roundTo(29.985, 2)).toBe(29.99)
+    expect(roundTo(1.005, 2)).toBe(1.01)
+    expect(roundTo(-0.005, 2)).toBe(-0.01)
+  })
+
   const order = {
     id: "order_1",
     display_id: 1001,
@@ -56,9 +62,10 @@ describe("QuickBooks mapping", () => {
   }
   const refs = { items: { v1: "11", v2: "12" }, shippingItemId: "90", customerId: "7", paymentMethodId: "3", currency: "KWD" }
 
-  it("builds a receipt whose lines add up to the store total with 3 decimals", () => {
-    const { payload, mismatch } = orderToSale(order, refs)
+  it("builds a receipt whose lines add up to the store total", () => {
+    const { payload, mismatch, fils } = orderToSale(order, refs)
     expect(mismatch).toBe(0)
+    expect(fils).toBe(0)
     expect(payload.DocNumber).toBe("LALY-1001")
     expect(payload.Line).toHaveLength(4)
     expect(payload.Line[1]).toMatchObject({ Description: "VIGI NVR — هارد مراقبة: 1 تيرا" })
@@ -66,8 +73,42 @@ describe("QuickBooks mapping", () => {
     expect(payload).toMatchObject({ CurrencyRef: { value: "KWD" }, PaymentMethodRef: { value: "3" } })
   })
 
-  it("reports a total QuickBooks would compute differently", () => {
-    expect(orderToSale({ ...order, total: 100 }, refs).mismatch).toBe(11.55)
+  it("books fils-priced orders to 2 decimals with an explicit rounding line", () => {
+    // 3 x 9.995 = 29.985 + 1.250 delivery = 31.235: QuickBooks holds 31.24.
+    const fils = {
+      ...order,
+      lines: [{ variant_id: "v1", title: "Cable", quantity: 3, unit_price: 9.995, subtotal: 29.985 }],
+      shipping_total: 1.25,
+      discount_total: 0,
+      total: 31.235,
+    }
+    const { payload, mismatch, fils: dropped } = orderToSale(fils, { ...refs, roundingItemId: "95" })
+    expect(mismatch).toBe(0)
+    expect(dropped).toBe(-0.005)
+    expect(payload.Line[0]).toMatchObject({ Amount: 29.99, SalesItemLineDetail: { UnitPrice: 9.995, Qty: 3 } })
+    const total = (payload.Line as { Amount: number; DetailType: string }[]).reduce(
+      (s, l) => s + (l.DetailType === "DiscountLineDetail" ? -l.Amount : l.Amount),
+      0
+    )
+    expect(Math.round(total * 100) / 100).toBe(31.24)
+    expect(payload.PrivateNote).toContain("31.235 KWD")
+  })
+
+  it("absorbs rounding that overshoots into the discount", () => {
+    // Two lines of 0.335 round to 0.34 each (0.68); the total 0.670 is 0.67.
+    const odd = {
+      ...order,
+      lines: [
+        { variant_id: "v1", title: "A", quantity: 1, unit_price: 0.335, subtotal: 0.335 },
+        { variant_id: "v2", title: "B", quantity: 1, unit_price: 0.335, subtotal: 0.335 },
+      ],
+      shipping_total: 0,
+      discount_total: 0,
+      total: 0.67,
+    }
+    const { payload, mismatch } = orderToSale(odd, refs)
+    expect(mismatch).toBe(0)
+    expect(payload.Line[2]).toMatchObject({ DetailType: "DiscountLineDetail", Amount: 0.01 })
   })
 
   it("refuses a line without a synced item", () => {

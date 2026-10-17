@@ -191,7 +191,6 @@ module.exports = defineConfig({
         redirectUri:
           env.QUICKBOOKS_REDIRECT_URI ?? `${env.MEDUSA_BACKEND_URL ?? "http://localhost:9000"}/quickbooks/callback`,
         encryptionKey: env.QUICKBOOKS_ENCRYPTION_KEY,
-        amountDecimals: env.QUICKBOOKS_AMOUNT_DECIMALS ? Number(env.QUICKBOOKS_AMOUNT_DECIMALS) : 3,
       },
     },
     ...meilisearch,

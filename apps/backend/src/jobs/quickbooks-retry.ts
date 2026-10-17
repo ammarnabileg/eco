@@ -4,6 +4,7 @@ import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import { QUICKBOOKS_MODULE } from "../modules/quickbooks"
 import QuickBooksModuleService from "../modules/quickbooks/service"
 import {
+  syncCaptureToQuickbooksWorkflow,
   syncOrderToQuickbooksWorkflow,
   syncProductToQuickbooksWorkflow,
   syncRefundsToQuickbooksWorkflow,
@@ -32,6 +33,8 @@ export default async function quickbooksRetry(container: MedusaContainer) {
         if (data[0]?.product_id) {
           await syncProductToQuickbooksWorkflow(container).run({ input: data[0].product_id })
         }
+      } else if (record.entity === "capture") {
+        await syncCaptureToQuickbooksWorkflow(container).run({ input: record.local_id })
       } else if (record.entity === "refund") {
         const { data } = await query.graph({ entity: "refund", fields: ["payment_id"], filters: { id: record.local_id } })
         if (data[0]?.payment_id) {

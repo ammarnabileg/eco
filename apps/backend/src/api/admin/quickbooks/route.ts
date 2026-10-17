@@ -16,7 +16,6 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   res.json({
     configured: Boolean(options.clientId && options.clientSecret && options.encryptionKey),
     environment: options.environment ?? "sandbox",
-    decimals: options.amountDecimals ?? 3,
     connection: connection
       ? {
           realm_id: connection.realm_id,

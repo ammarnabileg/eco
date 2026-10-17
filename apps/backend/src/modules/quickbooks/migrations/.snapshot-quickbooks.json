@@ -201,6 +201,22 @@
           "enumItems": [],
           "mappedType": "text"
         },
+        "rounding_item_id": {
+          "name": "rounding_item_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
         "currency": {
           "name": "currency",
           "type": "text",
@@ -329,7 +345,8 @@
             "variant",
             "customer",
             "refund",
-            "payment_method"
+            "payment_method",
+            "capture"
           ],
           "mappedType": "enum"
         },
