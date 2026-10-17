@@ -2,6 +2,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Table, Text } from "@modules/common/components/ui"
 
 import LineItemOptions from "@modules/common/components/line-item-options"
+import LineItemAddons from "@modules/common/components/line-item-addons"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import Thumbnail from "@modules/products/components/thumbnail"
@@ -28,6 +29,7 @@ const Item = ({ item, currencyCode }: ItemProps) => {
           {item.product_title}
         </Text>
         <LineItemOptions variant={item.variant} data-testid="product-variant" />
+        <LineItemAddons metadata={item.metadata} currencyCode={currencyCode} />
       </Table.Cell>
 
       <Table.Cell className="!pe-0">

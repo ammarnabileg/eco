@@ -63,6 +63,11 @@ const nextConfig = {
         protocol: "https",
         hostname: "*.s3.amazonaws.com",
       },
+      // Product images on the store's Cloudflare R2 bucket.
+      {
+        protocol: "https",
+        hostname: "shop.brilliant-kw.com",
+      },
       ...(S3_HOSTNAME && S3_PATHNAME
         ? [
             {

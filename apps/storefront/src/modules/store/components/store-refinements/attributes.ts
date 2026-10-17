@@ -4,6 +4,9 @@ export const OPTION_VALUES_ATTRIBUTE = "option_values"
 export const CATEGORY_ATTRIBUTE = "category"
 // The index calls the product's tags "labels".
 export const LABELS_ATTRIBUTE = "labels"
+export const BRAND_ATTRIBUTE = "brand"
+// Filterable specs as "key:value", labelled by the category's spec template.
+export const SPECS_ATTRIBUTE = "specs"
 
 export const getSortOptions = (currencyCode: string) => {
   const minPrice = priceAttribute("min_price", currencyCode)

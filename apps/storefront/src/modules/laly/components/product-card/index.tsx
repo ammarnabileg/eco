@@ -1,5 +1,6 @@
 import Image from "next/image"
 
+import { isPriceOnRequest } from "@lib/util/catalog"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -9,7 +10,7 @@ import Countdown from "@modules/laly/components/countdown"
 
 // Fields a product query must request for this card to render fully.
 export const PRODUCT_CARD_FIELDS =
-  "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata"
+  "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+metadata,+product_detail.*"
 
 const isInStock = (variant?: HttpTypes.StoreProductVariant) =>
   !!variant &&
@@ -27,6 +28,7 @@ export default function ProductCard({
   // End of the sale price list this product is in, for a real countdown.
   offerEndsAt?: string
 }) {
+  const onRequest = isPriceOnRequest(product)
   const { cheapestPrice } = getProductPrice({ product })
   const variants = product.variants ?? []
   const onlyVariant = variants.length === 1 ? variants[0] : undefined
@@ -74,19 +76,21 @@ export default function ProductCard({
 
       <div className="flex flex-col flex-1 pt-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-        <span
-          className={`flex items-center gap-1 text-[11.5px] font-bold ${
-            inStock ? "text-laly-green" : "text-laly-faint"
-          }`}
-        >
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              inStock ? "bg-laly-green" : "bg-laly-faint"
+            className={`flex items-center gap-1 text-[11.5px] font-bold ${
+              inStock ? "text-laly-green" : "text-laly-faint"
             }`}
-          />
-          {inStock ? "متوفر" : "غير متوفر"}
-        </span>
-        {onSale && offerEndsAt && <Countdown endsAt={offerEndsAt} variant="chip" />}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                inStock ? "bg-laly-green" : "bg-laly-faint"
+              }`}
+            />
+            {inStock ? "متوفر" : "غير متوفر"}
+          </span>
+          {onSale && offerEndsAt && (
+            <Countdown endsAt={offerEndsAt} variant="chip" />
+          )}
         </div>
 
         <h3 className="mt-1 text-[13.5px] small:text-sm font-bold leading-snug line-clamp-2 min-h-[2.6em]">
@@ -99,27 +103,43 @@ export default function ProductCard({
           </LocalizedClientLink>
         </h3>
 
-        {cheapestPrice && (
-          <div className="mt-2 flex items-baseline flex-wrap gap-x-2">
-            <span
-              className="text-base small:text-[17px] font-extrabold text-laly-ink"
-              data-testid="price"
-            >
-              {cheapestPrice.calculated_price}
-            </span>
-            {onSale && (
+        {onRequest ? (
+          <p
+            className="mt-2 text-sm font-extrabold text-laly-teal"
+            data-testid="price-on-request"
+          >
+            السعر عند الطلب
+          </p>
+        ) : (
+          cheapestPrice && (
+            <div className="mt-2 flex items-baseline flex-wrap gap-x-2">
               <span
-                className="text-xs text-laly-faint line-through"
-                data-testid="original-price"
+                className="text-base small:text-[17px] font-extrabold text-laly-ink"
+                data-testid="price"
               >
-                {cheapestPrice.original_price}
+                {cheapestPrice.calculated_price}
               </span>
-            )}
-          </div>
+              {onSale && (
+                <span
+                  className="text-xs text-laly-faint line-through"
+                  data-testid="original-price"
+                >
+                  {cheapestPrice.original_price}
+                </span>
+              )}
+            </div>
+          )
         )}
 
         <div className="mt-auto pt-3">
-          {onlyVariant ? (
+          {onRequest ? (
+            <LocalizedClientLink
+              href={href}
+              className="w-full h-10 rounded-btn flex items-center justify-center text-[13px] font-bold bg-laly-teal-soft text-laly-teal hover:bg-laly-teal hover:text-white transition-colors"
+            >
+              اطلب عرض سعر
+            </LocalizedClientLink>
+          ) : onlyVariant ? (
             <AddToCartButton
               variantId={onlyVariant.id}
               disabled={!isInStock(onlyVariant)}

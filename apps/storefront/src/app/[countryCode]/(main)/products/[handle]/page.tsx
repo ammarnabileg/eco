@@ -1,6 +1,8 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { getProductSpecs } from "@lib/data/catalog"
 import { getStoreContent } from "@lib/data/content"
+import { CATALOG_PRODUCT_FIELDS, productDetail } from "@lib/util/catalog"
 import { getActiveOffers, offerEndsByProduct } from "@lib/data/offers"
 import { listProducts } from "@lib/data/products"
 import { getDevice } from "@lib/util/device"
@@ -15,7 +17,7 @@ type Props = {
 
 function getImagesForVariant(
   product: HttpTypes.StoreProduct,
-  selectedVariantId?: string,
+  selectedVariantId?: string
 ) {
   if (!selectedVariantId || !product.variants) {
     return product.images
@@ -41,19 +43,30 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const product = await listProducts({
     countryCode: params.countryCode,
-    queryParams: { handle },
+    queryParams: {
+      handle,
+      fields: `+thumbnail,+description,${CATALOG_PRODUCT_FIELDS}`,
+    },
   }).then(({ response }) => response.products[0])
 
   if (!product) {
     notFound()
   }
 
+  const detail = productDetail(product)
+  const title = detail?.seo_title_ar || product.title
+  const description =
+    detail?.seo_description_ar ||
+    product.description?.slice(0, 160) ||
+    product.title
+
   return {
-    title: product.title,
-    description: product.description || product.title,
+    title,
+    description,
+    alternates: { canonical: `/${params.countryCode}/products/${handle}` },
     openGraph: {
-      title: `${product.title} | Laly`,
-      description: product.description || product.title,
+      title: `${title} | Laly`,
+      description,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
   }
@@ -74,8 +87,7 @@ export default async function ProductPage(props: Props) {
     countryCode: params.countryCode,
     queryParams: {
       handle: params.handle,
-      fields:
-        "*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+variants.sku,*variants.images,*variants.options,+metadata,+tags,*categories,*type",
+      fields: `*variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,+variants.sku,*variants.images,*variants.options,+metadata,+tags,*categories,*categories.parent_category,*categories.parent_category.parent_category,*type,${CATALOG_PRODUCT_FIELDS}`,
     },
   }).then(({ response }) => response.products[0])
 
@@ -83,10 +95,11 @@ export default async function ProductPage(props: Props) {
     notFound()
   }
 
-  const [device, content, offers] = await Promise.all([
+  const [device, content, offers, specGroups] = await Promise.all([
     getDevice(),
     getStoreContent(),
     getActiveOffers(),
+    getProductSpecs(pricedProduct.id),
   ])
   const offerEnds = await offerEndsByProduct(offers)
 
@@ -101,6 +114,8 @@ export default async function ProductPage(props: Props) {
       device={device}
       badges={content.trust_badges}
       offerEndsAt={offerEnds[pricedProduct.id]}
+      specGroups={specGroups}
+      whatsapp={content.settings.whatsapp}
     />
   )
 }

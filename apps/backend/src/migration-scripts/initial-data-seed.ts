@@ -214,6 +214,23 @@ export default async function initial_data_seed({
     input: { id: stockLocation.id, add: [salesChannel.id] },
   })
 
+  // The homepage "best sellers" shelf reads this collection.
+  const { result: collections } = await createCollectionsWorkflow(container).run({
+    input: {
+      collections: [
+        { title: "الأكثر مبيعاً هذا الأسبوع", handle: "best-sellers", metadata: { en_title: "Best sellers this week" } },
+      ],
+    },
+  })
+
+  // The real catalogue comes from src/scripts/catalog (setup-catalog.ts, then
+  // import-botble.ts). These illustrated demo products are only for a local
+  // database: set SEED_DEMO_CATALOG=true before the first migration.
+  if (process.env.SEED_DEMO_CATALOG !== "true") {
+    logger.info("Finished seeding Laly data (no demo catalogue).")
+    return
+  }
+
   logger.info("Seeding catalogue...")
   const { result: categories } = await createProductCategoriesWorkflow(container).run({
     input: {
@@ -224,14 +241,6 @@ export default async function initial_data_seed({
         rank,
         metadata: { en_name: c.en },
       })),
-    },
-  })
-
-  const { result: collections } = await createCollectionsWorkflow(container).run({
-    input: {
-      collections: [
-        { title: "الأكثر مبيعاً هذا الأسبوع", handle: "best-sellers", metadata: { en_title: "Best sellers this week" } },
-      ],
     },
   })
 

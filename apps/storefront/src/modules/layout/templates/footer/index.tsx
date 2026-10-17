@@ -1,3 +1,4 @@
+import { nonEmptyCategories } from "@lib/util/categories"
 import { listCategories } from "@lib/data/categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon from "@modules/laly/components/icon"
@@ -19,7 +20,9 @@ export default async function Footer() {
     getStoreContent(),
   ])
   const whatsapp = whatsappLink(settings.whatsapp)
-  const topLevel = categories.filter((c) => !c.parent_category).slice(0, 6)
+  const topLevel = nonEmptyCategories(categories)
+    .filter((c) => !c.parent_category)
+    .slice(0, 6)
 
   return (
     <footer className="bg-laly-deep text-[#B9D3D8] mt-16 pb-20 small:pb-0">

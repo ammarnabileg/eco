@@ -7,6 +7,9 @@ import { getCacheOptions } from "./cookies"
 export const retrieveCollection = async (id: string) => {
   const next = {
     ...(await getCacheOptions("collections")),
+    // Visitors without a cache-id cookie get untagged entries, which
+    // nothing ever revalidates; prices and catalog edits must show up.
+    revalidate: 60,
   }
 
   return await sdk.client
@@ -25,6 +28,9 @@ export const listCollections = async (
 ): Promise<{ collections: HttpTypes.StoreCollection[]; count: number }> => {
   const next = {
     ...(await getCacheOptions("collections")),
+    // Visitors without a cache-id cookie get untagged entries, which
+    // nothing ever revalidates; prices and catalog edits must show up.
+    revalidate: 60,
   }
 
   queryParams.limit = queryParams.limit || "100"
@@ -47,6 +53,9 @@ export const getCollectionByHandle = async (
 ): Promise<HttpTypes.StoreCollection | null> => {
   const next = {
     ...(await getCacheOptions("collections")),
+    // Visitors without a cache-id cookie get untagged entries, which
+    // nothing ever revalidates; prices and catalog edits must show up.
+    revalidate: 60,
   }
 
   return await sdk.client

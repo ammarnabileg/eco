@@ -17,6 +17,8 @@ type ProductHit = Hit<
     title: string | null
     handle: string | null
     thumbnail: string | null
+    brand?: string | null
+    price_on_request?: boolean | null
   } & HitPricing
 >
 
@@ -35,7 +37,9 @@ const HitCard = ({
   priority: boolean
 }) => {
   const href = `/products/${hit.handle}`
-  const discount = getHitPricing(hit, currencyCode)?.discount
+  const discount = hit.price_on_request
+    ? null
+    : getHitPricing(hit, currencyCode)?.discount
 
   return (
     <article
@@ -73,6 +77,14 @@ const HitCard = ({
       </LocalizedClientLink>
 
       <div className="flex flex-col flex-1 pt-3">
+        {hit.brand && (
+          <span
+            dir="ltr"
+            className="self-start mb-1 font-latin text-[11px] font-bold text-laly-teal"
+          >
+            {hit.brand}
+          </span>
+        )}
         <h3 className="text-[13.5px] small:text-sm font-bold leading-snug line-clamp-2 min-h-[2.6em]">
           <LocalizedClientLink
             href={href}
@@ -83,7 +95,16 @@ const HitCard = ({
           </LocalizedClientLink>
         </h3>
         <div className="mt-auto pt-2">
-          <HitPrice hit={hit} currencyCode={currencyCode} />
+          {hit.price_on_request ? (
+            <p
+              className="text-sm font-extrabold text-laly-teal"
+              data-testid="price-on-request"
+            >
+              السعر عند الطلب
+            </p>
+          ) : (
+            <HitPrice hit={hit} currencyCode={currencyCode} />
+          )}
         </div>
       </div>
     </article>

@@ -5,6 +5,9 @@ import { getCacheOptions } from "./cookies"
 export const listCategories = async (query?: Record<string, unknown>) => {
   const next = {
     ...(await getCacheOptions("categories")),
+    // Visitors without a cache-id cookie get untagged entries, which
+    // nothing ever revalidates; prices and catalog edits must show up.
+    revalidate: 60,
   }
 
   const limit = query?.limit || 100
@@ -31,6 +34,9 @@ export const getCategoryByHandle = async (categoryHandle: string[]) => {
 
   const next = {
     ...(await getCacheOptions("categories")),
+    // Visitors without a cache-id cookie get untagged entries, which
+    // nothing ever revalidates; prices and catalog edits must show up.
+    revalidate: 60,
   }
 
   return sdk.client
@@ -38,7 +44,8 @@ export const getCategoryByHandle = async (categoryHandle: string[]) => {
       `/store/product-categories`,
       {
         query: {
-          fields: "*category_children, *products",
+          fields:
+            "*category_children, *category_children.category_children, *category_children.products, *products",
           handle,
         },
         next,

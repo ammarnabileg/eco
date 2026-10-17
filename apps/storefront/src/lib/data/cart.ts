@@ -157,6 +157,51 @@ export async function addToCart({
     .catch(medusaError)
 }
 
+/**
+ * Adds a product with its chosen add-ons (RAM, SSD, HDD...). The backend
+ * prices the add-ons; the line keeps them in metadata.addons.
+ */
+export async function addConfiguredToCart({
+  variantId,
+  quantity,
+  addonOptionIds,
+  countryCode,
+}: {
+  variantId: string
+  quantity: number
+  addonOptionIds: string[]
+  countryCode: string
+}) {
+  const cart = await getOrSetCart(countryCode)
+
+  if (!cart) {
+    throw new Error("Error retrieving or creating cart")
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  await sdk.client
+    .fetch(`/store/carts/${cart.id}/configured-items`, {
+      method: "POST",
+      body: {
+        variant_id: variantId,
+        quantity,
+        addon_option_ids: addonOptionIds,
+      },
+      headers,
+    })
+    .then(async () => {
+      const cartCacheTag = await getCacheTag("carts")
+      revalidateTag(cartCacheTag)
+
+      const fulfillmentCacheTag = await getCacheTag("fulfillment")
+      revalidateTag(fulfillmentCacheTag)
+    })
+    .catch(medusaError)
+}
+
 export async function updateLineItem({
   lineId,
   quantity,

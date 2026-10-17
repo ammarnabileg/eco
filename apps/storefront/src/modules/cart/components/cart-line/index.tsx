@@ -5,6 +5,7 @@ import { useState } from "react"
 import { deleteLineItem, updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import LineItemOptions from "@modules/common/components/line-item-options"
+import LineItemAddons from "@modules/common/components/line-item-addons"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -56,6 +57,7 @@ export default function CartLine({
             {item.variant?.title !== "Default" && (
               <LineItemOptions variant={item.variant} data-testid="product-variant" />
             )}
+            <LineItemAddons metadata={item.metadata} currencyCode={currencyCode} />
           </div>
           <button
             type="button"

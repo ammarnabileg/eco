@@ -1,3 +1,4 @@
+import { nonEmptyCategories } from "@lib/util/categories"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon from "@modules/laly/components/icon"
@@ -9,7 +10,7 @@ export default function CategoryTiles({
 }: {
   categories: HttpTypes.StoreProductCategory[]
 }) {
-  const topLevel = categories.filter((c) => !c.parent_category)
+  const topLevel = nonEmptyCategories(categories).filter((c) => !c.parent_category)
   if (!topLevel.length) {
     return null
   }

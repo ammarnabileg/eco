@@ -58,6 +58,9 @@ export const listProducts = async ({
 
   const next = {
     ...(await getCacheOptions("products")),
+    // Visitors without a cache-id cookie get untagged entries, which
+    // nothing ever revalidates; prices and catalog edits must show up.
+    revalidate: 60,
   }
 
   return sdk.client
