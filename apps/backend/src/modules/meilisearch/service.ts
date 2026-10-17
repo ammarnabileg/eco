@@ -23,7 +23,6 @@ type MeiliSearchResponse = {
 }
 type MeiliQuery = Record<string, unknown> & { indexUid: string }
 
-const LOCALES: Record<string, string> = { ar: "ara", en: "eng" }
 
 /**
  * Meilisearch provider for the Medusa Search Module. Implements the same
@@ -351,7 +350,8 @@ export default class MeilisearchSearchService extends AbstractSearchProviderServ
         options.match_strategy === "all" ? "all" : options.match_strategy === "last" ? "last" : "frequency",
       ...(options.min_score !== undefined ? { rankingScoreThreshold: options.min_score } : {}),
       ...(options.distinct ? { distinct: options.distinct } : {}),
-      ...(options.locales?.length ? { locales: options.locales.map((l) => LOCALES[l] ?? l) } : {}),
+      // Request locales are not forwarded: the index declares none (see
+      // settings.ts), and a query locale then matches nothing at all.
       ...(hybrid ? { hybrid } : {}),
       ...(vector?.value ? { vector: vector.value } : {}),
       ...(highlightFields

@@ -3,6 +3,7 @@ import {
   mergeAttributes,
   SpecAttribute,
   specFacets,
+  specTable,
   specText,
   templateErrors,
   validateSpecs,
@@ -90,6 +91,23 @@ describe("search projections", () => {
 
   it("renders option labels in both languages for keyword search", () => {
     expect(specText(attributes, specs)).toBe("4 MP · ملونة ColorVu ColorVu · IP67")
+  })
+})
+
+describe("specTable", () => {
+  it("groups rows and renders labels, units and yes/no in both languages", () => {
+    const grouped: SpecAttribute[] = attributes.map((a, i) => ({
+      ...a,
+      group_ar: i < 2 ? "الصورة" : "عام",
+      group_en: i < 2 ? "Image" : "General",
+    }))
+    const table = specTable(grouped, { resolution_mp: 4, night_vision: "colorvu", built_in_mic: false })
+    expect(table.map((g) => g.group_en)).toEqual(["Image", "General"])
+    expect(table[0].rows.map((r) => [r.value_ar, r.value_en])).toEqual([
+      ["4 MP", "4 MP"],
+      ["ملونة ColorVu", "ColorVu"],
+    ])
+    expect(table[1].rows[0]).toMatchObject({ value_ar: "لا", value_en: "No" })
   })
 })
 

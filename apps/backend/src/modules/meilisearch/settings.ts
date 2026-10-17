@@ -67,9 +67,11 @@ export function buildIndexSettings(
       },
       disableOnAttributes: typo?.disabled_on_attributes ?? [],
     },
-    // Force Arabic/English tokenization instead of per-document detection,
-    // which guesses wrong on short mixed titles like "كاميرا Hikvision 2MP".
-    localizedAttributes: [{ attributePatterns: ["*"], locales: ["ara", "eng"] }],
+    // No localizedAttributes: declaring locales (ara, eng or both) stops
+    // Arabic synonyms from reaching English documents ("مقوي" no longer finds
+    // "Range extender"), and the catalogue is mostly English until the
+    // Arabic content pass. Per-document detection handles mixed titles.
+    localizedAttributes: null,
     synonyms: buildSynonyms(options.synonyms),
     stopWords: options.stopWords ?? ARABIC_STOP_WORDS,
     faceting: { maxValuesPerFacet: 500, sortFacetValuesBy: { "*": "count" } },

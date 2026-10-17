@@ -52,10 +52,16 @@ describe("Arabic search vocabulary", () => {
   it("rewrites known phrases inside a sentence", () => {
     expect(rewriteQuery("شي يقوي النت في البيت")).toBe("شي راوتر في البيت")
     expect(rewriteQuery("  ابي   كاميرا للحوش ")).toBe("ابي كاميرا")
+    expect(rewriteQuery("ابي مقوي شبكة")).toBe("ابي مقوي")
+    expect(rewriteQuery("كاميرا مراقبة للمكتب")).toBe("كاميرا للمكتب")
   })
 
   it("adds the ال form of Arabic synonyms", () => {
     const synonyms = buildSynonyms()
+    // A word that starts a multi-word key loses its own synonyms in Meilisearch.
+    expect(synonyms["مقوي شبكة"]).toBeUndefined()
+    expect(synonyms["مقوي"]).toContain("extender")
+    expect(synonyms["واي فاي"]).toContain("wifi")
     expect(synonyms["النت"]).toEqual(expect.arrayContaining(["راوتر"]))
     expect(synonyms["هيك فيجن"]).toEqual(expect.arrayContaining(["hikvision"]))
     expect(synonyms["router"]).toEqual(expect.arrayContaining(["راوتر"]))

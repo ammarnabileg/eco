@@ -198,3 +198,64 @@ export function specText(attributes: SpecAttribute[], specs: SpecValues | null |
   }
   return parts.join(" · ")
 }
+
+export type SpecRow = {
+  key: string
+  label_ar: string
+  label_en: string
+  value_ar: string
+  value_en: string
+  filterable: boolean
+}
+export type SpecGroup = { group_ar: string; group_en: string; rows: SpecRow[] }
+
+const YES_NO = { ar: ["نعم", "لا"], en: ["Yes", "No"] }
+
+/**
+ * A product's specs as display rows grouped like the template, in both
+ * languages. Fields without a value are skipped.
+ */
+export function specTable(attributes: SpecAttribute[], specs: SpecValues | null | undefined): SpecGroup[] {
+  const groups = new Map<string, SpecGroup>()
+  for (const attr of attributes) {
+    const v = specs?.[attr.key]
+    if (v === undefined || v === null) {
+      continue
+    }
+    const option = (value: string) => attr.options?.find((o) => o.value === value)
+    const unit = attr.unit ? ` ${attr.unit}` : ""
+    let ar: string
+    let en: string
+    if (typeof v === "boolean") {
+      ar = YES_NO.ar[v ? 0 : 1]
+      en = YES_NO.en[v ? 0 : 1]
+    } else if (isLocalized(v)) {
+      ar = v.ar
+      en = v.en
+    } else if (Array.isArray(v)) {
+      ar = v.map((x) => option(x)?.label_ar ?? x).join("، ")
+      en = v.map((x) => option(x)?.label_en ?? x).join(", ")
+    } else {
+      const o = option(String(v))
+      ar = `${o?.label_ar ?? v}${o ? "" : unit}`
+      en = `${o?.label_en ?? v}${o ? "" : unit}`
+    }
+    const groupKey = attr.group_en ?? attr.group_ar ?? ""
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, {
+        group_ar: attr.group_ar ?? "المواصفات",
+        group_en: attr.group_en ?? "Specifications",
+        rows: [],
+      })
+    }
+    groups.get(groupKey)!.rows.push({
+      key: attr.key,
+      label_ar: attr.label_ar,
+      label_en: attr.label_en,
+      value_ar: ar,
+      value_en: en,
+      filterable: Boolean(attr.filterable),
+    })
+  }
+  return [...groups.values()]
+}

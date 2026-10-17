@@ -14,7 +14,7 @@ const GROUPS: string[][] = [
   ["سويتش", "switch", "موزع"],
   ["mesh", "ميش", "شبكة ميش"],
   // Surveillance
-  ["كاميرا", "كاميره", "كام", "camera", "cam", "كاميرات"],
+  ["كاميرا", "كاميره", "كام", "camera", "cam", "كاميرات", "كامرا", "كمرا"],
   ["كاميرا مراقبة", "cctv", "مراقبة", "سي سي تي في"],
   ["dvr", "جهاز تسجيل", "مسجل", "nvr"],
   ["هارد", "hdd", "hard disk", "هارديسك", "قرص صلب"],
@@ -52,7 +52,14 @@ const PHRASES: Record<string, string[]> = {
 // phrase. Customers wrap phrases in sentences ("شي يقوي النت في البيت"), so
 // known phrases are rewritten to their product term before searching.
 export function rewriteQuery(q: string, extra: Record<string, string[]> = {}): string {
-  const phrases = Object.entries({ ...PHRASES, ...extra })
+  // Phrases buildSynonyms cannot key ("مقوي شبكة") search as their first word.
+  const singles = new Set(GROUPS.flat().filter((t) => !t.includes(" ")).map((t) => t.toLowerCase()))
+  const groupPhrases = Object.fromEntries(
+    GROUPS.flat()
+      .filter((t) => t.includes(" ") && singles.has(t.split(" ")[0].toLowerCase()))
+      .map((t) => [t, [t.split(" ")[0]]])
+  )
+  const phrases = Object.entries({ ...groupPhrases, ...PHRASES, ...extra })
     .filter(([phrase]) => phrase.includes(" "))
     .sort(([a], [b]) => b.length - a.length)
   let out = ` ${q.trim().replace(/\s+/g, " ")} `
@@ -93,5 +100,13 @@ export function buildSynonyms(extra: Record<string, string[]> = {}): Record<stri
   for (const [phrase, targets] of Object.entries({ ...PHRASES, ...extra })) {
     add(phrase, targets)
   }
-  return Object.fromEntries(Object.entries(synonyms).map(([k, v]) => [k, [...v]]))
+  // Meilisearch drops a word's own synonyms when the word also starts a
+  // multi-word synonym ("مقوي" vs "مقوي شبكة"), so such phrases are not keys;
+  // rewriteQuery maps them to a product term instead.
+  const single = new Set(Object.keys(synonyms).filter((k) => !k.includes(" ")))
+  return Object.fromEntries(
+    Object.entries(synonyms)
+      .filter(([k]) => !k.includes(" ") || !single.has(k.split(" ")[0]))
+      .map(([k, v]) => [k, [...v]])
+  )
 }
