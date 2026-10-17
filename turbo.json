@@ -3,7 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".medusa/server/**"]
     },
     "dev": {
       "cache": false,
@@ -16,7 +16,14 @@
       "outputs": []
     },
     "test": {
-      "outputs": []
+      "outputs": [],
+      "passThroughEnv": [
+        "MEILISEARCH_TEST_HOST",
+        "MEILISEARCH_TEST_API_KEY",
+        "DB_HOST",
+        "DB_USERNAME",
+        "DB_PASSWORD"
+      ]
     }
   }
 }
