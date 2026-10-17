@@ -6,6 +6,8 @@ import {
   search,
 } from "@medusajs/framework/utils";
 
+import { mergeAttributes, SpecValues, specFacets, specText } from "../modules/catalog/specs";
+import { attributesByCategory } from "../workflows/catalog/steps/product-attributes";
 import { ProductOptionRow, toOptionValues } from "./helpers/option-values";
 import { loadPricing, priceFields, toProductPricing } from "./helpers/pricing";
 import { resolveProductIds } from "./helpers/resolve-product-ids";
@@ -19,7 +21,15 @@ const PRODUCT_GRAPH_FIELDS = [
   "status",
   "created_at",
   "sales_channels.id",
+  "categories.id",
   "categories.name",
+  "brand.name",
+  "product_detail.title_en",
+  "product_detail.description_en",
+  "product_detail.specs",
+  "product_detail.mpn",
+  "product_detail.series",
+  "product_detail.price_on_request",
   "tags.value",
   "options.title",
   "options.values.value",
@@ -35,7 +45,16 @@ type ProductRow = {
   created_at?: string | Date | null;
   deleted_at?: string | Date | null;
   sales_channels?: ({ id?: string | null } | null)[] | null;
-  categories?: ({ name?: string | null } | null)[] | null;
+  categories?: ({ id?: string | null; name?: string | null } | null)[] | null;
+  brand?: { name?: string | null } | null;
+  product_detail?: {
+    title_en?: string | null;
+    description_en?: string | null;
+    specs?: SpecValues | null;
+    mpn?: string | null;
+    series?: string | null;
+    price_on_request?: boolean | null;
+  } | null;
   tags?: ({ value?: string | null } | null)[] | null;
   options?: ProductOptionRow[] | null;
 };
@@ -46,12 +65,23 @@ const productFields = search.define({
   status: search.keyword().filterable().retrievable(false),
   sales_channel_ids: search.keyword().array().filterable().retrievable(false),
   title: search.text().searchable({ weight: 3 }).sortable().retrievable(),
+  title_en: search.text().searchable({ weight: 3 }).retrievable(),
+  // Model numbers ("DS-2CD2047G2-LU", "Archer BE230") are what installers type.
+  mpn: search.keyword().searchable({ weight: 3 }).retrievable(),
+  brand: search.keyword().searchable({ weight: 2 }).filterable().facetable().retrievable(),
+  series: search.keyword().filterable().facetable().retrievable(),
   description: search.text().searchable({ weight: 1 }),
+  description_en: search.text().searchable({ weight: 1 }),
+  // Filterable specs as "key:value", labelled by the category's spec template.
+  specs: search.keyword().array().filterable().facetable().retrievable(),
+  spec_text: search.text().searchable({ weight: 1 }),
+  price_on_request: search.boolean().filterable().retrievable(),
   handle: search.keyword().retrievable(),
   // Returned on hits only: never filtered, sorted or faceted on.
   thumbnail: search.keyword().retrievable(),
   created_at: search.date().sortable().retrievable(),
   category: search.keyword().array().filterable().facetable().retrievable(),
+  category_ids: search.keyword().array().filterable().retrievable(false),
   labels: search.keyword().array().filterable().facetable().retrievable(),
   option_values: search
     .keyword()
@@ -70,7 +100,9 @@ type ProductDocument = SearchTypes.InferSearchDocumentType<
 function toDocument(
   product: ProductRow,
   pricing: Parameters<typeof toProductPricing>[0],
+  attributes: ReturnType<typeof mergeAttributes>,
 ): ProductDocument {
+  const detail = product.product_detail;
   const category = (product.categories ?? [])
     .map((productCategory) => productCategory?.name?.trim())
     .filter((name): name is string => Boolean(name));
@@ -86,11 +118,22 @@ function toDocument(
     status: product.status ?? null,
     sales_channel_ids: salesChannelIds,
     title: product.title ?? null,
+    title_en: detail?.title_en ?? null,
+    mpn: detail?.mpn ?? null,
+    brand: product.brand?.name ?? null,
+    series: detail?.series ?? null,
     description: product.description ?? null,
+    description_en: detail?.description_en ?? null,
+    specs: specFacets(attributes, detail?.specs),
+    spec_text: specText(attributes, detail?.specs) || null,
+    price_on_request: detail?.price_on_request ?? false,
     handle: product.handle ?? null,
     thumbnail: product.thumbnail ?? null,
     created_at: product.created_at ?? null,
     category,
+    category_ids: (product.categories ?? [])
+      .map((productCategory) => productCategory?.id)
+      .filter((id): id is string => Boolean(id)),
     labels,
     option_values: toOptionValues(product.options),
     ...toProductPricing(pricing),
@@ -112,8 +155,25 @@ const source = {
       rows.map((row) => row.id),
       context,
     );
+    const categoryIds = rows.flatMap((row) =>
+      (row.categories ?? [])
+        .map((c) => c?.id)
+        .filter((id): id is string => Boolean(id)),
+    );
+    const byCategory = await attributesByCategory(
+      context.container.query,
+      categoryIds,
+    );
+    const attributesOf = (row: ProductRow) =>
+      mergeAttributes(
+        (row.categories ?? []).map((c) => ({
+          attributes: byCategory.get(c?.id ?? "") ?? [],
+        })),
+      );
 
-    return rows.map((row) => toDocument(row, pricing.get(row.id)));
+    return rows.map((row) =>
+      toDocument(row, pricing.get(row.id), attributesOf(row)),
+    );
   },
 };
 
