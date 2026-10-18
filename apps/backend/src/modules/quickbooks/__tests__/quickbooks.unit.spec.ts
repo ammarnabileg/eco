@@ -132,6 +132,31 @@ describe("QuickBooks mapping", () => {
     expect(item.Name.length).toBeLessThanOrEqual(100)
     expect(item.Name.endsWith("[DS-2CD2047G2-LU]")).toBe(true)
     expect(item).toMatchObject({ Type: "NonInventory", UnitPrice: 23.5, IncomeAccountRef: { value: "55" } })
+    expect(item).not.toHaveProperty("ParentRef")
+  })
+
+  it("describes items with names, brand, model, warranty and link, under their category", () => {
+    const item = variantToItem(
+      {
+        id: "v1",
+        sku: "TAPO-C200",
+        title: "Default",
+        price: 12.5,
+        product_title: "كاميرا Tapo C200",
+        details: { title_en: "Tapo C200 Wi-Fi Camera", brand: "Tapo", mpn: "C200", warranty_months: 24, url: "https://www.lalykw.com/kw/products/tapo-c200" },
+      },
+      "55",
+      3,
+      "77"
+    )
+    expect(item.Description.split("\n")).toEqual([
+      "كاميرا Tapo C200",
+      "Tapo C200 Wi-Fi Camera",
+      "Brand: Tapo · Model: C200",
+      "الضمان: 24 شهر / Warranty: 24 months",
+      "https://www.lalykw.com/kw/products/tapo-c200",
+    ])
+    expect(item).toMatchObject({ SubItem: true, ParentRef: { value: "77" } })
   })
 
   it("sends a currency only to companies whose home currency differs, and only with Multicurrency", () => {

@@ -38,7 +38,13 @@ type VariantRow = {
   id: string
   title?: string | null
   sku?: string | null
-  product?: { title?: string | null } | null
+  product?: {
+    title?: string | null
+    handle?: string | null
+    product_detail?: { title_en?: string | null; mpn?: string | null; warranty_months?: number | null } | null
+    brand?: { name?: string | null } | null
+    categories?: ({ name?: string | null } | null)[] | null
+  } | null
   prices?: { amount: number; currency_code: string }[] | null
 }
 
@@ -74,6 +80,26 @@ async function namedItem(
   return item.Id
 }
 
+// Store category -> QuickBooks product category, found or created once per
+// session. Categories need QuickBooks Plus or Advanced; without them the item
+// is simply left uncategorised.
+const categories = new WeakMap<object, Map<string, Promise<string | null>>>()
+async function categoryId(ctx: QboContext, name: string | null): Promise<string | null> {
+  if (!name) return null
+  const clean = name.replace(/:/g, "-").slice(0, 100)
+  let cache = categories.get(ctx.client)
+  if (!cache) categories.set(ctx.client, (cache = new Map()))
+  if (!cache.has(clean)) {
+    cache.set(
+      clean,
+      findOrCreateByName(ctx, "Item", "Name", clean, { Name: clean, Type: "Category" }, `category-${clean}`)
+        .then((c) => c.Id)
+        .catch(() => null)
+    )
+  }
+  return cache.get(clean)!
+}
+
 /** Creates or updates the QuickBooks Item of a variant; returns its id. */
 async function upsertVariantItem(ctx: QboContext, v: VariantRow, update: boolean): Promise<string> {
   const existing = await ctx.service.findRecord("variant", v.id)
@@ -84,15 +110,26 @@ async function upsertVariantItem(ctx: QboContext, v: VariantRow, update: boolean
     throw new MedusaError(MedusaError.Types.INVALID_DATA, "Pick the QuickBooks income account in Settings > QuickBooks")
   }
   const price = v.prices?.find((p) => p.currency_code === "kwd")?.amount ?? null
+  const p = v.product
+  const storefront = (process.env.STOREFRONT_URL ?? "").split(",")[0].trim().replace(/\/$/, "")
   const payload = variantToItem(
     {
       id: v.id,
       sku: v.sku,
       title: v.title,
       price,
-      product_title: v.product?.title ?? "Product",
+      product_title: p?.title ?? "Product",
+      details: {
+        title_en: p?.product_detail?.title_en,
+        brand: p?.brand?.name,
+        mpn: p?.product_detail?.mpn,
+        warranty_months: p?.product_detail?.warranty_months,
+        url: storefront && p?.handle ? `${storefront}/kw/products/${p.handle}` : null,
+      },
     },
-    ctx.connection.income_account_id
+    ctx.connection.income_account_id,
+    3,
+    await categoryId(ctx, p?.categories?.find((c) => c?.name)?.name ?? null)
   )
   let item: { Id: string; SyncToken?: string }
   if (existing?.qb_id) {
@@ -127,7 +164,20 @@ async function loadVariants(container: MedusaContainer, filters: Record<string, 
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const { data } = await query.graph({
     entity: "variant",
-    fields: ["id", "title", "sku", "product.title", "prices.amount", "prices.currency_code"],
+    fields: [
+      "id",
+      "title",
+      "sku",
+      "product.title",
+      "product.handle",
+      "product.product_detail.title_en",
+      "product.product_detail.mpn",
+      "product.product_detail.warranty_months",
+      "product.brand.name",
+      "product.categories.name",
+      "prices.amount",
+      "prices.currency_code",
+    ],
     filters,
   })
   return data as VariantRow[]

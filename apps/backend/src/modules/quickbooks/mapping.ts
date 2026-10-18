@@ -140,10 +140,38 @@ export function orderToSale(order: OrderInput, refs: ItemRefs, priceDecimals = 3
 }
 
 /** A QuickBooks NonInventory item for a variant (the store keeps the stock). */
+export type ItemDetails = {
+  title_en?: string | null
+  brand?: string | null
+  mpn?: string | null
+  warranty_months?: number | null
+  url?: string | null
+}
+
+/** Sales description shown on invoices and receipts (max 4000). */
+export function itemDescription(name: string, variant: string | null | undefined, d: ItemDetails = {}) {
+  const lines = [
+    [name, variant && variant !== "Default" ? variant : null].filter(Boolean).join(" — "),
+    d.title_en && d.title_en !== name ? d.title_en : null,
+    [d.brand ? `Brand: ${d.brand}` : null, d.mpn ? `Model: ${d.mpn}` : null].filter(Boolean).join(" · ") || null,
+    d.warranty_months ? `الضمان: ${d.warranty_months} شهر / Warranty: ${d.warranty_months} months` : null,
+    d.url ?? null,
+  ]
+  return clip(lines.filter(Boolean).join("\n"), 4000)
+}
+
 export function variantToItem(
-  v: { id: string; sku?: string | null; title?: string | null; price?: number | null; product_title: string },
+  v: {
+    id: string
+    sku?: string | null
+    title?: string | null
+    price?: number | null
+    product_title: string
+    details?: ItemDetails
+  },
   incomeAccountId: string,
-  decimals = 3
+  decimals = 3,
+  categoryId?: string | null
 ) {
   const variant = v.title && v.title !== "Default" ? ` ${v.title}` : ""
   const sku = v.sku ? ` [${v.sku}]` : ""
@@ -156,6 +184,8 @@ export function variantToItem(
     ...(v.sku ? { Sku: clip(v.sku, 100) } : {}),
     ...(v.price != null ? { UnitPrice: roundTo(v.price, decimals) } : {}),
     IncomeAccountRef: { value: incomeAccountId },
+    Description: itemDescription(v.product_title, v.title, v.details),
+    ...(categoryId ? { SubItem: true, ParentRef: { value: categoryId } } : {}),
     Active: true,
   }
 }

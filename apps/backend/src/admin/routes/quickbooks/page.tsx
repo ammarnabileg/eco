@@ -184,6 +184,19 @@ const QuickbooksPage = () => {
     onError: (e: Error) => toast.error(e.message),
   })
 
+  const resendProducts = useMutation({
+    mutationFn: () =>
+      sdk.client.fetch<{ already_running: boolean }>("/admin/quickbooks/sync", {
+        method: "POST",
+        body: { all_products: true },
+      }),
+    onSuccess: ({ already_running }) =>
+      toast.success(
+        already_running ? "الإرسال شغال بالفعل" : "بدأ إرسال كل المنتجات في الخلفية (حوالي دقيقة لكل 100 منتج)"
+      ),
+    onError: (e: Error) => toast.error(e.message),
+  })
+
   if (isLoading || !status) {
     return <Container>جاري التحميل…</Container>
   }
@@ -300,9 +313,14 @@ const QuickbooksPage = () => {
                 يعاد المحاولة تلقائياً كل 15 دقيقة (حتى 6 مرات).
               </Text>
             </div>
-            <Button size="small" variant="secondary" disabled={!status.failed_count} isLoading={retry.isPending} onClick={() => retry.mutate()}>
-              إعادة محاولة الطلبات
-            </Button>
+            <div className="flex gap-2">
+              <Button size="small" variant="secondary" isLoading={resendProducts.isPending} onClick={() => resendProducts.mutate()}>
+                إعادة إرسال كل المنتجات
+              </Button>
+              <Button size="small" variant="secondary" disabled={!status.failed_count} isLoading={retry.isPending} onClick={() => retry.mutate()}>
+                إعادة محاولة الفاشل
+              </Button>
+            </div>
           </div>
           <Table>
             <Table.Header>

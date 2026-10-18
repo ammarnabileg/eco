@@ -161,6 +161,7 @@ medusaIntegrationTestRunner({
         {
           title: "Archer BE230",
           status: "published",
+          categories: [{ id: (await api.post("/admin/product-categories", { name: "Wi-Fi Routers" }, adminHeaders)).data.product_category.id }],
           options: [{ title: "Default", values: ["Default"] }],
           variants: [
             { title: "Default", sku: "ARCHER-BE230", manage_inventory: false, options: { Default: "Default" }, prices: [{ amount: 27.9, currency_code: "kwd" }] },
@@ -171,6 +172,10 @@ medusaIntegrationTestRunner({
       await api.post("/admin/quickbooks/sync", { products: [product.product.id] }, adminHeaders)
       const item = qbo.creates.find((c) => c.entity === "Item" && String(c.body.Name).includes("ARCHER-BE230"))
       expect(item?.body).toMatchObject({ Type: "NonInventory", UnitPrice: 27.9, IncomeAccountRef: { value: "79" } })
+      expect(String(item?.body.Description)).toContain("Archer BE230")
+      const category = qbo.creates.find((c) => c.entity === "Item" && c.body.Type === "Category")
+      expect(category?.body.Name).toBe("Wi-Fi Routers")
+      expect(item?.body).toMatchObject({ SubItem: true, ParentRef: { value: category?.id } })
 
       const { result: order } = await createOrderWorkflow(container).run({
         input: {
@@ -337,6 +342,32 @@ medusaIntegrationTestRunner({
       await api.post(`/admin/quickbooks/events/${data.events[0].id}/review`, {}, adminHeaders)
       expect((await api.get("/admin/quickbooks/events", adminHeaders)).data.count).toBe(0)
       expect((await api.get("/admin/quickbooks/events?all=1", adminHeaders)).data.count).toBe(2)
+    })
+
+    it("re-sends every product in the background on request", async () => {
+      await connect()
+      for (const title of ["Tapo C200", "Tapo C210"]) {
+        await api.post(
+          "/admin/products",
+          {
+            title,
+            status: "published",
+            options: [{ title: "Default", values: ["Default"] }],
+            variants: [{ title: "Default", manage_inventory: false, options: { Default: "Default" }, prices: [{ amount: 10, currency_code: "kwd" }] }],
+          },
+          adminHeaders
+        )
+      }
+      qbo.creates = []
+      const { status, data } = await api.post("/admin/quickbooks/sync", { all_products: true }, adminHeaders)
+      expect(status).toBe(202)
+      expect(data).toMatchObject({ started: true })
+      for (let i = 0; i < 40 && qbo.creates.filter((c) => c.entity === "Item").length < 2; i++) {
+        await new Promise((r) => setTimeout(r, 250))
+      }
+      const names = qbo.creates.filter((c) => c.entity === "Item").map((c) => String(c.body.Name))
+      expect(names.some((n) => n.startsWith("Tapo C200"))).toBe(true)
+      expect(names.some((n) => n.startsWith("Tapo C210"))).toBe(true)
     })
 
     it("refreshes an expired access token once and keeps the rotated refresh token", async () => {

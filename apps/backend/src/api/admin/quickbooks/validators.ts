@@ -14,6 +14,8 @@ export const SyncQuickbooks = z
     orders: z.array(z.string().startsWith("order_")).max(50).optional(),
     products: z.array(z.string().startsWith("prod_")).max(50).optional(),
     retry_failed: z.boolean().optional(),
+    /** Re-send every product in the background (e.g. after mapping changes). */
+    all_products: z.boolean().optional(),
   })
   .strict()
 export type SyncQuickbooksType = z.infer<typeof SyncQuickbooks>
