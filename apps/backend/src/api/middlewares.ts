@@ -55,6 +55,12 @@ export default defineMiddlewares({
       ],
     },
     {
+      // The signature covers the exact bytes Intuit sent.
+      method: ["POST"],
+      matcher: "/hooks/quickbooks",
+      bodyParser: { preserveRawBody: true },
+    },
+    {
       method: ["POST"],
       matcher: "/admin/integrations/:key",
       middlewares: [validateAndTransformBody(SaveIntegration)],

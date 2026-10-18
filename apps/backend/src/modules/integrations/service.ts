@@ -86,7 +86,9 @@ class IntegrationsModuleService extends MedusaService({ IntegrationSetting }) {
         else delete target[f.key]
       }
     }
-    const enabled = input.enabled ?? row?.enabled ?? false
+    // Saving one field of a never-saved integration keeps its current state
+    // (switched on by environment variables, or off), not "off".
+    const enabled = input.enabled ?? row?.enabled ?? resolveIntegration(key, null).enabled
     if (enabled) {
       const missing = missingFields(def, resolveValues(def, { ...config, ...secrets }))
       if (missing.length) {

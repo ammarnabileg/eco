@@ -15,6 +15,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       klickpay_webhook: `${backend}/hooks/payment/klickpay_knet`,
       taly_webhook: `${backend}/hooks/payment/taly_taly`,
       deema_webhook: `${backend}/hooks/payment/deema_deema`,
+      quickbooks_webhook: `${backend}/hooks/quickbooks`,
       quickbooks_redirect: process.env.QUICKBOOKS_REDIRECT_URI ?? `${backend}/quickbooks/callback`,
       google_feed_ar: `${backend}/feeds/google/ar`,
       google_feed_en: `${backend}/feeds/google/en`,

@@ -11,6 +11,7 @@ import { QUICKBOOKS_MODULE } from "../../modules/quickbooks"
 import { exchangeCode, QboClient, revokeToken } from "../../modules/quickbooks/client"
 import { decrypt } from "../../modules/quickbooks/crypto"
 import QuickBooksModuleService from "../../modules/quickbooks/service"
+import { LOCAL_ENTITY, needsAttention, QboEvent } from "../../modules/quickbooks/webhook"
 import { encryptionKey, storeTokens } from "./qbo"
 import { syncCaptureToQuickBooks, syncOrderToQuickBooks, syncProductToQuickBooks, syncRefundsToQuickBooks } from "./sync"
 
@@ -175,4 +176,75 @@ const pushCaptureToQuickbooksStep = createStep("push-capture-to-quickbooks", asy
 export const syncCaptureToQuickbooksWorkflow = createWorkflow(
   "sync-capture-to-quickbooks",
   (paymentId: string) => new WorkflowResponse(pushCaptureToQuickbooksStep(paymentId))
+)
+
+// --- webhook events -------------------------------------------------------
+
+const markQuickbooksEventReviewedStep = createStep(
+  "mark-quickbooks-event-reviewed",
+  async (id: string, { container }) => {
+    const svc = resolveService(container)
+    const [event] = await svc.listQbWebhookEvents({ id }, { take: 1 })
+    if (!event) {
+      throw new MedusaError(MedusaError.Types.NOT_FOUND, `QuickBooks event ${id} not found`)
+    }
+    const updated = await svc.updateQbWebhookEvents({ id, reviewed_at: new Date() })
+    return new StepResponse(updated, { id, previous: event.reviewed_at })
+  },
+  async (undo, { container }) => {
+    if (undo) {
+      await resolveService(container).updateQbWebhookEvents({ id: undo.id, reviewed_at: undo.previous })
+    }
+  }
+)
+
+export const reviewQuickbooksEventWorkflow = createWorkflow(
+  "review-quickbooks-event",
+  (id: string) => new WorkflowResponse(markQuickbooksEventReviewedStep(id))
+)
+
+const recordQuickbooksEventsStep = createStep(
+  "record-quickbooks-events",
+  async (events: QboEvent[], { container }) => {
+    const svc = resolveService(container)
+    const connection = await svc.getConnection()
+    const created: string[] = []
+    for (const event of events) {
+      // Another company's events (the app may be connected elsewhere).
+      if (!connection || event.realm_id !== connection.realm_id) continue
+      const [existing] = await svc.listQbWebhookEvents({ event_key: event.key.slice(0, 500) }, { take: 1, select: ["id"] })
+      if (existing) continue
+      const kinds = LOCAL_ENTITY[event.entity] ?? []
+      const ids = [event.entity_id, ...(event.merged_id ? [event.merged_id] : [])]
+      const [record] = kinds.length ? await svc.listQbSyncRecords({ entity: kinds as never, qb_id: ids }, { take: 1 }) : []
+      try {
+        const row = await svc.createQbWebhookEvents({
+          event_key: event.key.slice(0, 500),
+          realm_id: event.realm_id,
+          entity: event.entity,
+          entity_id: event.entity_id,
+          operation: event.operation,
+          occurred_at: event.occurred_at ? new Date(event.occurred_at) : null,
+          local_entity: record?.entity ?? null,
+          local_id: record?.local_id ?? null,
+          attention: needsAttention(event, !!record),
+          raw: event as unknown as Record<string, unknown>,
+        })
+        created.push(row.id)
+      } catch {
+        // Delivered twice at the same moment: the unique key kept one.
+      }
+    }
+    return new StepResponse(created.length, created)
+  },
+  async (created, { container }) => {
+    if (created?.length) {
+      await resolveService(container).deleteQbWebhookEvents(created)
+    }
+  }
+)
+
+export const recordQuickbooksEventsWorkflow = createWorkflow(
+  "record-quickbooks-events",
+  (events: QboEvent[]) => new WorkflowResponse(recordQuickbooksEventsStep(events))
 )

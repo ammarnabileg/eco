@@ -34,6 +34,90 @@ const ENTITY_LABEL: Record<string, string> = {
   capture: "تحصيل دفعة",
 }
 
+type QbEvent = {
+  id: string
+  entity: string
+  entity_id: string
+  operation: string
+  occurred_at: string | null
+  local_entity: string | null
+  local_id: string | null
+}
+
+const OPERATION_LABEL: Record<string, string> = {
+  create: "إنشاء",
+  update: "تعديل",
+  delete: "حذف",
+  void: "إلغاء (Void)",
+  merge: "دمج",
+}
+
+// QuickBooks changes to records the store booked: the store does not follow
+// them, so staff decide (fix in QuickBooks, or re-sync from the store).
+function QuickbooksEvents() {
+  const queryClient = useQueryClient()
+  const { data } = useQuery({
+    queryKey: ["quickbooks", "events"],
+    queryFn: () => sdk.client.fetch<{ events: QbEvent[]; count: number }>("/admin/quickbooks/events"),
+  })
+  const review = useMutation({
+    mutationFn: (id: string) => sdk.client.fetch(`/admin/quickbooks/events/${id}/review`, { method: "POST" }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["quickbooks", "events"] }),
+    onError: (e: Error) => toast.error(e.message),
+  })
+  return (
+    <Container className="flex flex-col gap-3 p-0">
+      <div className="px-6 pt-4">
+        <Heading level="h2">تغييرات من QuickBooks تحتاج مراجعة ({data?.count ?? 0})</Heading>
+        <Text size="small" className="text-ui-fg-subtle">
+          حد عدّل أو حذف أو ألغى في QuickBooks حاجة المتجر رحّلها. المتجر ما بيغيّرش نفسه تلقائياً: راجع وصحّح في
+          QuickBooks أو في المتجر، وبعدين علّم إنها اتراجعت.
+        </Text>
+      </div>
+      <Table>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>في QuickBooks</Table.HeaderCell>
+            <Table.HeaderCell>العملية</Table.HeaderCell>
+            <Table.HeaderCell>في المتجر</Table.HeaderCell>
+            <Table.HeaderCell>الوقت</Table.HeaderCell>
+            <Table.HeaderCell />
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {(data?.events ?? []).map((e) => (
+            <Table.Row key={e.id}>
+              <Table.Cell dir="ltr">
+                {e.entity} #{e.entity_id}
+              </Table.Cell>
+              <Table.Cell>
+                <Badge size="2xsmall" color={["delete", "void", "merge"].includes(e.operation) ? "red" : "orange"}>
+                  {OPERATION_LABEL[e.operation] ?? e.operation}
+                </Badge>
+              </Table.Cell>
+              <Table.Cell>
+                {e.local_entity === "order" ? (
+                  <a className="text-ui-fg-interactive" href={`/app/orders/${e.local_id}`}>
+                    طلب {e.local_id}
+                  </a>
+                ) : (
+                  `${ENTITY_LABEL[e.local_entity ?? ""] ?? e.local_entity ?? "—"} ${e.local_id ?? ""}`
+                )}
+              </Table.Cell>
+              <Table.Cell>{e.occurred_at ? new Date(e.occurred_at).toLocaleString("ar-KW") : "—"}</Table.Cell>
+              <Table.Cell>
+                <Button size="small" variant="secondary" isLoading={review.isPending && review.variables === e.id} onClick={() => review.mutate(e.id)}>
+                  تمت المراجعة
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </Container>
+  )
+}
+
 const QuickbooksPage = () => {
   const queryClient = useQueryClient()
   const { data: status, isLoading } = useQuery({
@@ -246,6 +330,7 @@ const QuickbooksPage = () => {
           </Table>
         </Container>
       )}
+      {connected && <QuickbooksEvents />}
     </div>
   )
 }

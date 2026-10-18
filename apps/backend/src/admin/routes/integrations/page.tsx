@@ -58,7 +58,10 @@ const PROVIDER_URLS: Record<string, { label: string; key: string }[]> = {
   klickpay: [{ label: "رابط الـ Webhook", key: "klickpay_webhook" }],
   taly: [{ label: "رابط الـ Webhook (بيتبعت تلقائياً مع كل طلب)", key: "taly_webhook" }],
   deema: [{ label: "رابط الـ Webhook", key: "deema_webhook" }],
-  quickbooks: [{ label: "Redirect URI في تطبيق Intuit", key: "quickbooks_redirect" }],
+  quickbooks: [
+    { label: "Redirect URI (Keys & credentials ← Redirect URIs)", key: "quickbooks_redirect" },
+    { label: "Webhook endpoint (Webhooks ← Endpoint URL)", key: "quickbooks_webhook" },
+  ],
   google_merchant: [
     { label: "Feed عربي", key: "google_feed_ar" },
     { label: "Feed إنجليزي", key: "google_feed_en" },

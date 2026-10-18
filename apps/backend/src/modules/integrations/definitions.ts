@@ -155,6 +155,13 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         ],
         default: "sandbox",
       },
+      {
+        key: "webhook_verifier",
+        label: "Webhook verifier token",
+        type: "secret",
+        env: "QUICKBOOKS_WEBHOOK_VERIFIER",
+        help: "من صفحة Webhooks في تطبيق Intuit. فاضي = الـ Webhook مقفول.",
+      },
     ],
   },
   {

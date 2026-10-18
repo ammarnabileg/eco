@@ -3,6 +3,7 @@ import { MedusaService } from "@medusajs/framework/utils"
 import { readIntegration, settingsKey } from "../integrations/store"
 import QbConnection from "./models/qb-connection"
 import QbSyncRecord from "./models/qb-sync-record"
+import QbWebhookEvent from "./models/qb-webhook-event"
 
 export type QuickBooksOptions = {
   clientId?: string
@@ -11,9 +12,11 @@ export type QuickBooksOptions = {
   redirectUri?: string
   /** Secret used to encrypt stored OAuth tokens. */
   encryptionKey?: string
+  /** Verifier token of the app's webhook (Intuit dashboard > Webhooks). */
+  webhookVerifier?: string
 }
 
-class QuickBooksModuleService extends MedusaService({ QbConnection, QbSyncRecord }) {
+class QuickBooksModuleService extends MedusaService({ QbConnection, QbSyncRecord, QbWebhookEvent }) {
   protected readonly options_: QuickBooksOptions
   private readonly pg_: Parameters<typeof readIntegration>[0]
 
@@ -36,6 +39,7 @@ class QuickBooksModuleService extends MedusaService({ QbConnection, QbSyncRecord
       clientSecret: settings.active ? (v.client_secret as string) : undefined,
       environment: v.environment === "production" ? "production" : "sandbox",
       encryptionKey: this.options_.encryptionKey || settingsKey(),
+      webhookVerifier: (v.webhook_verifier as string | undefined) || undefined,
     }
   }
 

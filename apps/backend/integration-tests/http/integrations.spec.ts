@@ -83,6 +83,18 @@ medusaIntegrationTestRunner({
       expect(JSON.stringify(data)).not.toContain("deema-secret-key")
     })
 
+    it("keeps an environment-enabled integration on when only one field is saved", async () => {
+      process.env.TALY_USERNAME = "env-user"
+      process.env.TALY_PASSWORD = "env-pass"
+      try {
+        const { data } = await save("taly", { values: { base_url: "https://api.taly.test" } })
+        expect(data.integration).toMatchObject({ enabled: true, active: true })
+      } finally {
+        delete process.env.TALY_USERNAME
+        delete process.env.TALY_PASSWORD
+      }
+    })
+
     it("feeds QuickBooks app keys saved in the admin to the QuickBooks connection", async () => {
       const before = await api.get("/admin/quickbooks", adminHeaders)
       expect(before.data.configured).toBe(false)

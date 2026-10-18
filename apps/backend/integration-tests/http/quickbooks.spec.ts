@@ -1,3 +1,5 @@
+import { createHmac } from "node:crypto"
+
 import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ContainerRegistrationKeys, generateJwtToken, Modules } from "@medusajs/framework/utils"
 import {
@@ -285,6 +287,48 @@ medusaIntegrationTestRunner({
         Line: [{ Amount: 12.5, LinkedTxn: [{ TxnId: invoice.id, TxnType: "Invoice" }] }],
       })
       expect(booked[0].requestid).toBe(`capture-${payment.id}`.slice(0, 50))
+    })
+
+    it("records signed webhook events once and flags changes to what the store booked", async () => {
+      await connect()
+      const container = getContainer()
+      await api.post(
+        "/admin/integrations/quickbooks",
+        { values: { webhook_verifier: "verifier-token" } },
+        adminHeaders
+      )
+      const svc = container.resolve("quickbooks") as {
+        createQbSyncRecords: (d: Record<string, unknown>) => Promise<unknown>
+      }
+      await svc.createQbSyncRecords({ entity: "order", local_id: "order_123", qb_type: "Invoice", qb_id: "130", status: "synced" })
+
+      const events = [
+        { id: "ev-void", type: "qbo.invoice.voided.v1", intuitentityid: "130", intuitaccountid: "9130", time: "2026-10-18T10:00:00Z" },
+        { id: "ev-other", type: "qbo.invoice.created.v1", intuitentityid: "999", intuitaccountid: "9130" },
+        { id: "ev-foreign", type: "qbo.invoice.voided.v1", intuitentityid: "130", intuitaccountid: "other-company" },
+      ]
+      const body = JSON.stringify(events)
+      const post = (raw: string, signature: string) =>
+        api.post("/hooks/quickbooks", raw, {
+          headers: { "content-type": "application/json", "intuit-signature": signature },
+          validateStatus: () => true,
+          transformRequest: [(d: unknown) => d],
+        })
+      const signature = createHmac("sha256", "verifier-token").update(body).digest("base64")
+
+      expect((await post(body, "forged")).status).toBe(401)
+      const first = await post(body, signature)
+      expect(first.data).toEqual({ received: 2 })
+      // Intuit retries: nothing is recorded twice.
+      expect((await post(body, signature)).data).toEqual({ received: 0 })
+
+      const { data } = await api.get("/admin/quickbooks/events", adminHeaders)
+      expect(data.count).toBe(1)
+      expect(data.events[0]).toMatchObject({ entity: "Invoice", operation: "void", local_entity: "order", local_id: "order_123" })
+
+      await api.post(`/admin/quickbooks/events/${data.events[0].id}/review`, {}, adminHeaders)
+      expect((await api.get("/admin/quickbooks/events", adminHeaders)).data.count).toBe(0)
+      expect((await api.get("/admin/quickbooks/events?all=1", adminHeaders)).data.count).toBe(2)
     })
 
     it("refreshes an expired access token once and keeps the rotated refresh token", async () => {
