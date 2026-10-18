@@ -9,7 +9,7 @@ import IntegrationsModuleService from "../../modules/integrations/service"
 import { resolveIntegration, settingsKey } from "../../modules/integrations/store"
 import { paymentMethodName } from "../../modules/quickbooks/mapping"
 import { WHATSAPP_MODULE } from "../../modules/whatsapp"
-import { EvolutionConfig, sendText } from "../../modules/whatsapp/client"
+import { Button, EvolutionConfig, sendButtons, sendText } from "../../modules/whatsapp/client"
 import {
   cancelRequestedText,
   confirmedText,
@@ -21,6 +21,8 @@ import {
   otpMatches,
   otpText,
   parseReply,
+  REPLY_CANCEL,
+  REPLY_CONFIRM,
   welcomeText,
 } from "../../modules/whatsapp/messages"
 import WhatsAppModuleService from "../../modules/whatsapp/service"
@@ -32,6 +34,8 @@ export type WhatsAppSettings = {
   cfg: EvolutionConfig
   welcome: boolean
   order: boolean
+  interactive: boolean
+  cartReminder: boolean
   guestOtp: boolean
 }
 
@@ -44,8 +48,36 @@ export async function whatsappSettings(container: MedusaContainer): Promise<What
     cfg: { baseUrl: String(v.base_url ?? ""), instance: String(v.instance ?? ""), apiKey: String(v.api_key ?? "") },
     welcome: v.welcome !== "off",
     order: v.order !== "off",
+    interactive: v.interactive === "on",
+    cartReminder: v.cart_reminder === "on",
     guestOtp: v.guest_otp !== "off",
   }
+}
+
+/** Storefront address for links in messages (first of STOREFRONT_URL). */
+export const storefrontUrl = (path = "") =>
+  `${(process.env.STOREFRONT_URL ?? "").split(",")[0].trim().replace(/\/$/, "") || "https://www.lalykw.com"}/kw${path}`
+
+/**
+ * Sends `text` with buttons when interactive messages are on, and plain text
+ * when they are off or the gateway refuses them. The text always works alone.
+ */
+export async function sendRich(
+  settings: WhatsAppSettings,
+  phone: string,
+  text: string,
+  rich?: { title: string; footer?: string; buttons: Button[] }
+) {
+  if (settings.interactive && rich?.buttons.length) {
+    try {
+      await sendButtons(settings.cfg, phone, { title: rich.title, description: text, footer: rich.footer ?? "Laly", buttons: rich.buttons })
+      return "buttons" as const
+    } catch {
+      // fall back to text
+    }
+  }
+  await sendText(settings.cfg, phone, text)
+  return "text" as const
 }
 
 /** Shared secret Evolution sends back with each webhook call. */
@@ -66,7 +98,13 @@ export async function sendWelcome(container: MedusaContainer, customerId: string
   const customer = data[0] as { first_name?: string | null; phone?: string | null; has_account?: boolean } | undefined
   const phone = normalizePhone(customer?.phone)
   if (!customer?.has_account || !phone) return false
-  await sendText(settings.cfg, phone, welcomeText(customer.first_name ?? null))
+  await sendRich(settings, phone, welcomeText(customer.first_name ?? null), {
+    title: "أهلاً بك في Laly",
+    buttons: [
+      { type: "url", text: "🛍️ تسوق الآن", url: storefrontUrl() },
+      { type: "url", text: "👤 حسابي", url: storefrontUrl("/account") },
+    ],
+  })
   return true
 }
 
@@ -140,7 +178,13 @@ export async function sendOrderMessage(container: MedusaContainer, orderId: stri
     payment: paymentMethodName(provider),
   })
   try {
-    await sendText(settings.cfg, phone, text)
+    await sendRich(settings, phone, text, {
+      title: `طلب #${o.display_id}`,
+      buttons: [
+        { type: "reply", id: REPLY_CONFIRM, text: "✅ تأكيد الطلب" },
+        { type: "reply", id: REPLY_CANCEL, text: "❌ إلغاء الطلب" },
+      ],
+    })
     await saveOrderWhatsappWorkflow(container).run({ input: { order_id: orderId, phone, status: "sent" } })
     return true
   } catch (error) {
@@ -189,7 +233,14 @@ export async function acknowledgeReply(
   const query = container.resolve(ContainerRegistrationKeys.QUERY)
   const { data } = await query.graph({ entity: "order", fields: ["display_id"], filters: { id: result.order_id } })
   const id = (data[0] as unknown as { display_id?: number } | undefined)?.display_id ?? ""
-  await sendText(settings.cfg, result.phone, result.status === "confirmed" ? confirmedText(id) : cancelRequestedText(id))
+  if (result.status !== "confirmed") {
+    await sendText(settings.cfg, result.phone, cancelRequestedText(id))
+    return
+  }
+  await sendRich(settings, result.phone, confirmedText(id), {
+    title: `طلب #${id}`,
+    buttons: [{ type: "url", text: "📦 تفاصيل الطلب", url: storefrontUrl(`/order/${result.order_id}/confirmed`) }],
+  })
 }
 
 // --- guest phone codes -----------------------------------------------------
@@ -266,7 +317,10 @@ export async function sendGuestOtp(container: MedusaContainer, cartId: string) {
   }
   const code = newOtpCode()
   await createGuestOtpWorkflow(container).run({ input: { cart_id: cartId, phone: cart.phone, code } })
-  await sendText(settings.cfg, cart.phone, otpText(code))
+  await sendRich(settings, cart.phone, otpText(code), {
+    title: "رمز التحقق",
+    buttons: [{ type: "copy", text: "📋 نسخ الرمز", code }],
+  })
   return { phone: maskPhone(cart.phone) }
 }
 

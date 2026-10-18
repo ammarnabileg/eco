@@ -89,8 +89,9 @@ function WhatsappTools({ active }: { active: boolean }) {
     onError: (e: Error) => toast.error(e.message),
   })
   const test = useMutation({
-    mutationFn: () => sdk.client.fetch("/admin/whatsapp/send-test", { method: "POST", body: { phone } }),
-    onSuccess: () => toast.success("تم إرسال رسالة التجربة"),
+    mutationFn: (kind: "text" | "buttons" | "carousel") =>
+      sdk.client.fetch("/admin/whatsapp/send-test", { method: "POST", body: { phone, kind } }),
+    onSuccess: () => toast.success("تم إرسال رسالة التجربة. شوفها على الموبايل"),
     onError: (e: Error) => toast.error(e.message),
   })
   return (
@@ -109,10 +110,29 @@ function WhatsappTools({ active }: { active: boolean }) {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
-        <Button size="small" variant="secondary" disabled={!active || !phone} isLoading={test.isPending} onClick={() => test.mutate()}>
-          إرسال رسالة تجربة
-        </Button>
+        {(
+          [
+            ["text", "تجربة نص"],
+            ["buttons", "تجربة الأزرار"],
+            ["carousel", "تجربة كروت المنتجات"],
+          ] as const
+        ).map(([kind, label]) => (
+          <Button
+            key={kind}
+            size="small"
+            variant="secondary"
+            disabled={!active || !phone || test.isPending}
+            isLoading={test.isPending && test.variables === kind}
+            onClick={() => test.mutate(kind)}
+          >
+            {label}
+          </Button>
+        ))}
       </div>
+      <Text size="xsmall" className="text-ui-fg-muted">
+        لو الأزرار أو الكروت وصلت وظهرت صح على أكتر من موبايل (أندرويد وآيفون)، شغّل "رسائل تفاعلية". غير كده سيبها متوقفة
+        والرسائل هتتبعت نص عادي.
+      </Text>
     </div>
   )
 }

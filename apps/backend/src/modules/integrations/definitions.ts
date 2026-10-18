@@ -181,6 +181,22 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
       { key: "welcome", label: "رسالة ترحيب عند التسجيل", type: "select", options: ON_OFF, default: "on", public: true },
       { key: "order", label: "رسالة الطلب مع التأكيد", type: "select", options: ON_OFF, default: "on", public: true },
       {
+        key: "interactive",
+        label: "رسائل تفاعلية (أزرار وكروت منتجات)",
+        type: "select",
+        options: ON_OFF,
+        default: "off",
+        help: "أزرار تأكيد/إلغاء، نسخ الكود، روابط، وكروت منتجات. جرّبها برسائل التجربة الأول: مش بتظهر على كل أجهزة واتساب، ولو فشلت بتتبعت نص عادي.",
+      },
+      {
+        key: "cart_reminder",
+        label: "تذكير بالسلة المتروكة",
+        type: "select",
+        options: ON_OFF,
+        default: "off",
+        help: "رسالة واحدة بس لكل سلة فيها رقم موبايل واتسابت من 2 لـ 24 ساعة من غير طلب.",
+      },
+      {
         key: "guest_otp",
         label: "رمز تحقق للعميل الضيف",
         type: "select",

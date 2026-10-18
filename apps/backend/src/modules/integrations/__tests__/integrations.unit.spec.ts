@@ -36,7 +36,7 @@ describe("integration settings", () => {
     }
     const publicKeys = INTEGRATIONS.flatMap((d) => d.fields.filter((f) => f.public).map((f) => `${d.key}.${f.key}`))
     expect(publicKeys.sort()).toEqual(
-      ["adsense.client", "clarity.project_id", "deema.widget_key", "deema.widget_url", "google_merchant.site_verification"].sort()
+      ["adsense.client", "clarity.project_id", "deema.widget_key", "deema.widget_url", "google_merchant.site_verification", "whatsapp.order", "whatsapp.welcome"].sort()
     )
   })
 })

@@ -51,4 +51,15 @@ describe("WhatsApp messages", () => {
     expect(incomingMessage(msg({ remoteJid: "120363-123@g.us" }))).toBeNull()
     expect(incomingMessage({ event: "connection.update" })).toBeNull()
   })
+
+  it("reads button taps from old and new WhatsApp clients as the button id", () => {
+    const tap = (message: Record<string, unknown>) =>
+      incomingMessage({ event: "messages.upsert", data: { key: { remoteJid: "96550000000@s.whatsapp.net" }, message } })?.text
+    expect(tap({ buttonsResponseMessage: { selectedButtonId: "laly_confirm" } })).toBe("laly_confirm")
+    expect(tap({ templateButtonReplyMessage: { selectedId: "laly_cancel" } })).toBe("laly_cancel")
+    expect(tap({ interactiveResponseMessage: { nativeFlowResponseMessage: { paramsJson: '{"id":"laly_confirm"}' } } })).toBe("laly_confirm")
+    expect(tap({ interactiveResponseMessage: { nativeFlowResponseMessage: { paramsJson: "not json" } } })).toBeUndefined()
+    expect(parseReply("laly_confirm")).toBe("confirm")
+    expect(parseReply("laly_cancel")).toBe("cancel")
+  })
 })

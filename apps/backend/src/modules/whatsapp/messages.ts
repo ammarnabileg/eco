@@ -17,11 +17,15 @@ export const maskPhone = (phone: string) => `+${phone.slice(0, 3)} •••• 
 
 export type Reply = "confirm" | "cancel" | null
 
+/** Ids of the order message buttons; a tap arrives as this text. */
+export const REPLY_CONFIRM = "laly_confirm"
+export const REPLY_CANCEL = "laly_cancel"
+
 /** "1", "١", "نعم", "تأكيد" confirm; "2", "٢", "إلغاء" cancel. */
 export function parseReply(text: string | null | undefined): Reply {
   const t = String(text ?? "").trim().toLowerCase().replace(/[.!،,]/g, "")
-  if (["1", "١", "نعم", "ايوه", "أيوه", "اكيد", "أكيد", "تأكيد", "تاكيد", "اكد", "أكد", "yes", "confirm", "ok"].includes(t)) return "confirm"
-  if (["2", "٢", "لا", "إلغاء", "الغاء", "الغي", "ألغي", "cancel", "no"].includes(t)) return "cancel"
+  if (["1", "١", "نعم", "ايوه", "أيوه", "اكيد", "أكيد", "تأكيد", "تاكيد", "اكد", "أكد", "yes", "confirm", "ok", REPLY_CONFIRM].includes(t)) return "confirm"
+  if (["2", "٢", "لا", "إلغاء", "الغاء", "الغي", "ألغي", "cancel", "no", REPLY_CANCEL].includes(t)) return "cancel"
   return null
 }
 
@@ -36,7 +40,7 @@ export function otpMatches(code: string, cartId: string, key: string, hash: stri
   return a.length === b.length && timingSafeEqual(a, b)
 }
 
-const kwd = (n: number) => `${Number(n).toFixed(3)} د.ك`
+export const kwd = (n: number) => `${Number(n).toFixed(3)} د.ك`
 
 export const welcomeText = (name: string | null) =>
   `أهلاً${name ? ` ${name}` : ""} في Laly 👋\nتم إنشاء حسابك بنجاح. هنا هتوصلك تحديثات طلباتك، وتقدر تكلمنا في أي وقت على نفس الرقم.`
@@ -76,3 +80,18 @@ export const confirmedText = (displayId: number | string) =>
 
 export const cancelRequestedText = (displayId: number | string) =>
   `وصلنا طلب إلغاء الطلب #${displayId}. سيتواصل معك فريقنا قريباً لتأكيد الإلغاء.`
+
+export const cartReminderText = (name: string | null, items: { title: string; quantity: number }[], link: string) =>
+  [
+    `أهلاً${name ? ` ${name}` : ""} 👋`,
+    `لسه محتفظين لك بسلتك في Laly:`,
+    ...items.slice(0, 5).map((i) => `• ${i.title} × ${i.quantity}`),
+    items.length > 5 ? `• و${items.length - 5} منتجات أخرى` : null,
+    ``,
+    `كمّل طلبك من هنا: ${link}`,
+  ]
+    .filter((l) => l !== null)
+    .join("\n")
+
+export const productsText = (products: { title: string; price: number | null; url: string }[]) =>
+  products.map((p) => `• ${p.title}${p.price != null ? ` — ${kwd(p.price)}` : ""}\n${p.url}`).join("\n\n")

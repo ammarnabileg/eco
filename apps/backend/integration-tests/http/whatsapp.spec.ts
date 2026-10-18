@@ -5,11 +5,14 @@ import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ContainerRegistrationKeys, generateJwtToken, Modules } from "@medusajs/framework/utils"
 
 import { whatsappWebhookToken } from "../../src/workflows/whatsapp"
+import { remindAbandonedCarts } from "../../src/workflows/whatsapp/rich"
 
 jest.setTimeout(120 * 1000)
 
 // A stand-in for Evolution API that records every message sent.
 const sent: { number: string; text: string }[] = []
+const calls: { path: string; body: Record<string, any> }[] = []
+let refuseInteractive = false
 let evolution: Server
 let evolutionUrl = ""
 beforeAll(async () => {
@@ -18,7 +21,12 @@ beforeAll(async () => {
     req.on("data", (c) => (body += c))
     req.on("end", () => {
       if (req.url?.startsWith("/message/sendText/")) sent.push(JSON.parse(body))
+      calls.push({ path: String(req.url).split("/").slice(0, 3).join("/"), body: body ? JSON.parse(body) : {} })
       res.setHeader("content-type", "application/json")
+      if (refuseInteractive && !req.url?.startsWith("/message/sendText/")) {
+        res.statusCode = 400
+        return res.end(JSON.stringify({ message: "not supported" }))
+      }
       res.end(JSON.stringify({ key: { id: "msg" } }))
     })
   })
@@ -37,6 +45,8 @@ medusaIntegrationTestRunner({
 
     beforeEach(async () => {
       sent.length = 0
+      calls.length = 0
+      refuseInteractive = false
       const container = getContainer()
       const user = await container.resolve(Modules.USER).createUsers({ email: "admin@test.local" })
       const authIdentity = await container.resolve(Modules.AUTH).createAuthIdentities({
@@ -117,6 +127,78 @@ medusaIntegrationTestRunner({
       expect(sent.at(-1)!.number).toBe("96550001234")
     })
 
+    const enableInteractive = (extra: Record<string, string> = {}) =>
+      api.post("/admin/integrations/whatsapp", { values: { interactive: "on", ...extra } }, admin)
+
+    it("sends the guest code with a copy button, and as text when buttons are refused", async () => {
+      await enableInteractive()
+      const cartId = await guestCart()
+      await call("post", "/store/whatsapp/otp", { cart_id: cartId })
+      const buttons = calls.at(-1)!
+      expect(buttons.path).toBe("/message/sendButtons")
+      expect(buttons.body.buttons[0]).toMatchObject({ type: "copy", copyCode: buttons.body.description.match(/\d{6}/)[0] })
+
+      refuseInteractive = true
+      await call("post", "/store/whatsapp/otp", { cart_id: cartId })
+      expect(calls.at(-1)!.path).toBe("/message/sendText")
+      expect(sent.at(-1)!.text).toMatch(/\d{6}/)
+    })
+
+    const publishedProduct = async (title: string, thumbnail: string | null) => {
+      const { data } = await api.post(
+        "/admin/products",
+        {
+          title,
+          status: "published",
+          thumbnail,
+          options: [{ title: "Default", values: ["Default"] }],
+          variants: [{ title: "Default", manage_inventory: false, options: { Default: "Default" }, prices: [{ amount: 12.5, currency_code: "kwd" }] }],
+        },
+        admin
+      )
+      return data.product as { id: string; handle: string; variants: { id: string }[] }
+    }
+
+    it("lets staff send products as cards, or as links when a product has no image", async () => {
+      await enableInteractive()
+      const withImage = await publishedProduct("Tapo C200", "https://cdn.test/c200.jpg")
+      const res = await api.post("/admin/whatsapp/products", { phone: "50001234", product_ids: [withImage.id] }, admin)
+      expect(res.data.kind).toBe("carousel")
+      const card = calls.at(-1)!.body.cards[0]
+      expect(card).toMatchObject({ body: "Tapo C200", footer: "12.500 د.ك", imageUrl: "https://cdn.test/c200.jpg" })
+      expect(card.buttons[0].url).toContain(`/kw/products/${withImage.handle}`)
+
+      const noImage = await publishedProduct("Cable", null)
+      const text = await api.post("/admin/whatsapp/products", { phone: "50001234", product_ids: [noImage.id] }, admin)
+      expect(text.data.kind).toBe("text")
+      expect(sent.at(-1)!.text).toContain("Cable — 12.500 د.ك")
+    })
+
+    it("reminds an abandoned cart once, with a link that reopens it", async () => {
+      await enableInteractive({ cart_reminder: "on" })
+      const product = await publishedProduct("Router", null)
+      const { data: channel } = await api.post("/admin/sales-channels", { name: "Web" }, admin)
+      await api.post(`/admin/sales-channels/${channel.sales_channel.id}/products`, { add: [product.id] }, admin)
+      const { data: key } = await api.post("/admin/api-keys", { title: "Web", type: "publishable" }, admin)
+      await api.post(`/admin/api-keys/${key.api_key.id}/sales-channels`, { add: [channel.sales_channel.id] }, admin)
+      const web = { headers: { "x-publishable-api-key": key.api_key.token } }
+      const { data } = await api.post(
+        "/store/carts",
+        { region_id: regionId, email: "a@b.kw", shipping_address: { first_name: "Sara", country_code: "kw", phone: "5000 1234" } },
+        web
+      )
+      await api.post(`/store/carts/${data.cart.id}/line-items`, { variant_id: product.variants[0].id, quantity: 2 }, web)
+
+      const later = Date.now() + 3 * 3600 * 1000
+      expect(await remindAbandonedCarts(getContainer(), Date.now())).toBe(0) // too fresh
+      expect(await remindAbandonedCarts(getContainer(), later)).toBe(1)
+      expect(await remindAbandonedCarts(getContainer(), later)).toBe(0) // never twice
+      const msg = calls.at(-1)!
+      expect(msg.body.number).toBe("96550001234")
+      expect(JSON.stringify(msg.body)).toContain(`/kw/cart/recover/${data.cart.id}`)
+      expect(JSON.stringify(msg.body)).toContain("Router × 2")
+    })
+
     it("records the customer's reply to the order message and answers it", async () => {
       const wa = getContainer().resolve("whatsapp") as {
         createWaOrderConfirmations: (d: object) => Promise<{ id: string }>
@@ -134,6 +216,22 @@ medusaIntegrationTestRunner({
       expect((await hook({ "x-laly-token": whatsappWebhookToken() }, "شكرا")).data.handled).toBe(false)
       expect((await hook({ "x-laly-token": whatsappWebhookToken() })).data.handled).toBe(true)
       expect((await wa.retrieveWaOrderConfirmation(row.id)).status).toBe("confirmed")
+
+      // A tap on the "cancel" button of another order message.
+      const second = await wa.createWaOrderConfirmations({ order_id: "order_2", phone: "96550001234", status: "sent" })
+      const tap = await api.post(
+        "/hooks/whatsapp",
+        {
+          event: "messages.upsert",
+          data: {
+            key: { remoteJid: "96550001234@s.whatsapp.net" },
+            message: { interactiveResponseMessage: { nativeFlowResponseMessage: { paramsJson: '{"id":"laly_cancel"}' } } },
+          },
+        },
+        { headers: { "x-laly-token": whatsappWebhookToken() } }
+      )
+      expect(tap.data.handled).toBe(true)
+      expect((await wa.retrieveWaOrderConfirmation(second.id)).status).toBe("cancel_requested")
     })
   },
 })

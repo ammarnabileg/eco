@@ -29,6 +29,55 @@ export async function sendText(cfg: EvolutionConfig, number: string, text: strin
   return res.key?.id ?? null
 }
 
+// Interactive messages (Evolution sendButtons / sendCarousel). WhatsApp does
+// not render them on every client, so callers keep a plain-text fallback.
+export type Button =
+  | { type: "reply"; id: string; text: string }
+  | { type: "url"; text: string; url: string }
+  | { type: "copy"; text: string; code: string }
+  | { type: "call"; text: string; phone: string }
+
+const toEvolution = (b: Button) =>
+  b.type === "reply"
+    ? { type: "reply", displayText: b.text, id: b.id }
+    : b.type === "url"
+      ? { type: "url", displayText: b.text, url: b.url }
+      : b.type === "copy"
+        ? { type: "copy", displayText: b.text, copyCode: b.code }
+        : { type: "call", displayText: b.text, phoneNumber: b.phone }
+
+export async function sendButtons(
+  cfg: EvolutionConfig,
+  number: string,
+  msg: { title: string; description: string; footer?: string; buttons: Button[] }
+) {
+  const res = await call<{ key?: { id?: string } }>(cfg, "/message/sendButtons", {
+    number,
+    title: msg.title,
+    description: msg.description,
+    footer: msg.footer ?? "",
+    buttons: msg.buttons.map(toEvolution),
+  })
+  return res.key?.id ?? null
+}
+
+export type Card = { body: string; footer?: string; imageUrl: string; buttons: Button[] }
+
+/** Swipeable product cards (up to 10), each with an image and its own buttons. */
+export async function sendCarousel(cfg: EvolutionConfig, number: string, msg: { body: string; cards: Card[] }) {
+  const res = await call<{ key?: { id?: string } }>(cfg, "/message/sendCarousel", {
+    number,
+    body: msg.body,
+    cards: msg.cards.slice(0, 10).map((c) => ({
+      body: c.body,
+      footer: c.footer ?? "",
+      imageUrl: c.imageUrl,
+      buttons: c.buttons.map(toEvolution),
+    })),
+  })
+  return res.key?.id ?? null
+}
+
 /** Points the instance's webhook at the store, for customers' replies. */
 export function setWebhook(cfg: EvolutionConfig, url: string, token: string) {
   return call(cfg, "/webhook/set", {
@@ -49,12 +98,38 @@ export function incomingMessage(body: unknown): { phone: string; text: string } 
   if (String(b?.event ?? "").toLowerCase() !== "messages.upsert") return null
   const data = (b.data ?? {}) as {
     key?: { remoteJid?: string; remoteJidAlt?: string; senderPn?: string; fromMe?: boolean }
-    message?: { conversation?: string; extendedTextMessage?: { text?: string } }
+    message?: {
+      conversation?: string
+      extendedTextMessage?: { text?: string }
+      buttonsResponseMessage?: { selectedButtonId?: string }
+      templateButtonReplyMessage?: { selectedId?: string }
+      listResponseMessage?: { singleSelectReply?: { selectedRowId?: string } }
+      interactiveResponseMessage?: { nativeFlowResponseMessage?: { paramsJson?: string } }
+    }
   }
   if (data.key?.fromMe) return null
   // Newer WhatsApp addresses chats by LID; the phone then comes alongside.
   const jid = [data.key?.remoteJid, data.key?.remoteJidAlt, data.key?.senderPn].find((j) => j?.endsWith("@s.whatsapp.net"))
-  const text = data.message?.conversation ?? data.message?.extendedTextMessage?.text
+  // A button tap arrives as the button's id.
+  const m = data.message
+  const text =
+    m?.buttonsResponseMessage?.selectedButtonId ??
+    m?.templateButtonReplyMessage?.selectedId ??
+    m?.listResponseMessage?.singleSelectReply?.selectedRowId ??
+    nativeFlowId(m?.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson) ??
+    m?.conversation ??
+    m?.extendedTextMessage?.text
   if (!jid || !text || jid.includes("-")) return null
   return { phone: jid.split("@")[0], text }
+}
+
+// Newer clients send button taps as a native-flow reply carrying {"id": ...}.
+function nativeFlowId(params?: string) {
+  if (!params) return undefined
+  try {
+    const id = (JSON.parse(params) as { id?: unknown }).id
+    return typeof id === "string" ? id : undefined
+  } catch {
+    return undefined
+  }
 }
