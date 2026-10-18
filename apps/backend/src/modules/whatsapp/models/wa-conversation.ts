@@ -1,7 +1,7 @@
 import { model } from "@medusajs/framework/utils"
 
 // One conversation per customer phone, shown in the admin inbox. `instance` is
-// the number this customer talks to, so replies stay on one number.
+// the WhatsApp number (Evolution instance) the last message went through.
 const WaConversation = model
   .define("wa_conversation", {
     id: model.id({ prefix: "wacv" }).primaryKey(),

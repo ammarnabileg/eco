@@ -3,10 +3,11 @@ import { ContainerRegistrationKeys, MedusaError } from "@medusajs/framework/util
 import { createStep, createWorkflow, StepResponse, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
 
 import { WHATSAPP_MODULE } from "../../modules/whatsapp"
-import { Card, sendCarousel, sendText } from "../../modules/whatsapp/client"
+import { Card } from "../../modules/whatsapp/client"
 import { cartReminderText, kwd, normalizePhone, productsText } from "../../modules/whatsapp/messages"
 import WhatsAppModuleService from "../../modules/whatsapp/service"
 import { sendRich, storefrontUrl, WhatsAppSettings, whatsappSettings } from "./index"
+import { deliver } from "./inbox"
 
 const wa = (c: MedusaContainer) => c.resolve<WhatsAppModuleService>(WHATSAPP_MODULE)
 
@@ -19,17 +20,25 @@ const absolute = (url?: string | null) => {
 }
 
 /** Cards when interactive is on and every card has an image; else a text list. */
-async function sendCards(settings: WhatsAppSettings, phone: string, body: string, cards: (Card | null)[], fallback: string) {
+async function sendCards(
+  container: MedusaContainer,
+  settings: WhatsAppSettings,
+  phone: string,
+  kind: string,
+  body: string,
+  cards: (Card | null)[],
+  fallback: string
+) {
   const ready = cards.filter((c): c is Card => !!c)
   if (settings.interactive && ready.length && ready.length === cards.length) {
     try {
-      await sendCarousel(settings.cfg, phone, { body, cards: ready })
+      await deliver(container, phone, { type: "carousel", body, cards: ready }, { kind, quietFailure: true })
       return "carousel" as const
     } catch {
       // fall back to text
     }
   }
-  await sendText(settings.cfg, phone, `${body}\n\n${fallback}`)
+  await deliver(container, phone, { type: "text", text: `${body}\n\n${fallback}` }, { kind })
   return "text" as const
 }
 
@@ -75,7 +84,7 @@ export async function sendProducts(container: MedusaContainer, rawPhone: string,
         }
       : null
   )
-  return { phone, kind: await sendCards(settings, phone, body, cards, productsText(rows)), count: rows.length }
+  return { phone, kind: await sendCards(container, settings, phone, "products", body, cards, productsText(rows)), count: rows.length }
 }
 
 // --- abandoned carts ---------------------------------------------------------
@@ -156,8 +165,8 @@ export async function remindAbandonedCarts(container: MedusaContainer, now = Dat
             }
           : null
       })
-      if (cards.length > 1) await sendCards(settings, phone, "سلتك لسه مستنياك في Laly 🛒", cards, text)
-      else await sendRich(settings, phone, text, { title: "سلتك مستنياك", buttons: [{ type: "url", text: "✅ كمّل طلبك", url: link }] })
+      if (cards.length > 1) await sendCards(container, settings, phone, "cart_reminder", "سلتك لسه مستنياك في Laly 🛒", cards, text)
+      else await sendRich(container, settings, phone, "cart_reminder", text, { title: "سلتك مستنياك", buttons: [{ type: "url", text: "✅ كمّل طلبك", url: link }] })
       await saveCartReminderWorkflow(container).run({ input: { cart_id: cart.id, phone, status: "sent" } })
       sent++
     } catch (error) {

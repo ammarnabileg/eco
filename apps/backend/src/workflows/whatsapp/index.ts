@@ -9,7 +9,7 @@ import IntegrationsModuleService from "../../modules/integrations/service"
 import { resolveIntegration, settingsKey } from "../../modules/integrations/store"
 import { paymentMethodName } from "../../modules/quickbooks/mapping"
 import { WHATSAPP_MODULE } from "../../modules/whatsapp"
-import { Button, EvolutionConfig, sendButtons, sendText } from "../../modules/whatsapp/client"
+import { Button, EvolutionConfig } from "../../modules/whatsapp/client"
 import {
   cancelRequestedText,
   confirmedText,
@@ -26,6 +26,7 @@ import {
   welcomeText,
 } from "../../modules/whatsapp/messages"
 import WhatsAppModuleService from "../../modules/whatsapp/service"
+import { deliver } from "./inbox"
 
 const wa = (c: MedusaContainer) => c.resolve<WhatsAppModuleService>(WHATSAPP_MODULE)
 
@@ -63,20 +64,23 @@ export const storefrontUrl = (path = "") =>
  * when they are off or the gateway refuses them. The text always works alone.
  */
 export async function sendRich(
+  container: MedusaContainer,
   settings: WhatsAppSettings,
   phone: string,
+  kind: string,
   text: string,
   rich?: { title: string; footer?: string; buttons: Button[] }
 ) {
   if (settings.interactive && rich?.buttons.length) {
     try {
-      await sendButtons(settings.cfg, phone, { title: rich.title, description: text, footer: rich.footer ?? "Laly", buttons: rich.buttons })
+      const message = { type: "buttons" as const, title: rich.title, text, footer: rich.footer ?? "Laly", buttons: rich.buttons }
+      await deliver(container, phone, message, { kind, quietFailure: true })
       return "buttons" as const
     } catch {
       // fall back to text
     }
   }
-  await sendText(settings.cfg, phone, text)
+  await deliver(container, phone, { type: "text", text }, { kind })
   return "text" as const
 }
 
@@ -98,7 +102,7 @@ export async function sendWelcome(container: MedusaContainer, customerId: string
   const customer = data[0] as { first_name?: string | null; phone?: string | null; has_account?: boolean } | undefined
   const phone = normalizePhone(customer?.phone)
   if (!customer?.has_account || !phone) return false
-  await sendRich(settings, phone, welcomeText(customer.first_name ?? null), {
+  await sendRich(container, settings, phone, "welcome", welcomeText(customer.first_name ?? null), {
     title: "أهلاً بك في Laly",
     buttons: [
       { type: "url", text: "🛍️ تسوق الآن", url: storefrontUrl() },
@@ -178,7 +182,7 @@ export async function sendOrderMessage(container: MedusaContainer, orderId: stri
     payment: paymentMethodName(provider),
   })
   try {
-    await sendRich(settings, phone, text, {
+    await sendRich(container, settings, phone, "order", text, {
       title: `طلب #${o.display_id}`,
       buttons: [
         { type: "reply", id: REPLY_CONFIRM, text: "✅ تأكيد الطلب" },
@@ -234,10 +238,10 @@ export async function acknowledgeReply(
   const { data } = await query.graph({ entity: "order", fields: ["display_id"], filters: { id: result.order_id } })
   const id = (data[0] as unknown as { display_id?: number } | undefined)?.display_id ?? ""
   if (result.status !== "confirmed") {
-    await sendText(settings.cfg, result.phone, cancelRequestedText(id))
+    await deliver(container, result.phone, { type: "text", text: cancelRequestedText(id) }, { kind: "reply" })
     return
   }
-  await sendRich(settings, result.phone, confirmedText(id), {
+  await sendRich(container, settings, result.phone, "reply", confirmedText(id), {
     title: `طلب #${id}`,
     buttons: [{ type: "url", text: "📦 تفاصيل الطلب", url: storefrontUrl(`/order/${result.order_id}/confirmed`) }],
   })
@@ -317,7 +321,7 @@ export async function sendGuestOtp(container: MedusaContainer, cartId: string) {
   }
   const code = newOtpCode()
   await createGuestOtpWorkflow(container).run({ input: { cart_id: cartId, phone: cart.phone, code } })
-  await sendRich(settings, cart.phone, otpText(code), {
+  await sendRich(container, settings, cart.phone, "otp", otpText(code), {
     title: "رمز التحقق",
     buttons: [{ type: "copy", text: "📋 نسخ الرمز", code }],
   })
