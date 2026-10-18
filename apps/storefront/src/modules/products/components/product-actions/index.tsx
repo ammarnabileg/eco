@@ -34,6 +34,8 @@ type ProductActionsProps = {
   whatsapp?: string | null
   /** The region offers Taly instalments. */
   talyAvailable?: boolean
+  /** The product is eligible for Deema and the region offers it. */
+  deemaAvailable?: boolean
 }
 
 const optionsAsKeymap = (
@@ -53,6 +55,7 @@ export default function ProductActions({
   layout = "desktop",
   whatsapp,
   talyAvailable = false,
+  deemaAvailable = false,
 }: ProductActionsProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -237,7 +240,7 @@ export default function ProductActions({
           بدون فوائد مع Taly
         </p>
       )}
-      {variantPrice && (
+      {deemaAvailable && variantPrice && (
         <DeemaWidget
           amount={
             Math.round(

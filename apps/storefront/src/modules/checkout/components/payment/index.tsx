@@ -34,9 +34,12 @@ import { useCallback, useEffect, useState } from "react"
 const Payment = ({
   cart,
   availablePaymentMethods,
+  bnplHidden = false,
 }: {
   cart: HttpTypes.StoreCart
   availablePaymentMethods: { id: string }[]
+  /** An instalment gateway was hidden because a product is not eligible. */
+  bnplHidden?: boolean
 }) => {
   const activeSession = cart.payment_collection?.payment_sessions?.find(
     (paymentSession) => paymentSession.status === "pending"
@@ -230,6 +233,11 @@ const Payment = ({
                   </div>
                 ))}
               </RadioGroup>
+              {bnplHidden && (
+                <p className="mt-2 text-xs text-laly-mut" data-testid="bnpl-hidden">
+                  التقسيط غير متاح لبعض منتجات السلة.
+                </p>
+              )}
             </>
           )}
 

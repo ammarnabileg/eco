@@ -66,7 +66,7 @@ medusaIntegrationTestRunner({
       // An empty secret keeps the saved one; narrowing methods updates checkout.
       await save("klickpay", { values: { client_secret: "", methods: ["knet"] } })
       expect(await regionProviders()).toEqual(["pp_klickpay_knet"])
-      const row = await getContainer().resolve("integrations").findRow("klickpay")
+      const row = await (getContainer().resolve("integrations") as { findRow: (k: string) => Promise<{ secrets: string }> }).findRow("klickpay")
       expect(row.secrets).not.toContain("kp-very-secret")
 
       await save("klickpay", { enabled: false })

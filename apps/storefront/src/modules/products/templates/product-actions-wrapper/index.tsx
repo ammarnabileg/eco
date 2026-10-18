@@ -1,3 +1,4 @@
+import { getProductBnpl } from "@lib/data/bnpl"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { listProducts } from "@lib/data/products"
 import { CATALOG_PRODUCT_FIELDS } from "@lib/util/catalog"
@@ -18,7 +19,7 @@ export default async function ProductActionsWrapper({
   layout: "mobile" | "desktop"
   whatsapp?: string | null
 }) {
-  const [product, providers] = await Promise.all([
+  const [product, providers, bnpl] = await Promise.all([
     listProducts({
     queryParams: {
       id: [id],
@@ -27,6 +28,7 @@ export default async function ProductActionsWrapper({
     regionId: region.id,
     }).then(({ response }) => response.products[0]),
     listCartPaymentMethods(region.id),
+    getProductBnpl(id),
   ])
 
   if (!product) {
@@ -39,7 +41,8 @@ export default async function ProductActionsWrapper({
       region={region}
       layout={layout}
       whatsapp={whatsapp}
-      talyAvailable={!!providers?.some((p) => p.id.startsWith("pp_taly_"))}
+      talyAvailable={bnpl.taly && !!providers?.some((p) => p.id.startsWith("pp_taly_"))}
+      deemaAvailable={bnpl.deema && !!providers?.some((p) => p.id.startsWith("pp_deema_"))}
     />
   )
 }

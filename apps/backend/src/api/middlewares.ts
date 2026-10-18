@@ -26,6 +26,7 @@ import {
 } from "./admin/content/validators"
 import { SaveIntegration } from "./admin/integrations/validators"
 import { SyncQuickbooks, UpdateQuickbooksSettings } from "./admin/quickbooks/validators"
+import { guardBnplComplete, guardBnplSession } from "./store/carts/bnpl-guard"
 import { guardLineItems } from "./store/carts/guards"
 import { AddConfiguredItem, CreateQuoteRequest } from "./store/catalog/validators"
 
@@ -102,6 +103,16 @@ export default defineMiddlewares({
         authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true }),
         validateAndTransformBody(CreateQuoteRequest),
       ],
+    },
+    {
+      method: ["POST"],
+      matcher: "/store/payment-collections/:id/payment-sessions",
+      middlewares: [guardBnplSession],
+    },
+    {
+      method: ["POST"],
+      matcher: "/store/carts/:id/complete",
+      middlewares: [guardBnplComplete],
     },
     {
       method: ["POST"],

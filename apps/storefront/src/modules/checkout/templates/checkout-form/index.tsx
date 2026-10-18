@@ -1,4 +1,5 @@
 import { listCartShippingMethods } from "@lib/data/fulfillment"
+import { filterBnplMethods } from "@lib/data/bnpl"
 import { listCartPaymentMethods } from "@lib/data/payment"
 import { HttpTypes } from "@medusajs/types"
 import Addresses from "@modules/checkout/components/addresses"
@@ -18,7 +19,9 @@ export default async function CheckoutForm({
   }
 
   const shippingMethods = await listCartShippingMethods(cart.id)
-  const paymentMethods = await listCartPaymentMethods(cart.region?.id ?? "")
+  const allMethods = (await listCartPaymentMethods(cart.region?.id ?? "")) ?? []
+  // Instalments only when every product in the cart allows the gateway.
+  const { methods: paymentMethods, hidden: bnplHidden } = await filterBnplMethods(cart.id, allMethods)
 
   if (!shippingMethods || !paymentMethods) {
     return null
@@ -30,7 +33,7 @@ export default async function CheckoutForm({
 
       <Shipping cart={cart} availableShippingMethods={shippingMethods} />
 
-      <Payment cart={cart} availablePaymentMethods={paymentMethods} />
+      <Payment cart={cart} availablePaymentMethods={paymentMethods} bnplHidden={bnplHidden} />
 
       <Review cart={cart} />
     </div>
