@@ -1,5 +1,5 @@
 import { decrypt, encrypt } from "../crypto"
-import { authorizeUrl, qboString, signState, verifyState } from "../client"
+import { authorizeUrl, qboString, safeRequestId, signState, verifyState } from "../client"
 import { customerPayload, orderToSale, paymentMethodName, roundTo, variantToItem } from "../mapping"
 
 describe("QuickBooks tokens and OAuth state", () => {
@@ -23,6 +23,15 @@ describe("QuickBooks tokens and OAuth state", () => {
     const url = new URL(authorizeUrl("cid", "https://api.laly.kw/quickbooks/callback", "st"))
     expect(url.searchParams.get("scope")).toBe("com.intuit.quickbooks.accounting")
     expect(url.searchParams.get("redirect_uri")).toBe("https://api.laly.kw/quickbooks/callback")
+  })
+
+  it("keeps request ids within QuickBooks' 50 URL characters, stable across retries", () => {
+    expect(safeRequestId("order-order_01ABC")).toBe("order-order_01ABC")
+    const delivery = safeRequestId("item-Delivery / التوصيل")
+    expect(delivery).toMatch(/^item-[0-9a-f]{32}$/)
+    expect(encodeURIComponent(delivery).length).toBeLessThanOrEqual(50)
+    expect(safeRequestId("item-Delivery / التوصيل")).toBe(delivery)
+    expect(safeRequestId("customer-email:a.long.name@example.com")).toMatch(/^customer-[0-9a-f]{32}$/)
   })
 
   it("escapes quotes in queries", () => {

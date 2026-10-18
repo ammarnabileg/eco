@@ -68,6 +68,11 @@ beforeAll(() => {
       }
       const entity = entities[path]
       if (entity && init?.method === "POST") {
+        // Like QuickBooks: requestid is limited to 50 characters as encoded in the URL.
+        const rawRequestId = url.search.match(/[?&]requestid=([^&]*)/)?.[1] ?? ""
+        if (rawRequestId.length > 50) {
+          return json({ Fault: { Error: [{ code: "6000", Message: "request_id too long" }] } }, 400)
+        }
         const body = JSON.parse(String(init.body))
         const id = String(body.Id ?? qbo.nextId++)
         qbo.creates.push({ entity, id, body, requestid: url.searchParams.get("requestid") })

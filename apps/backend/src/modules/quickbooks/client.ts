@@ -1,4 +1,4 @@
-import { createHmac, randomBytes, timingSafeEqual } from "node:crypto"
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto"
 
 // QuickBooks Online Accounting API v3 and Intuit OAuth 2.0. Plain HTTP, no
 // SDK: the surface used is small (token, query, create, update).
@@ -169,7 +169,7 @@ export class QboClient {
    * returns the first result when the same id is sent again.
    */
   async create<T extends Entity>(entity: string, payload: Record<string, unknown>, requestId?: string): Promise<T> {
-    const res = await this.send("POST", entity.toLowerCase(), payload, requestId ? { requestid: requestId } : {})
+    const res = await this.send("POST", entity.toLowerCase(), payload, requestId ? { requestid: safeRequestId(requestId) } : {})
     return res[entity] as T
   }
 
@@ -187,4 +187,16 @@ export class QboClient {
     const res = await this.send("GET", `companyinfo/${this.realmId}`)
     return ((res.CompanyInfo as Record<string, unknown> | undefined)?.CompanyName as string) ?? null
   }
+}
+
+/**
+ * QuickBooks limits requestid to 50 characters as sent in the URL, so
+ * Arabic names or e-mails (percent-encoded: one Arabic letter becomes six
+ * characters) overflow. Plain ids pass unchanged; anything else becomes a
+ * stable hash, so a retry still sends the same id.
+ */
+export function safeRequestId(id: string): string {
+  if (/^[A-Za-z0-9_-]{1,50}$/.test(id)) return id
+  const prefix = (id.match(/^[a-z]+/i)?.[0] ?? "req").slice(0, 10)
+  return `${prefix}-${createHash("sha256").update(id).digest("hex").slice(0, 32)}`
 }
