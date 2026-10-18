@@ -23,7 +23,7 @@ export type FieldDefinition = {
 export type IntegrationDefinition = {
   key: string
   name: string
-  group: "payments" | "accounting" | "marketing"
+  group: "payments" | "accounting" | "messaging" | "marketing"
   description: string
   docs?: string
   fields: FieldDefinition[]
@@ -35,6 +35,11 @@ export const KLICKPAY_METHODS = [
   { value: "apple_pay", label: "Apple Pay" },
   { value: "google_pay", label: "Google Pay" },
   { value: "samsung_pay", label: "Samsung Pay" },
+]
+
+const ON_OFF = [
+  { value: "on", label: "مفعّل" },
+  { value: "off", label: "متوقف" },
 ]
 
 export const INTEGRATIONS: IntegrationDefinition[] = [
@@ -161,6 +166,27 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         type: "secret",
         env: "QUICKBOOKS_WEBHOOK_VERIFIER",
         help: "من صفحة Webhooks في تطبيق Intuit. فاضي = الـ Webhook مقفول.",
+      },
+    ],
+  },
+  {
+    key: "whatsapp",
+    name: "WhatsApp (Evolution API)",
+    group: "messaging",
+    description: "رسائل واتساب للعملاء: ترحيب عند التسجيل، تفاصيل الطلب مع التأكيد بالرد، ورمز تحقق للعميل الضيف.",
+    fields: [
+      { key: "base_url", label: "رابط سيرفر Evolution", type: "text", default: "https://webs.onz.one" },
+      { key: "instance", label: "اسم الـ Instance", type: "text", required: true, help: "الرقم المربوط في Evolution Manager." },
+      { key: "api_key", label: "API Key", type: "secret", required: true, help: "مفتاح الـ Instance أو المفتاح العام للسيرفر." },
+      { key: "welcome", label: "رسالة ترحيب عند التسجيل", type: "select", options: ON_OFF, default: "on" },
+      { key: "order", label: "رسالة الطلب مع التأكيد", type: "select", options: ON_OFF, default: "on" },
+      {
+        key: "guest_otp",
+        label: "رمز تحقق للعميل الضيف",
+        type: "select",
+        options: ON_OFF,
+        default: "on",
+        help: "الضيف لازم يأكد رقمه بكود على واتساب قبل الدفع.",
       },
     ],
   },

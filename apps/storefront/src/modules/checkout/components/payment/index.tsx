@@ -11,6 +11,8 @@ import { gatewaySessionData } from "@lib/util/gateway-session"
 import { convertToLocale } from "@lib/util/money"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import ErrorMessage from "@modules/checkout/components/error-message"
+import WhatsappOtp from "@modules/checkout/components/whatsapp-otp"
+import type { OtpStatus } from "@lib/data/whatsapp"
 import PaymentContainer, {
   StripePaymentContainer,
 } from "@modules/checkout/components/payment-container"
@@ -35,11 +37,14 @@ const Payment = ({
   cart,
   availablePaymentMethods,
   bnplHidden = false,
+  otp,
 }: {
   cart: HttpTypes.StoreCart
   availablePaymentMethods: { id: string }[]
   /** An instalment gateway was hidden because a product is not eligible. */
   bnplHidden?: boolean
+  /** Guest phone check on WhatsApp. */
+  otp?: OtpStatus
 }) => {
   const activeSession = cart.payment_collection?.payment_sessions?.find(
     (paymentSession) => paymentSession.status === "pending"
@@ -59,6 +64,7 @@ const Payment = ({
   const { countryCode } = useParams() as { countryCode: string }
 
   const isOpen = searchParams.get("step") === "payment"
+  const [phoneVerified, setPhoneVerified] = useState(!!otp?.verified)
   // Set by /api/payment-redirect when a gateway payment did not complete.
   const gatewayFailed = searchParams.get("error") === "payment_failed"
 
@@ -201,6 +207,9 @@ const Payment = ({
               وإن لم يتم الخصم، جرّب مرة أخرى أو اختر طريقة دفع أخرى.
             </div>
           )}
+          {otp?.required && !phoneVerified && (
+            <WhatsappOtp cartId={cart.id} phone={otp.phone} onVerified={() => setPhoneVerified(true)} />
+          )}
           {!paidByGiftcard && methods?.length && (
             <>
               <RadioGroup
@@ -266,6 +275,7 @@ const Payment = ({
             onClick={handleSubmit}
             isLoading={isLoading}
             disabled={
+              (!!otp?.required && !phoneVerified) ||
               (isStripeLike(selectedPaymentMethod) && !paymentComplete) ||
               (!selectedPaymentMethod && !paidByGiftcard)
             }

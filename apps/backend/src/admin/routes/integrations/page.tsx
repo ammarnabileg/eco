@@ -36,7 +36,7 @@ type Field = {
 type Integration = {
   key: string
   name: string
-  group: "payments" | "accounting" | "marketing"
+  group: "payments" | "accounting" | "messaging" | "marketing"
   description: string
   docs: string | null
   enabled: boolean
@@ -50,6 +50,7 @@ type Response = { integrations: Integration[]; urls: Record<string, string> }
 const GROUPS = [
   { key: "payments", label: "الدفع" },
   { key: "accounting", label: "المحاسبة" },
+  { key: "messaging", label: "واتساب" },
   { key: "marketing", label: "التسويق والتحليلات" },
 ] as const
 
@@ -77,6 +78,43 @@ function StatusBadge({ item }: { item: Integration }) {
   if (item.active) return <Badge color="green" size="2xsmall">مفعّل</Badge>
   if (item.enabled) return <Badge color="orange" size="2xsmall">ناقص بيانات</Badge>
   return <Badge color="grey" size="2xsmall">متوقف</Badge>
+}
+
+// WhatsApp only: point Evolution's webhook at the store, and send a test.
+function WhatsappTools({ active }: { active: boolean }) {
+  const [phone, setPhone] = useState("")
+  const webhook = useMutation({
+    mutationFn: () => sdk.client.fetch<{ url: string }>("/admin/whatsapp/webhook", { method: "POST" }),
+    onSuccess: ({ url }) => toast.success(`تم ضبط الـ Webhook على ${url}`),
+    onError: (e: Error) => toast.error(e.message),
+  })
+  const test = useMutation({
+    mutationFn: () => sdk.client.fetch("/admin/whatsapp/test", { method: "POST", body: { phone } }),
+    onSuccess: () => toast.success("تم إرسال رسالة التجربة"),
+    onError: (e: Error) => toast.error(e.message),
+  })
+  return (
+    <div className="flex flex-col gap-3 rounded-md border border-ui-border-base p-3">
+      <Text size="small" className="text-ui-fg-subtle">
+        بعد الحفظ والتفعيل: اضبط الـ Webhook علشان ردود العملاء (1 للتأكيد / 2 للإلغاء) توصل للمتجر، وجرّب الإرسال.
+      </Text>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button size="small" variant="secondary" disabled={!active} isLoading={webhook.isPending} onClick={() => webhook.mutate()}>
+          ضبط الـ Webhook تلقائياً
+        </Button>
+        <Input
+          dir="ltr"
+          className="w-48"
+          placeholder="+965 5000 0000"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+        <Button size="small" variant="secondary" disabled={!active || !phone} isLoading={test.isPending} onClick={() => test.mutate()}>
+          إرسال رسالة تجربة
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 function IntegrationCard({ item, urls }: { item: Integration; urls: Record<string, string> }) {
@@ -201,6 +239,8 @@ function IntegrationCard({ item, urls }: { item: Integration; urls: Record<strin
           )
         })}
       </div>
+
+      {item.key === "whatsapp" && <WhatsappTools active={item.active} />}
 
       {(PROVIDER_URLS[item.key] ?? []).map((u) => (
         <div key={u.key} className="flex flex-col gap-1">

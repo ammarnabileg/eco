@@ -226,6 +226,8 @@ module.exports = defineConfig({
     { resolve: "./src/modules/catalog" },
     // Keys for payments, QuickBooks and marketing tools, editable in the admin.
     { resolve: "./src/modules/integrations" },
+    // WhatsApp messages and guest phone codes through Evolution API.
+    { resolve: "./src/modules/whatsapp" },
     {
       // QuickBooks Online: optional; syncing starts once an admin connects.
       resolve: "./src/modules/quickbooks",

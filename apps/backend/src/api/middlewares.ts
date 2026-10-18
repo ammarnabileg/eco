@@ -28,6 +28,8 @@ import { SaveIntegration } from "./admin/integrations/validators"
 import { SyncQuickbooks, UpdateQuickbooksSettings } from "./admin/quickbooks/validators"
 import { guardBnplComplete, guardBnplSession } from "./store/carts/bnpl-guard"
 import { guardLineItems } from "./store/carts/guards"
+import { guardOtpComplete, guardOtpSession } from "./store/carts/otp-guard"
+import { SendOtp, TestWhatsapp, VerifyOtp } from "./store/whatsapp/validators"
 import { AddConfiguredItem, CreateQuoteRequest } from "./store/catalog/validators"
 
 // Request them as stars: +brand.*,+product_detail.*,+addon_groups.options.*
@@ -60,6 +62,9 @@ export default defineMiddlewares({
       matcher: "/hooks/quickbooks",
       bodyParser: { preserveRawBody: true },
     },
+    { method: ["POST"], matcher: "/store/whatsapp/otp", middlewares: [validateAndTransformBody(SendOtp)] },
+    { method: ["POST"], matcher: "/store/whatsapp/otp/verify", middlewares: [validateAndTransformBody(VerifyOtp)] },
+    { method: ["POST"], matcher: "/admin/whatsapp/test", middlewares: [validateAndTransformBody(TestWhatsapp)] },
     {
       method: ["POST"],
       matcher: "/admin/integrations/:key",
@@ -113,12 +118,12 @@ export default defineMiddlewares({
     {
       method: ["POST"],
       matcher: "/store/payment-collections/:id/payment-sessions",
-      middlewares: [guardBnplSession],
+      middlewares: [guardOtpSession, guardBnplSession],
     },
     {
       method: ["POST"],
       matcher: "/store/carts/:id/complete",
-      middlewares: [guardBnplComplete],
+      middlewares: [guardOtpComplete, guardBnplComplete],
     },
     {
       method: ["POST"],
