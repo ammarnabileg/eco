@@ -4,24 +4,44 @@ import { MedusaError } from "@medusajs/framework/utils"
 
 export type EvolutionConfig = { baseUrl: string; instance: string; apiKey: string }
 
-async function call<T>(cfg: EvolutionConfig, path: string, body: unknown): Promise<T> {
+/** A refused or failed gateway call; `status` is 0 when it was never reached. */
+export class EvolutionError extends MedusaError {
+  constructor(
+    public status: number,
+    message: string
+  ) {
+    super(MedusaError.Types.UNEXPECTED_STATE, message)
+  }
+  /** The number itself is unusable (disconnected, banned, wrong key), not the message. */
+  get numberProblem() {
+    return this.status === 0 || this.status === 401 || this.status === 403 || this.status === 404 || this.status >= 500
+  }
+}
+
+async function call<T>(cfg: EvolutionConfig, path: string, body?: unknown, method = "POST"): Promise<T> {
   const url = `${cfg.baseUrl.replace(/\/$/, "")}${path}/${encodeURIComponent(cfg.instance)}`
   let res: Response
   try {
     res = await fetch(url, {
-      method: "POST",
+      method,
       headers: { apikey: cfg.apiKey, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: body === undefined ? undefined : JSON.stringify(body),
       signal: AbortSignal.timeout(20_000),
     })
   } catch (error) {
-    throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, `WhatsApp gateway unreachable: ${(error as Error).message}`)
+    throw new EvolutionError(0, `WhatsApp gateway unreachable: ${(error as Error).message}`)
   }
   const text = await res.text()
   if (!res.ok) {
-    throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, `WhatsApp gateway error ${res.status}: ${text.slice(0, 300)}`)
+    throw new EvolutionError(res.status, `WhatsApp gateway error ${res.status}: ${text.slice(0, 300)}`)
   }
   return (text ? JSON.parse(text) : {}) as T
+}
+
+/** "open" when the number is logged in and can send. */
+export async function connectionState(cfg: EvolutionConfig) {
+  const res = await call<{ instance?: { state?: string }; state?: string }>(cfg, "/instance/connectionState", undefined, "GET")
+  return res.instance?.state ?? res.state ?? "unknown"
 }
 
 export async function sendText(cfg: EvolutionConfig, number: string, text: string) {
@@ -92,19 +112,35 @@ export function setWebhook(cfg: EvolutionConfig, url: string, token: string) {
   })
 }
 
-/** The sender's number and text of an incoming message, or null. */
-export function incomingMessage(body: unknown): { phone: string; text: string } | null {
-  const b = body as { event?: string; data?: Record<string, unknown> }
+export type Incoming = { phone: string; text: string; instance: string | null; name: string | null; id: string | null }
+
+const MEDIA: Record<string, string> = {
+  imageMessage: "📷 صورة",
+  videoMessage: "🎥 فيديو",
+  audioMessage: "🎤 رسالة صوتية",
+  documentMessage: "📄 ملف",
+  stickerMessage: "ملصق",
+  locationMessage: "📍 موقع",
+  contactMessage: "👤 جهة اتصال",
+}
+
+/** The sender, text and receiving instance of an incoming message, or null. */
+export function incomingMessage(body: unknown): Incoming | null {
+  const b = body as { event?: string; instance?: string; data?: Record<string, unknown> }
   if (String(b?.event ?? "").toLowerCase() !== "messages.upsert") return null
   const data = (b.data ?? {}) as {
-    key?: { remoteJid?: string; remoteJidAlt?: string; senderPn?: string; fromMe?: boolean }
-    message?: {
+    pushName?: string
+    key?: { id?: string; remoteJid?: string; remoteJidAlt?: string; senderPn?: string; fromMe?: boolean }
+    message?: Record<string, unknown> & {
       conversation?: string
       extendedTextMessage?: { text?: string }
       buttonsResponseMessage?: { selectedButtonId?: string }
       templateButtonReplyMessage?: { selectedId?: string }
       listResponseMessage?: { singleSelectReply?: { selectedRowId?: string } }
       interactiveResponseMessage?: { nativeFlowResponseMessage?: { paramsJson?: string } }
+      imageMessage?: { caption?: string }
+      videoMessage?: { caption?: string }
+      documentMessage?: { caption?: string; fileName?: string }
     }
   }
   if (data.key?.fromMe) return null
@@ -112,15 +148,18 @@ export function incomingMessage(body: unknown): { phone: string; text: string } 
   const jid = [data.key?.remoteJid, data.key?.remoteJidAlt, data.key?.senderPn].find((j) => j?.endsWith("@s.whatsapp.net"))
   // A button tap arrives as the button's id.
   const m = data.message
+  const media = Object.keys(MEDIA).find((k) => m?.[k])
+  const caption = m?.imageMessage?.caption ?? m?.videoMessage?.caption ?? m?.documentMessage?.caption ?? m?.documentMessage?.fileName
   const text =
     m?.buttonsResponseMessage?.selectedButtonId ??
     m?.templateButtonReplyMessage?.selectedId ??
     m?.listResponseMessage?.singleSelectReply?.selectedRowId ??
     nativeFlowId(m?.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson) ??
     m?.conversation ??
-    m?.extendedTextMessage?.text
+    m?.extendedTextMessage?.text ??
+    (media ? [MEDIA[media], caption].filter(Boolean).join(": ") : undefined)
   if (!jid || !text || jid.includes("-")) return null
-  return { phone: jid.split("@")[0], text }
+  return { phone: jid.split("@")[0], text, instance: b.instance ?? null, name: data.pushName ?? null, id: data.key?.id ?? null }
 }
 
 // Newer clients send button taps as a native-flow reply carrying {"id": ...}.
