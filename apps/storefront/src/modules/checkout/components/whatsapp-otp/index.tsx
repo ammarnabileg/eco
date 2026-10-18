@@ -2,7 +2,9 @@
 
 import { sendOtp, verifyOtp } from "@lib/data/whatsapp"
 import { Button } from "@modules/common/components/ui"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
+const RESEND_AFTER = 60
 
 /** Guests confirm their phone with a 6-digit code sent on WhatsApp. */
 export default function WhatsappOtp({
@@ -18,14 +20,24 @@ export default function WhatsappOtp({
   const [code, setCode] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [wait, setWait] = useState(0)
+
+  useEffect(() => {
+    if (wait <= 0) return
+    const t = setTimeout(() => setWait((w) => w - 1), 1000)
+    return () => clearTimeout(t)
+  }, [wait])
 
   const send = async () => {
     setBusy(true)
     setError(null)
     const res = await sendOtp(cartId)
     setBusy(false)
-    if (res.ok) setSent(true)
-    else setError(res.error ?? null)
+    if (res.ok) {
+      setSent(true)
+      setCode("")
+      setWait(RESEND_AFTER)
+    } else setError(res.error ?? null)
   }
   const verify = async () => {
     setBusy(true)
@@ -43,7 +55,7 @@ export default function WhatsappOtp({
         هنبعتلك رمز تحقق على واتساب{phone ? <> على الرقم <span dir="ltr">{phone}</span></> : null}.
       </p>
       {!sent ? (
-        <Button size="small" variant="secondary" className="mt-3" isLoading={busy} onClick={send}>
+        <Button size="small" variant="secondary" className="mt-3" isLoading={busy} disabled={!phone} onClick={send}>
           إرسال الرمز على واتساب
         </Button>
       ) : (
@@ -62,10 +74,21 @@ export default function WhatsappOtp({
           <Button size="small" isLoading={busy} disabled={code.length !== 6} onClick={verify}>
             تأكيد
           </Button>
-          <button type="button" className="text-xs text-laly-mut underline" onClick={send} disabled={busy}>
-            إعادة الإرسال
+          <button
+            type="button"
+            className="text-xs text-laly-mut underline disabled:no-underline disabled:opacity-60"
+            onClick={send}
+            disabled={busy || wait > 0}
+          >
+            {wait > 0 ? `إعادة الإرسال بعد ${wait} ث` : "إعادة الإرسال"}
           </button>
         </div>
+      )}
+      {!phone && (
+        <p className="mt-2 text-xs text-laly-mut">أضف رقم موبايل صحيح في عنوان التوصيل الأول.</p>
+      )}
+      {sent && !error && (
+        <p className="mt-2 text-xs text-laly-mut">الرمز صالح لمدة 10 دقايق.</p>
       )}
       {error && <p className="mt-2 text-xs text-laly-red" role="alert">{error}</p>}
     </div>

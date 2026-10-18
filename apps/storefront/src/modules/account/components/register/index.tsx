@@ -10,9 +10,10 @@ import { signup } from "@lib/data/customer"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
+  whatsappWelcome?: boolean
 }
 
-const Register = ({ setCurrentView }: Props) => {
+const Register = ({ setCurrentView, whatsappWelcome = false }: Props) => {
   const [message, formAction] = useActionState(signup, null)
 
   return (
@@ -67,6 +68,11 @@ const Register = ({ setCurrentView }: Props) => {
             autoComplete="tel"
             data-testid="phone-input"
           />
+          {whatsappWelcome && (
+            <p className="-mt-1 text-xs text-laly-mut">
+              اكتب رقم الواتساب علشان توصلك رسالة الترحيب وتفاصيل طلباتك.
+            </p>
+          )}
           <Input
             label="كلمة المرور"
             name="password"

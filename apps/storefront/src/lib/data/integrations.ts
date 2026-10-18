@@ -9,6 +9,7 @@ export type PublicIntegrations = {
   adsense?: { client: string | null }
   google_merchant?: { site_verification: string | null }
   deema?: { widget_key: string | null; widget_url: string | null }
+  whatsapp?: { welcome: string | null; order: string | null }
 }
 
 export const getPublicIntegrations = async (): Promise<PublicIntegrations> => {

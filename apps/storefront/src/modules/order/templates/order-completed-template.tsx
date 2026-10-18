@@ -9,6 +9,7 @@ import OrderDetails from "@modules/order/components/order-details"
 import ShippingDetails from "@modules/order/components/shipping-details"
 import PaymentDetails from "@modules/order/components/payment-details"
 import { HttpTypes } from "@medusajs/types"
+import { getPublicIntegrations } from "@lib/data/integrations"
 
 type OrderCompletedTemplateProps = {
   order: HttpTypes.StoreOrder
@@ -20,6 +21,8 @@ export default async function OrderCompletedTemplate({
   const cookies = await nextCookies()
 
   const isOnboarding = cookies.get("_medusa_onboarding")?.value === "true"
+  const { whatsapp } = await getPublicIntegrations()
+  const whatsappNotice = whatsapp?.order === "on" && !!order.shipping_address?.phone
 
   return (
     <div className="py-6 min-h-[calc(100vh-64px)]">
@@ -36,6 +39,18 @@ export default async function OrderCompletedTemplate({
             <span>شكرًا لك!</span>
             <span className="text-laly-teal">تم تأكيد طلبك</span>
           </Heading>
+          {whatsappNotice && (
+            <div
+              className="rounded-xl border border-laly-teal-soft bg-laly-teal-faint p-4 text-sm text-laly-ink"
+              data-testid="whatsapp-order-notice"
+            >
+              <p className="font-bold">هتوصلك رسالة على واتساب بتفاصيل الطلب</p>
+              <p className="mt-1 text-laly-mut">
+                على الرقم <span dir="ltr">{order.shipping_address?.phone}</span>. رد بـ <b>1</b> لتأكيد الطلب أو{" "}
+                <b>2</b> لو عايز تلغيه.
+              </p>
+            </div>
+          )}
           <OrderDetails order={order} />
           <Heading level="h2" className="flex flex-row text-3xl-regular">
             ملخص الطلب

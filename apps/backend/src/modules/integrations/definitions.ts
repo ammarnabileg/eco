@@ -178,8 +178,8 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
       { key: "base_url", label: "رابط سيرفر Evolution", type: "text", default: "https://webs.onz.one" },
       { key: "instance", label: "اسم الـ Instance", type: "text", required: true, help: "الرقم المربوط في Evolution Manager." },
       { key: "api_key", label: "API Key", type: "secret", required: true, help: "مفتاح الـ Instance أو المفتاح العام للسيرفر." },
-      { key: "welcome", label: "رسالة ترحيب عند التسجيل", type: "select", options: ON_OFF, default: "on" },
-      { key: "order", label: "رسالة الطلب مع التأكيد", type: "select", options: ON_OFF, default: "on" },
+      { key: "welcome", label: "رسالة ترحيب عند التسجيل", type: "select", options: ON_OFF, default: "on", public: true },
+      { key: "order", label: "رسالة الطلب مع التأكيد", type: "select", options: ON_OFF, default: "on", public: true },
       {
         key: "guest_otp",
         label: "رمز تحقق للعميل الضيف",
