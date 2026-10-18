@@ -183,6 +183,16 @@ export class QboClient {
     return res[entity] as T
   }
 
+  /** Home currency and whether Multicurrency is on (company Preferences). */
+  async currencyPrefs(): Promise<{ home: string | null; multicurrency: boolean }> {
+    const res = await this.send("GET", "preferences")
+    const prefs = ((res.Preferences as Record<string, unknown> | undefined)?.CurrencyPrefs ?? {}) as {
+      HomeCurrency?: { value?: string }
+      MultiCurrencyEnabled?: boolean
+    }
+    return { home: prefs.HomeCurrency?.value ?? null, multicurrency: !!prefs.MultiCurrencyEnabled }
+  }
+
   async companyName(): Promise<string | null> {
     const res = await this.send("GET", `companyinfo/${this.realmId}`)
     return ((res.CompanyInfo as Record<string, unknown> | undefined)?.CompanyName as string) ?? null

@@ -170,3 +170,20 @@ export function customerPayload(c: { name: string; email: string | null; phone?:
     ...(c.currency ? { CurrencyRef: { value: c.currency } } : {}),
   }
 }
+
+/**
+ * The CurrencyRef to send, or null to leave it out. A company whose home
+ * currency is the store's needs none (and works without Multicurrency);
+ * any other company must have Multicurrency on with that currency added.
+ */
+export function currencyToSend(store: string, prefs: { home: string | null; multicurrency: boolean }): string | null {
+  const code = store.toUpperCase()
+  if (!prefs.home || prefs.home.toUpperCase() === code) return null
+  if (!prefs.multicurrency) {
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      `QuickBooks company currency is ${prefs.home} and Multicurrency is off. In QuickBooks: Settings > Account and settings > Advanced > Currency, turn on Multicurrency and add ${code} (or use a company whose home currency is ${code}).`
+    )
+  }
+  return code
+}

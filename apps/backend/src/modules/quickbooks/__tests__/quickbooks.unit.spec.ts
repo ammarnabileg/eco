@@ -1,6 +1,6 @@
 import { decrypt, encrypt } from "../crypto"
 import { authorizeUrl, qboString, safeRequestId, signState, verifyState } from "../client"
-import { customerPayload, orderToSale, paymentMethodName, roundTo, variantToItem } from "../mapping"
+import { currencyToSend, customerPayload, orderToSale, paymentMethodName, roundTo, variantToItem } from "../mapping"
 
 describe("QuickBooks tokens and OAuth state", () => {
   it("encrypts tokens and refuses a wrong key", () => {
@@ -132,6 +132,12 @@ describe("QuickBooks mapping", () => {
     expect(item.Name.length).toBeLessThanOrEqual(100)
     expect(item.Name.endsWith("[DS-2CD2047G2-LU]")).toBe(true)
     expect(item).toMatchObject({ Type: "NonInventory", UnitPrice: 23.5, IncomeAccountRef: { value: "55" } })
+  })
+
+  it("sends a currency only to companies whose home currency differs, and only with Multicurrency", () => {
+    expect(currencyToSend("kwd", { home: "KWD", multicurrency: false })).toBeNull()
+    expect(currencyToSend("kwd", { home: "USD", multicurrency: true })).toBe("KWD")
+    expect(() => currencyToSend("kwd", { home: "USD", multicurrency: false })).toThrow("Multicurrency")
   })
 
   it("labels gateways and customers", () => {

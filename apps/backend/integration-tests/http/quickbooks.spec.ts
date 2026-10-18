@@ -44,6 +44,9 @@ beforeAll(() => {
     if (url.hostname === "sandbox-quickbooks.api.intuit.com") {
       const path = url.pathname.replace(/^\/v3\/company\/[^/]+\//, "")
       if (path.startsWith("companyinfo")) return json({ CompanyInfo: { CompanyName: "Laly Test Co" } })
+      if (path === "preferences") {
+        return json({ Preferences: { CurrencyPrefs: { HomeCurrency: { value: "USD" }, MultiCurrencyEnabled: true } } })
+      }
       if (path === "query") {
         const q = url.searchParams.get("query") ?? ""
         if (q.includes("from Account") && q.includes("'Income'")) {

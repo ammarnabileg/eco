@@ -3,6 +3,7 @@ import { ContainerRegistrationKeys, MedusaError } from "@medusajs/framework/util
 
 import { QboError } from "../../modules/quickbooks/client"
 import {
+  currencyToSend,
   customerPayload,
   OrderLine,
   orderToSale,
@@ -19,6 +20,19 @@ import { exclusive, findOrCreateByName, QboContext, recordFailed, recordSynced, 
 // never books the same order twice.
 
 const GENERIC_ITEM = "__generic"
+
+// The CurrencyRef to send, read once per QuickBooks session from the
+// company's preferences (none when the home currency is the store's).
+const currencies = new WeakMap<object, Promise<string | null>>()
+function qboCurrency(ctx: QboContext): Promise<string | null> {
+  if (!currencies.has(ctx.client)) {
+    currencies.set(
+      ctx.client,
+      ctx.client.currencyPrefs().then((prefs) => currencyToSend(ctx.connection.currency ?? "KWD", prefs))
+    )
+  }
+  return currencies.get(ctx.client)!
+}
 
 type VariantRow = {
   id: string
@@ -190,7 +204,7 @@ async function customerId(ctx: QboContext, order: OrderRow) {
     name,
     email: order.email,
     phone: person.phone ?? order.customer?.phone ?? null,
-    currency: ctx.connection.currency,
+    currency: await qboCurrency(ctx),
   })
   const c = await findOrCreateByName(ctx, "Customer", "DisplayName", payload.DisplayName, payload, `customer-${key}`.slice(0, 50))
   await recordSynced(ctx, "customer", key, { type: "Customer", id: c.Id })
@@ -301,7 +315,7 @@ export async function syncOrderToQuickBooks(container: MedusaContainer, orderId:
             customerId: await customerId(ctx, order),
             paymentMethodId: paid ? await paymentMethodId(ctx, provider) : null,
             depositAccountId: paid ? ctx.connection.deposit_account_id : null,
-            currency: ctx.connection.currency,
+            currency: await qboCurrency(ctx),
           }
         )
         if (mismatch !== 0) {
@@ -380,7 +394,7 @@ export async function syncCaptureToQuickBooks(container: MedusaContainer, paymen
             CustomerRef: invoice.CustomerRef,
             TotalAmt: amount,
             TxnDate: new Date(payment.captured_at ?? Date.now()).toISOString().slice(0, 10),
-            ...(ctx.connection.currency ? { CurrencyRef: { value: ctx.connection.currency } } : {}),
+            ...((await qboCurrency(ctx)) ? { CurrencyRef: { value: await qboCurrency(ctx) } } : {}),
             ...(pm ? { PaymentMethodRef: { value: pm } } : {}),
             ...(ctx.connection.deposit_account_id
               ? {
@@ -468,7 +482,7 @@ export async function syncRefundsToQuickBooks(container: MedusaContainer, paymen
               DocNumber: `LALY-${order.display_id}-R`.slice(0, 21),
               TxnDate: new Date(refund.created_at).toISOString().slice(0, 10),
               CustomerRef: { value: customerRecord?.qb_id },
-              ...(ctx.connection.currency ? { CurrencyRef: { value: ctx.connection.currency } } : {}),
+              ...((await qboCurrency(ctx)) ? { CurrencyRef: { value: await qboCurrency(ctx) } } : {}),
               ...(ctx.connection.deposit_account_id
                 ? {
                     DepositToAccountRef: {
