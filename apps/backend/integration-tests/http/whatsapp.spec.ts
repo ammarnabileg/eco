@@ -4,6 +4,8 @@ import { AddressInfo } from "node:net"
 import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { ContainerRegistrationKeys, generateJwtToken, Modules } from "@medusajs/framework/utils"
 
+import { createOrderWorkflow } from "@medusajs/medusa/core-flows"
+
 import { whatsappWebhookToken } from "../../src/workflows/whatsapp"
 import { remindAbandonedCarts } from "../../src/workflows/whatsapp/rich"
 
@@ -197,6 +199,82 @@ medusaIntegrationTestRunner({
       expect(msg.body.number).toBe("96550001234")
       expect(JSON.stringify(msg.body)).toContain(`/kw/cart/recover/${data.cart.id}`)
       expect(JSON.stringify(msg.body)).toContain("Router × 2")
+    })
+
+    it("keeps every message in the inbox and lets staff reply", async () => {
+      const incoming = (id: string, text: string) =>
+        api.post(
+          "/hooks/whatsapp",
+          {
+            event: "messages.upsert",
+            instance: "laly",
+            data: { pushName: "Sara", key: { id, remoteJid: "96550001234@s.whatsapp.net" }, message: { conversation: text } },
+          },
+          { headers: { "x-laly-token": whatsappWebhookToken() } }
+        )
+      await incoming("m1", "عندكم كاميرا خارجية؟")
+      await incoming("m1", "عندكم كاميرا خارجية؟") // delivered twice by the gateway
+      await incoming("m2", "📷")
+
+      const list = await api.get("/admin/whatsapp/conversations?unread=true", admin)
+      expect(list.data.unread).toBe(1)
+      const [conversation] = list.data.conversations
+      expect(conversation).toMatchObject({ phone: "96550001234", name: "Sara", unread: 2, last_preview: "📷" })
+      expect((await api.get("/admin/whatsapp/conversations?q=1234", admin)).data.count).toBe(1)
+      expect((await api.get("/admin/whatsapp/conversations?q=nobody", admin)).data.count).toBe(0)
+
+      const reply = await api.post(
+        `/admin/whatsapp/conversations/${conversation.id}/messages`,
+        { text: "أيوه متوفرة 👍" },
+        { ...admin, validateStatus: () => true }
+      )
+      expect(reply.status).toBe(200)
+      expect(sent.at(-1)).toMatchObject({ number: "96550001234", text: "أيوه متوفرة 👍" })
+
+      await api.post(`/admin/whatsapp/conversations/${conversation.id}/read`, {}, admin)
+      const thread = (await api.get(`/admin/whatsapp/conversations/${conversation.id}`, admin)).data
+      expect(thread.conversation.unread).toBe(0)
+      expect(thread.messages.map((m: { direction: string; body: string; kind: string }) => [m.direction, m.kind, m.body])).toEqual([
+        ["in", "customer", "عندكم كاميرا خارجية؟"],
+        ["in", "customer", "📷"],
+        ["out", "staff", "أيوه متوفرة 👍"],
+      ])
+      expect(thread.messages[2].author_id).toBeTruthy()
+      expect(thread.orders).toEqual([])
+
+      // Orders show beside the conversation when their shipping phone matches, however it was typed.
+      const order = async (phone: string) =>
+        (
+          await createOrderWorkflow(getContainer()).run({
+            input: {
+              region_id: regionId,
+              email: "s@b.kw",
+              currency_code: "kwd",
+              shipping_address: { first_name: "Sara", country_code: "kw", phone },
+              items: [{ title: "Tapo C200", quantity: 1, unit_price: 12.5 }],
+            },
+          })
+        ).result.id
+      const mine = await order("+965 5000-1234")
+      await order("6000 9999")
+      const again = (await api.get(`/admin/whatsapp/conversations/${conversation.id}`, admin)).data
+      expect(again.orders.map((o: { id: string }) => o.id)).toEqual([mine])
+    })
+
+    it("keeps automatic messages and failed sends in the customer's conversation", async () => {
+      const cartId = await guestCart()
+      await call("post", "/store/whatsapp/otp", { cart_id: cartId })
+      await api.post("/admin/integrations/whatsapp", { values: { base_url: "http://127.0.0.1:1" } }, admin)
+      const failed = await api.post("/admin/whatsapp/send-test", { phone: "50001234" }, { ...admin, validateStatus: () => true })
+      expect(failed.status).toBeGreaterThanOrEqual(400)
+
+      const [conversation] = (await api.get("/admin/whatsapp/conversations", admin)).data.conversations
+      const { messages } = (await api.get(`/admin/whatsapp/conversations/${conversation.id}`, admin)).data
+      expect(messages.map((m: { kind: string; status: string }) => [m.kind, m.status])).toEqual([
+        ["otp", "sent"],
+        ["test", "failed"],
+      ])
+      expect(messages[1].error).toContain("unreachable")
     })
 
     it("records the customer's reply to the order message and answers it", async () => {

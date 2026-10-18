@@ -13,7 +13,17 @@ export const SendProducts = z
   })
   .strict()
 
+export const ListConversations = z.object({
+  q: z.string().max(50).optional(),
+  unread: z.enum(["true", "false"]).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(30),
+  offset: z.coerce.number().int().min(0).default(0),
+})
+export const SendInboxMessage = z.object({ text: z.string().trim().min(1).max(4000) }).strict()
+
 export type SendOtpType = z.infer<typeof SendOtp>
 export type VerifyOtpType = z.infer<typeof VerifyOtp>
 export type TestWhatsappType = z.infer<typeof TestWhatsapp>
 export type SendProductsType = z.infer<typeof SendProducts>
+export type ListConversationsType = z.infer<typeof ListConversations>
+export type SendInboxMessageType = z.infer<typeof SendInboxMessage>

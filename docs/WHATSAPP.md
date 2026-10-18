@@ -45,3 +45,14 @@ Every 30 minutes the `whatsapp-cart-reminders` job looks for carts idle for 2 to
 items, has a shipping phone and has no order. Each cart gets one reminder at most, and each phone at most one a week.
 A failed send is recorded and not retried, so a customer is never messaged twice.
 PIX buttons are Brazil-only and are not used. Failures are logged and shown on the order.
+
+## Inbox (admin → واتساب)
+Every message sent or received is stored per customer phone (`wa_conversation`, `wa_message`), including automatic ones
+(order, code, welcome, reminders), staff replies and failed sends with their error. Staff read and answer conversations
+from the admin page; replies go out from the store number. The page refreshes every few seconds. Media from customers
+shows as a label (📷 صورة، 🎤 رسالة صوتية …), and the media file itself is not stored. A conversation shows the
+customer's last 5 orders, matched on the last 8 digits of the shipping phone. The gateway may deliver a message twice;
+duplicates are ignored by message id.
+
+Bulk campaigns are deliberately not built on Evolution: spreading marketing across several numbers does not prevent
+bans, and a ban takes the order and code messages down with it.

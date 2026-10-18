@@ -45,7 +45,7 @@ describe("WhatsApp messages", () => {
       event: "messages.upsert",
       data: { key, message: { conversation: text } },
     })
-    expect(incomingMessage(msg({ remoteJid: "96550000000@s.whatsapp.net" }))).toEqual({ phone: "96550000000", text: "1" })
+    expect(incomingMessage(msg({ remoteJid: "96550000000@s.whatsapp.net" }))).toMatchObject({ phone: "96550000000", text: "1" })
     expect(incomingMessage(msg({ remoteJid: "abc@lid", remoteJidAlt: "96550000000@s.whatsapp.net" }))?.phone).toBe("96550000000")
     expect(incomingMessage(msg({ remoteJid: "96550000000@s.whatsapp.net", fromMe: true }))).toBeNull()
     expect(incomingMessage(msg({ remoteJid: "120363-123@g.us" }))).toBeNull()

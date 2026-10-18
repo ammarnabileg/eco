@@ -29,7 +29,7 @@ import { SyncQuickbooks, UpdateQuickbooksSettings } from "./admin/quickbooks/val
 import { guardBnplComplete, guardBnplSession } from "./store/carts/bnpl-guard"
 import { guardLineItems } from "./store/carts/guards"
 import { guardOtpComplete, guardOtpSession } from "./store/carts/otp-guard"
-import { SendOtp, SendProducts, TestWhatsapp, VerifyOtp } from "./store/whatsapp/validators"
+import { SendInboxMessage, SendOtp, SendProducts, TestWhatsapp, VerifyOtp } from "./store/whatsapp/validators"
 import { AddConfiguredItem, CreateQuoteRequest } from "./store/catalog/validators"
 
 // Request them as stars: +brand.*,+product_detail.*,+addon_groups.options.*
@@ -66,6 +66,11 @@ export default defineMiddlewares({
     { method: ["POST"], matcher: "/store/whatsapp/otp/verify", middlewares: [validateAndTransformBody(VerifyOtp)] },
     { method: ["POST"], matcher: "/admin/whatsapp/send-test", middlewares: [validateAndTransformBody(TestWhatsapp)] },
     { method: ["POST"], matcher: "/admin/whatsapp/products", middlewares: [validateAndTransformBody(SendProducts)] },
+    {
+      method: ["POST"],
+      matcher: "/admin/whatsapp/conversations/:id/messages",
+      middlewares: [validateAndTransformBody(SendInboxMessage)],
+    },
     {
       method: ["POST"],
       matcher: "/admin/integrations/:key",
