@@ -64,7 +64,7 @@ export default defineMiddlewares({
     },
     { method: ["POST"], matcher: "/store/whatsapp/otp", middlewares: [validateAndTransformBody(SendOtp)] },
     { method: ["POST"], matcher: "/store/whatsapp/otp/verify", middlewares: [validateAndTransformBody(VerifyOtp)] },
-    { method: ["POST"], matcher: "/admin/whatsapp/test", middlewares: [validateAndTransformBody(TestWhatsapp)] },
+    { method: ["POST"], matcher: "/admin/whatsapp/send-test", middlewares: [validateAndTransformBody(TestWhatsapp)] },
     {
       method: ["POST"],
       matcher: "/admin/integrations/:key",

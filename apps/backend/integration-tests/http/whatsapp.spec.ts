@@ -111,6 +111,12 @@ medusaIntegrationTestRunner({
       expect((await call("get", `/store/whatsapp/otp?cart_id=${cartId}`)).data.required).toBe(false)
     })
 
+    it("sends a test message from the admin", async () => {
+      const res = await api.post("/admin/whatsapp/send-test", { phone: "+965 5000 1234" }, { ...admin, validateStatus: () => true })
+      expect(res.status).toBe(200)
+      expect(sent.at(-1)!.number).toBe("96550001234")
+    })
+
     it("records the customer's reply to the order message and answers it", async () => {
       const wa = getContainer().resolve("whatsapp") as {
         createWaOrderConfirmations: (d: object) => Promise<{ id: string }>

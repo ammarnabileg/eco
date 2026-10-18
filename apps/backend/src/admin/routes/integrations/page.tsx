@@ -89,7 +89,7 @@ function WhatsappTools({ active }: { active: boolean }) {
     onError: (e: Error) => toast.error(e.message),
   })
   const test = useMutation({
-    mutationFn: () => sdk.client.fetch("/admin/whatsapp/test", { method: "POST", body: { phone } }),
+    mutationFn: () => sdk.client.fetch("/admin/whatsapp/send-test", { method: "POST", body: { phone } }),
     onSuccess: () => toast.success("تم إرسال رسالة التجربة"),
     onError: (e: Error) => toast.error(e.message),
   })
