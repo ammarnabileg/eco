@@ -141,6 +141,12 @@ Storefront checks, from `apps/storefront`: `npx tsc --noEmit`, `pnpm lint`, `pnp
 
 ## 5. Lessons learned (do not repeat)
 
+- **AI costs:**
+  - Every AI request is recorded in `ai_usage`, through `recordAiUsage` in `workflows/ai/usage.ts`.
+  - New AI calls must record theirs too.
+  - `integration-tests/http/ai-baseline.spec.ts` prints `AI_BASELINE`. Run it before and after any change to
+    prompts or context, and update `docs/AI-COSTS.md`.
+
 - **Medusa's production build drops any folder named `test`** under `src/api`. A route at `admin/whatsapp/test`
   worked in development and returned 404 in production. Name such folders differently (`send-test`) and check
   `.medusa/server` after `pnpm build`.
