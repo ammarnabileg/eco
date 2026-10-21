@@ -38,6 +38,8 @@ const heroSlideFields = {
     .regex(/^(\/[^\s]*|https:\/\/[^\s]+)$/, "Use a /path or an https:// link")
     .nullish(),
   image_url: z.string().url().startsWith("https://").nullish(),
+  banner_url: z.string().url().nullish(),
+  banner_mobile_url: z.string().url().nullish(),
   rank: z.number().int().min(0).optional(),
   is_active: z.boolean().optional(),
   starts_at: z.coerce.date().nullish(),

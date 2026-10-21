@@ -24,3 +24,5 @@ build
 !.yarn/versions
 
 .medusa
+# Local file storage (uploads and test output); production uses S3
+static/

@@ -16,6 +16,10 @@ const HeroSlide = model.define("hero_slide", {
   cta_label_en: model.text().nullable(),
   cta_url: model.text().nullable(),
   image_url: model.text().nullable(),
+  /** A finished banner (text drawn on it): shown full width instead of the text layout. */
+  banner_url: model.text().nullable(),
+  /** The banner for phones; without one, phones get the wide banner. */
+  banner_mobile_url: model.text().nullable(),
   rank: model.number().default(0),
   is_active: model.boolean().default(true),
   starts_at: model.dateTime().nullable(),

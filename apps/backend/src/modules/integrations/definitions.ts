@@ -278,6 +278,13 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         help: "لخلفية بيضا وصور تسويقية حوالين صورة المنتج الحقيقية. محتاج مفتاح OpenRouter.",
       },
       {
+        key: "banner_model",
+        label: "موديل خلفيات الإعلانات (OpenRouter)",
+        type: "text",
+        default: "recraft/recraft-v4.1-flash",
+        help: "لاستوديو الصور: بيولّد الخلفية بس، والنص بيتكتب في المتصفح بخط المتجر.",
+      },
+      {
         key: "video_model",
         label: "موديل الفيديو (OpenRouter)",
         type: "text",

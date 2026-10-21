@@ -58,6 +58,7 @@ export async function assistantSettings(container: MedusaContainer) {
     // Images and video always go through OpenRouter.
     openRouterKey: String(v.openrouter_api_key ?? ""),
     imageModel: String(v.image_model ?? ""),
+    bannerModel: String(v.banner_model ?? ""),
     videoModel: String(v.video_model ?? ""),
   }
 }

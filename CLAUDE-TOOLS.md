@@ -69,6 +69,7 @@ decimals.
 | Personal homepage and account: recently viewed (cookie `_laly_viewed`), picks from orders/views, buy again, last order status | `api/store/recommendations`, `workflows/recommendations`, storefront `modules/home/components/for-you` | — |
 | AI admin assistant (Claude direct or OpenRouter): reads products/orders/sales, proposes price and product changes that staff confirm | `workflows/assistant`, `api/admin/assistant`, `admin/routes/assistant` | `docs/ASSISTANT.md` |
 | Add a product with AI: official page → grounded copy/specs/SEO, add-on and variant questions, official photos + AI edits, optional video (OpenRouter), saved as draft | `workflows/ai-product`, `api/admin/ai-products`, `admin/routes/ai-product` | `docs/AI-PRODUCTS.md` |
+| AI image studio: AI backgrounds, original product photo on a white card, text and store price drawn on a canvas, PNG download, homepage banner slide | `workflows/studio`, `api/admin/studio`, `admin/routes/studio`, `admin/components/studio`, job `studio-stale-slides` | `docs/AI-STUDIO.md` |
 | WhatsApp via Evolution API (see below) | `modules/whatsapp`, `workflows/whatsapp`, `admin/routes/whatsapp` | `docs/WHATSAPP.md` |
 
 **WhatsApp features:**
@@ -147,6 +148,13 @@ Storefront checks, from `apps/storefront`: `npx tsc --noEmit`, `pnpm lint`, `pnp
   - `integration-tests/http/ai-baseline.spec.ts` prints `AI_BASELINE`. Run it before and after any change to
     prompts or context, and update `docs/AI-COSTS.md`.
 
+- **Studio prices are never typed by hand.** Approval reads the numbers in the image's price texts and compares them
+  with the store's price. Keep that check whenever the studio's text roles change.
+- **Canvas output must be checked in a real browser.** Unit tests with a fake text measure passed while the square
+  layout pushed the button off the image and the strike-through missed the old price. Render the sizes in Chromium
+  (Playwright, `executablePath: /opt/pw-browsers/chromium`) and look at them.
+- **Integration tests that store files write into `apps/backend/static`.** Test images were committed this way once.
+  The folder is now git-ignored (Docker creates it), and tests should still delete what they write.
 - **Medusa's production build drops any folder named `test`** under `src/api`. A route at `admin/whatsapp/test`
   worked in development and returned 404 in production. Name such folders differently (`send-test`) and check
   `.medusa/server` after `pnpm build`.

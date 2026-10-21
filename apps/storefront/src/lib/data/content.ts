@@ -37,6 +37,9 @@ export type HeroSlide = {
   cta_label_en: string | null
   cta_url: string | null
   image_url: string | null
+  /** A finished image from the admin studio; when set it is the whole slide. */
+  banner_url?: string | null
+  banner_mobile_url?: string | null
 }
 
 export type StoreContent = {

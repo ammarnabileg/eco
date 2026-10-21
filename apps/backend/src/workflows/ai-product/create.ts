@@ -51,7 +51,7 @@ const ENHANCE: Record<"white" | "lifestyle", (title: string) => string> = {
 const TYPES: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp" }
 
 /** Reads a photo for editing: from our own storage directly, or from a public site. */
-async function loadImage(url: string) {
+export async function loadImage(url: string) {
   const local = `${(process.env.MEDUSA_BACKEND_URL ?? "http://localhost:9000").replace(/\/$/, "")}/static/`
   if (url.startsWith(local)) {
     // Local file storage: only a file name inside ./static, never a path.

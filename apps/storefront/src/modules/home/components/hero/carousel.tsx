@@ -40,6 +40,73 @@ export default function HeroCarousel({
   const ctaClass =
     "inline-flex items-center gap-2 rounded-btn bg-laly-sand hover:bg-laly-sand-d text-[#26200D] font-bold text-sm px-5 py-3 transition-colors"
 
+  // `onLight`: the dots sit on the page background on phones (banner slides).
+  const dots = (onLight = false) =>
+    slides.length > 1 ? (
+      <div className={`${onLight ? "mt-4" : "mt-6 small:mt-8"} flex items-center gap-2.5`}>
+        {slides.map((s, i) => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => setIndex(i)}
+            aria-label={`الشريحة ${i + 1}`}
+            aria-current={i === index}
+            className={`h-[9px] rounded-full transition-all ${
+              i === index
+                ? "w-[26px] bg-laly-sand"
+                : onLight
+                  ? "w-[9px] bg-black/20 small:bg-white/30"
+                  : "w-[9px] bg-white/30"
+            }`}
+          />
+        ))}
+      </div>
+    ) : null
+
+  // A banner designed in the admin studio already has its text and price in
+  // the image: show it whole, linked to its page, with the title as alt text.
+  if (slide.banner_url) {
+    const image = (
+      <picture key={slide.id} className="block animate-fade-in-top">
+        {slide.banner_mobile_url && (
+          <source media="(max-width: 1023px)" srcSet={slide.banner_mobile_url} />
+        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={slide.banner_url}
+          alt={localize(slide, "title")}
+          width={1920}
+          height={600}
+          className="w-full h-auto rounded-[18px] small:rounded-[22px]"
+        />
+      </picture>
+    )
+    return (
+      <section
+        aria-roledescription="carousel"
+        aria-label="العروض الرئيسية"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onFocus={() => setPaused(true)}
+        onBlur={() => setPaused(false)}
+        className="small:bg-[linear-gradient(160deg,#0A2A31_0%,#0B333B_46%,#0E4652_100%)] px-4 pt-4 small:px-0 small:pt-10 small:pb-12"
+      >
+        <div className="content-container !px-0 small:!px-6 flex flex-col items-center">
+          {ctaUrl.startsWith("/") ? (
+            <LocalizedClientLink href={ctaUrl} className="block w-full">
+              {image}
+            </LocalizedClientLink>
+          ) : (
+            <a href={ctaUrl} className="block w-full" rel="noopener noreferrer">
+              {image}
+            </a>
+          )}
+          {dots(true)}
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section
       aria-roledescription="carousel"
@@ -90,22 +157,7 @@ export default function HeroCarousel({
               </a>
             )}
           </div>
-          {slides.length > 1 && (
-            <div className="mt-6 small:mt-8 flex items-center gap-2.5">
-              {slides.map((s, i) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => setIndex(i)}
-                  aria-label={`الشريحة ${i + 1}`}
-                  aria-current={i === index}
-                  className={`h-[9px] rounded-full transition-all ${
-                    i === index ? "w-[26px] bg-laly-sand" : "w-[9px] bg-white/30"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
+          {dots()}
         </div>
         <div className="hidden small:block">
           {/* eslint-disable-next-line @next/next/no-img-element */}

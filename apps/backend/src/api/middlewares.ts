@@ -26,6 +26,7 @@ import {
 } from "./admin/content/validators"
 import { CreateAiProduct, DraftAiProduct, EnhanceAiImage, ImportAiImages, PublishAiVideo, StartAiVideo } from "./admin/ai-products/validators"
 import { AssistantChat, AssistantExecute } from "./admin/assistant/validators"
+import { AdCopy, ApproveBanner, GenerateBackground, PublishSlide, SaveBanner } from "./admin/studio/validators"
 import { SaveIntegration } from "./admin/integrations/validators"
 import { SyncQuickbooks, UpdateQuickbooksSettings } from "./admin/quickbooks/validators"
 import { guardBnplComplete, guardBnplSession } from "./store/carts/bnpl-guard"
@@ -119,6 +120,12 @@ export default defineMiddlewares({
     body("/admin/ai-products/create", CreateAiProduct),
     body("/admin/ai-products/:id/video", StartAiVideo),
     body("/admin/ai-products/:id/video/publish", PublishAiVideo),
+    body("/admin/studio/banners", SaveBanner),
+    body("/admin/studio/banners/:id", SaveBanner),
+    body("/admin/studio/banners/:id/approve", ApproveBanner),
+    body("/admin/studio/slide", PublishSlide),
+    body("/admin/studio/background", GenerateBackground),
+    body("/admin/studio/copy", AdCopy),
     body("/admin/assistant/chat", AssistantChat),
     body("/admin/assistant/execute", AssistantExecute),
     body("/admin/quickbooks/settings", UpdateQuickbooksSettings),

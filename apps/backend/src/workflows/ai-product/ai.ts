@@ -126,9 +126,9 @@ export function parseJsonObject(text: string): Record<string, unknown> {
   }
 }
 
-async function mediaSettings(container: MedusaContainer, kind: "image" | "video") {
+async function mediaSettings(container: MedusaContainer, kind: "image" | "video" | "banner") {
   const s = await assistantSettings(container)
-  const model = kind === "image" ? s.imageModel : s.videoModel
+  const model = kind === "image" ? s.imageModel : kind === "banner" ? s.bannerModel : s.videoModel
   if (!s.enabled || !s.openRouterKey || !model) {
     throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "Add the OpenRouter key and the image/video model in Integrations ← المساعد الذكي")
   }
@@ -146,6 +146,18 @@ export async function aiEditImage(container: MedusaContainer, prompt: string, im
       input_references: [{ type: "image_url", image_url: { url: `data:${image.type};base64,${image.bytes.toString("base64")}` } }],
     },
     track: { container, run_id: newRunId(), task: "image_edit", model },
+  })
+  const out = data.data?.[0]
+  if (!out?.b64_json) throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, "The image model returned no image")
+  return { bytes: Buffer.from(out.b64_json, "base64"), type: out.media_type || "image/png" }
+}
+
+/** A new image from a text prompt (banner backgrounds), with the model's own aspect ratios. */
+export async function aiGenerateImage(container: MedusaContainer, prompt: string, aspectRatio: string) {
+  const { key, model } = await mediaSettings(container, "banner")
+  const data = await openRouter<{ data?: { b64_json?: string; media_type?: string }[] }>(key, "/images", {
+    body: { model, prompt, n: 1, aspect_ratio: aspectRatio },
+    track: { container, run_id: newRunId(), task: "image_generate", model },
   })
   const out = data.data?.[0]
   if (!out?.b64_json) throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, "The image model returned no image")
