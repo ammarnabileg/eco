@@ -80,3 +80,48 @@ after deployment; the scripted test cannot measure it.
 
 **Result:** −86% characters sent. The page is fetched once (checked in the test), and the specification rows still
 reach the model (checked).
+
+## Phase 4: proposal safety
+A proposal signs, together with the change, the values it was made against and an expiry 30 minutes later.
+`POST /admin/assistant/execute` checks the following in order, and applies nothing if any fails:
+1. **The signature.** Changing the change, the summary or the expiry breaks it.
+2. **The expiry.**
+3. **The current values:**
+   - **Prices:** every variant must still have the price shown in the proposal. A bulk change is all-or-nothing,
+     and the refusal names up to 5 changed variants.
+   - **Product edits:** the edited fields must still hold the values they had.
+
+Pressing the button a second time is refused as stale, because the price already changed. A bulk change applies
+exactly the list fixed at proposal time; nothing is searched again on execution.
+
+## Phase 5: before / after
+Same scripted scenarios, same store data, same code paths (`ai-baseline.spec.ts`):
+
+| Scenario | Requests | Characters sent | Largest request |
+|---|---:|---:|---:|
+| Assistant, 4 questions | 9 → 9 | 106,211 → 67,091 (−37%) | 20,346 → 11,897 |
+| Product draft + 1 update | 4 → 3 | 134,704 → 19,269 (−86%) | 33,798 → 8,687 |
+| **Both** | 13 → 12 | **240,915 → 86,360 (−64%)** | |
+
+**What the tests confirm stayed correct:**
+- the TP-Link bulk change is one proposal for all 15 routers, inside the step limit;
+- specification rows still reach the model;
+- the page is fetched once per product;
+- invented specs are still dropped;
+- proposals are still applied only on the button, now also refused when stale or expired;
+- all earlier tests pass.
+
+**What these numbers are not:**
+- **They are not money.** The scripted model counts characters ÷ 4. Real tokens, cache hits and dollars come from
+  the `ai_usage` table in production.
+- **They don't show the cache effect.** 47,000 of the remaining assistant characters are the fixed instructions and
+  tool list, which the provider may cache; `cached_tokens` will show it.
+- **They don't measure answer quality with the real model.** One known trade-off: a follow-up that relies on an
+  earlier tool result ("the second one in that list") now makes the model search again, because old results are
+  no longer sent. That costs one search instead of resending everything every time.
+
+**How to compare real spending:**
+- Note the daily cost and the average cost per run in admin → المساعد الذكي for a week.
+- Do the same per task, especially `admin_chat`, `product_draft` and `product_category`.
+- Before this change no costs were recorded, so the first week after deployment is the real baseline. The scripted
+  comparison above is the only before/after available for the code itself.

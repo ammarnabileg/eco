@@ -170,6 +170,12 @@ medusaIntegrationTestRunner({
       expect(applied.data.result).toContain("تم")
       expect(await kwdPrice()).toEqual([["kwd", 12.9], ["usd", 47]]) // other currencies kept
 
+      // Pressing it again does nothing: the price is no longer what it was proposed against.
+      const again = await api.post("/admin/assistant/execute", { action }, { ...admin, validateStatus: () => true })
+      expect(again.status).toBe(400)
+      expect(again.data.message).toContain("السعر اتغيّر")
+      expect(await kwdPrice()).toEqual([["kwd", 12.9], ["usd", 47]])
+
       // The next question carries only the earlier question and written answer, not the tool results.
       script = [() => ({ content: [{ type: "text", text: "تمام" }], stop_reason: "end_turn" })]
       const next = await chat("شكراً", res.data.messages)
@@ -252,6 +258,50 @@ medusaIntegrationTestRunner({
       ]
       await chat("دوّر")
       expect(requests[2].body.messages.at(-1).content[0].content).toContain("Same call as before")
+    })
+
+    it("refuses a proposal whose price changed meanwhile, or that expired, and applies nothing", async () => {
+      await api.post("/admin/integrations/assistant", { enabled: true, values: { api_key: "sk-ant-test" } }, admin)
+      script = [() => toolUse("t1", "adjust_prices", { product_ids: [productId], percent: 10 })]
+      const [stale] = (await chat("زود 10%")).data.actions
+      // Someone changes the price in the admin before the button is pressed.
+      await api.post(`/admin/products/${productId}/variants/${variantId}`, { prices: [{ amount: 15, currency_code: "kwd" }, { amount: 47, currency_code: "usd" }] }, admin)
+      const refused = await api.post("/admin/assistant/execute", { action: stale }, { ...admin, validateStatus: () => true })
+      expect(refused.status).toBe(400)
+      expect(refused.data.message).toContain("TAPO-C200")
+      expect(await kwdPrice()).toEqual([["kwd", 15], ["usd", 47]])
+
+      script = [() => toolUse("t2", "set_price", { variant_id: variantId, price_kwd: 14 })]
+      const [later] = (await chat("خليه 14")).data.actions
+      const now = Date.now()
+      const clock = jest.spyOn(Date, "now").mockReturnValue(now + 31 * 60 * 1000)
+      try {
+        const expired = await api.post("/admin/assistant/execute", { action: later }, { ...admin, validateStatus: () => true })
+        expect(expired.status).toBe(400)
+        expect(expired.data.message).toContain("انتهت صلاحيته")
+      } finally {
+        clock.mockRestore()
+      }
+      // Moving the expiry by hand breaks the signature.
+      const extended = await api.post(
+        "/admin/assistant/execute",
+        { action: { ...later, expires_at: new Date(now + 99 * 3600 * 1000).toISOString() } },
+        { ...admin, validateStatus: () => true }
+      )
+      expect(extended.status).toBe(400)
+      expect(await kwdPrice()).toEqual([["kwd", 15], ["usd", 47]])
+    })
+
+    it("refuses a product edit when the product changed after the proposal", async () => {
+      await api.post("/admin/integrations/assistant", { enabled: true, values: { api_key: "sk-ant-test" } }, admin)
+      script = [() => toolUse("t1", "update_product", { product_id: productId, title: "Tapo C200 جديد" })]
+      const [action] = (await chat("غيّر الاسم")).data.actions
+      await api.post(`/admin/products/${productId}`, { title: "Edited by staff" }, admin)
+      const res = await api.post("/admin/assistant/execute", { action }, { ...admin, validateStatus: () => true })
+      expect(res.status).toBe(400)
+      expect(res.data.message).toContain("title")
+      const { data } = await api.get(`/admin/products/${productId}?fields=title`, admin)
+      expect(data.product.title).toBe("Edited by staff")
     })
 
     it("tells the model when a tool fails instead of breaking the chat", async () => {

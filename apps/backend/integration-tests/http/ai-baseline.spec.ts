@@ -212,7 +212,7 @@ medusaIntegrationTestRunner({
       expect(lastActions).toHaveLength(1)
       expect(lastActions[0].tool).toBe("adjust_prices")
       expect(lastActions[0].input.changes).toHaveLength(15)
-      expect(lastActions[0].input.changes![0]).toEqual({ variant_id: expect.stringMatching(/^variant_/), price_kwd: 10.5 })
+      expect(lastActions[0].input.changes![0]).toEqual({ variant_id: expect.stringMatching(/^variant_/), price_kwd: 10.5, expected_kwd: 10 })
       const chat = await totals("admin_chat")
       expect(chat.requests).toBeGreaterThanOrEqual(9)
 

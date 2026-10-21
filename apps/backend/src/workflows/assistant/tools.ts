@@ -243,13 +243,18 @@ async function runRead(container: MedusaContainer, name: ToolName, raw: unknown)
 
 // --- write tools: proposals and their execution --------------------------------
 
-export type Action = { tool: ToolName; input: Record<string, unknown>; summary: string; signature: string }
+// A proposal records the values it was made against (`expected_*`) and when
+// it expires; both are signed with it, so execution can refuse a stale or
+// altered change. Running an applied proposal again is refused as stale.
+export const PROPOSAL_TTL_MS = 30 * 60 * 1000
 
-const sign = (tool: string, input: unknown, summary: string) =>
-  createHmac("sha256", settingsKey()).update(JSON.stringify([tool, input, summary])).digest("hex")
+export type Action = { tool: ToolName; input: Record<string, unknown>; summary: string; expires_at: string; signature: string }
 
-export function verifyAction(a: { tool: string; input: unknown; summary: string; signature: string }) {
-  const expected = Buffer.from(sign(a.tool, a.input, a.summary))
+const sign = (tool: string, input: unknown, summary: string, expiresAt: string) =>
+  createHmac("sha256", settingsKey()).update(JSON.stringify([tool, input, summary, expiresAt])).digest("hex")
+
+export function verifyAction(a: { tool: string; input: unknown; summary: string; expires_at?: string; signature: string }) {
+  const expected = Buffer.from(sign(a.tool, a.input, a.summary, String(a.expires_at ?? "")))
   const got = Buffer.from(String(a.signature))
   return WRITE_TOOLS.has(a.tool as ToolName) && expected.length === got.length && timingSafeEqual(expected, got)
 }
@@ -263,7 +268,7 @@ async function propose(container: MedusaContainer, name: ToolName, raw: unknown)
   if (name === "set_price") {
     const i = schemas.set_price.parse(raw)
     const v = await findVariant(container, i.variant_id)
-    input = { variant_id: v.id, price_kwd: Number(i.price_kwd.toFixed(3)) }
+    input = { variant_id: v.id, price_kwd: Number(i.price_kwd.toFixed(3)), expected_kwd: priceOf(v)?.amount ?? null }
     summary = `${v.product?.title ?? ""}${v.sku ? ` (${v.sku})` : ""}: السعر ${kwd(priceOf(v)?.amount)} ← ${kwd(i.price_kwd)}`
   } else if (name === "adjust_prices") {
     const i = schemas.adjust_prices.parse(raw)
@@ -279,7 +284,7 @@ async function propose(container: MedusaContainer, name: ToolName, raw: unknown)
         })
     )
     if (!changes.length) throw new MedusaError(MedusaError.Types.INVALID_DATA, "These products have no KWD prices to change.")
-    input = { changes: changes.map(({ variant_id, to }) => ({ variant_id, price_kwd: to })) }
+    input = { changes: changes.map(({ variant_id, to, from }) => ({ variant_id, price_kwd: to, expected_kwd: from })) }
     summary = [
       `تعديل الأسعار ${i.percent > 0 ? "+" : ""}${i.percent}% على ${changes.length} صنف:`,
       ...changes.slice(0, 15).map((c) => `• ${c.label}: ${kwd(c.from)} ← ${kwd(c.to)}`),
@@ -290,7 +295,8 @@ async function propose(container: MedusaContainer, name: ToolName, raw: unknown)
     const p = await findProduct(container, i.product_id)
     const { product_id: _id, ...fields } = i
     if (!Object.keys(fields).length) throw new MedusaError(MedusaError.Types.INVALID_DATA, "Pass at least one field to change.")
-    input = { product_id: p.id, ...fields }
+    const current = p as unknown as Record<string, unknown>
+    input = { product_id: p.id, ...fields, expected: Object.fromEntries(Object.keys(fields).map((k) => [k, current[k] ?? null])) }
     const labels: Record<string, string> = { title: "الاسم", subtitle: "العنوان الفرعي", description: "الوصف", status: "الحالة" }
     summary = [
       `تعديل المنتج: ${p.title}`,
@@ -299,14 +305,33 @@ async function propose(container: MedusaContainer, name: ToolName, raw: unknown)
       ),
     ].join("\n")
   }
-  return { tool: name, input, summary, signature: sign(name, input, summary) }
+  const expiresAt = new Date(Date.now() + PROPOSAL_TTL_MS).toISOString()
+  return { tool: name, input, summary, expires_at: expiresAt, signature: sign(name, input, summary, expiresAt) }
 }
 
 /** Applies a confirmed action through Medusa's own workflows. */
 export async function executeAction(container: MedusaContainer, action: Action): Promise<string> {
   if (!verifyAction(action)) throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "This action was changed or is not allowed.")
-  const setPrices = async (changes: { variant_id: string; price_kwd: number }[]) => {
+  if (!(Date.parse(action.expires_at) > Date.now())) {
+    throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "الاقتراح ده انتهت صلاحيته (30 دقيقة). اطلبه تاني من المساعد.")
+  }
+  const setPrices = async (changes: { variant_id: string; price_kwd: number; expected_kwd: number | null }[]) => {
     const variants = await Promise.all(changes.map((c) => findVariant(container, c.variant_id)))
+    // All or nothing: one changed price makes the whole proposal stale.
+    const stale = variants.filter((v, idx) => {
+      const now = priceOf(v)?.amount ?? null
+      const was = changes[idx].expected_kwd
+      return now === null || was === null ? now !== was : Math.abs(Number(now) - Number(was)) > 0.0005
+    })
+    if (stale.length) {
+      throw new MedusaError(
+        MedusaError.Types.NOT_ALLOWED,
+        `السعر اتغيّر من وقت الاقتراح في ${stale.length} صنف (${stale
+          .slice(0, 5)
+          .map((v) => v.sku ?? v.product?.title ?? v.id)
+          .join("، ")}). ما اتنفذش أي تعديل؛ اطلب الاقتراح تاني.`
+      )
+    }
     await updateProductVariantsWorkflow(container).run({
       input: {
         product_variants: variants.map((v, idx) => {
@@ -327,15 +352,23 @@ export async function executeAction(container: MedusaContainer, action: Action):
   }
 
   if (action.tool === "set_price") {
-    const i = action.input as { variant_id: string; price_kwd: number }
+    const i = action.input as { variant_id: string; price_kwd: number; expected_kwd: number | null }
     await setPrices([i])
     return "تم تعديل السعر."
   }
   if (action.tool === "adjust_prices") {
-    const n = await setPrices((action.input as { changes: { variant_id: string; price_kwd: number }[] }).changes)
+    const n = await setPrices((action.input as { changes: { variant_id: string; price_kwd: number; expected_kwd: number | null }[] }).changes)
     return `تم تعديل أسعار ${n} صنف.`
   }
-  const { product_id, ...update } = action.input as { product_id: string } & Record<string, string>
+  const { product_id, expected, ...update } = action.input as { product_id: string; expected: Record<string, unknown> } & Record<string, string>
+  const now = (await findProduct(container, product_id)) as unknown as Record<string, unknown>
+  const changed = Object.keys(expected ?? {}).filter((k) => (now[k] ?? null) !== expected[k])
+  if (changed.length) {
+    throw new MedusaError(
+      MedusaError.Types.NOT_ALLOWED,
+      `المنتج اتعدّل من وقت الاقتراح (${changed.join("، ")}). ما اتنفذش التعديل؛ اطلب الاقتراح تاني.`
+    )
+  }
   await updateProductsWorkflow(container).run({ input: { selector: { id: product_id }, update } })
   return "تم تعديل المنتج."
 }

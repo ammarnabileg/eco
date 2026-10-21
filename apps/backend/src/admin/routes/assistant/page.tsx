@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react"
 import { AiUsagePanel } from "../../components/ai/usage-panel"
 import { sdk } from "../../lib/sdk"
 
-type Action = { tool: string; input: Record<string, unknown>; summary: string; signature: string }
+type Action = { tool: string; input: Record<string, unknown>; summary: string; expires_at: string; signature: string }
 type ApiMessage = Record<string, unknown>
 type Entry =
   | { kind: "user"; text: string }

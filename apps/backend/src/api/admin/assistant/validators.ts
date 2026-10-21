@@ -17,6 +17,7 @@ export const AssistantExecute = z
         tool: z.string(),
         input: z.record(z.string(), z.unknown()),
         summary: z.string(),
+        expires_at: z.string(),
         signature: z.string(),
       })
       .strict(),
