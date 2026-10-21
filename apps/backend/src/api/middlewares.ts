@@ -24,6 +24,7 @@ import {
   UpdateSiteSettings,
   UpdateTrustBadge,
 } from "./admin/content/validators"
+import { AssistantChat, AssistantExecute } from "./admin/assistant/validators"
 import { SaveIntegration } from "./admin/integrations/validators"
 import { SyncQuickbooks, UpdateQuickbooksSettings } from "./admin/quickbooks/validators"
 import { guardBnplComplete, guardBnplSession } from "./store/carts/bnpl-guard"
@@ -111,6 +112,8 @@ export default defineMiddlewares({
     body("/admin/catalog/quote-requests/:id", UpdateQuoteRequest),
     body("/admin/catalog/products/:id", UpdateProductCatalog),
     body("/store/carts/:id/configured-items", AddConfiguredItem),
+    body("/admin/assistant/chat", AssistantChat),
+    body("/admin/assistant/execute", AssistantExecute),
     body("/admin/quickbooks/settings", UpdateQuickbooksSettings),
     body("/admin/quickbooks/sync", SyncQuickbooks),
     {

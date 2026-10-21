@@ -23,7 +23,7 @@ export type FieldDefinition = {
 export type IntegrationDefinition = {
   key: string
   name: string
-  group: "payments" | "accounting" | "messaging" | "marketing"
+  group: "payments" | "accounting" | "messaging" | "marketing" | "ai"
   description: string
   docs?: string
   fields: FieldDefinition[]
@@ -203,6 +203,32 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         options: ON_OFF,
         default: "on",
         help: "الضيف لازم يأكد رقمه بكود على واتساب قبل الدفع.",
+      },
+    ],
+  },
+  {
+    key: "assistant",
+    name: "المساعد الذكي (Claude)",
+    group: "ai",
+    description: "مساعد في لوحة التحكم بيقرأ المنتجات والطلبات والمبيعات، ويجهّز تعديلات الأسعار والمنتجات لحد ما تضغط تنفيذ.",
+    fields: [
+      {
+        key: "api_key",
+        label: "Anthropic API Key",
+        type: "secret",
+        required: true,
+        env: "ANTHROPIC_API_KEY",
+        help: "من console.anthropic.com ← API Keys.",
+      },
+      {
+        key: "model",
+        label: "الموديل",
+        type: "select",
+        options: [
+          { value: "claude-opus-5-5", label: "Claude Opus 5.5 (الأدق)" },
+          { value: "claude-sonnet-5-5", label: "Claude Sonnet 5.5 (أرخص وأسرع)" },
+        ],
+        default: "claude-opus-5-5",
       },
     ],
   },

@@ -67,6 +67,7 @@ decimals.
 | Integrations page: keys entered in the admin, encrypted with AES-GCM, live within about 15s | `modules/integrations`, `admin/routes/integrations` | — |
 | QuickBooks Online: OAuth, product/order/refund sync, webhook, currency handling | `modules/quickbooks`, `workflows/quickbooks` | `docs/QUICKBOOKS.md` |
 | Personal homepage and account: recently viewed (cookie `_laly_viewed`), picks from orders/views, buy again, last order status | `api/store/recommendations`, `workflows/recommendations`, storefront `modules/home/components/for-you` | — |
+| AI admin assistant (Claude): reads products/orders/sales, proposes price and product changes that staff confirm | `workflows/assistant`, `api/admin/assistant`, `admin/routes/assistant` | `docs/ASSISTANT.md` |
 | WhatsApp via Evolution API (see below) | `modules/whatsapp`, `workflows/whatsapp`, `admin/routes/whatsapp` | `docs/WHATSAPP.md` |
 
 **WhatsApp features:**
@@ -94,8 +95,7 @@ decimals.
 
 - WhatsApp needs a working API key in the admin, then "ضبط الـ Webhook" and a real test.
 - Task backlog:
-    - AI admin assistant.
-  - Product enrichment pilot of 15 products with official specs (in progress).
+    - Product enrichment pilot of 15 products with official specs (in progress).
 
 ## 3. Tools Claude uses here
 
