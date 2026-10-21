@@ -22,7 +22,15 @@ export type MeilisearchProviderOptions = {
   /** 0..1 share of semantic ranking in hybrid search when an embedder is set. */
   semanticRatio?: number
   requestTimeoutMs?: number
+  /**
+   * Boolean fields whose `true` documents go after the others when relevance
+   * ties (always, for an empty query). Default: products without a price.
+   */
+  demoteWhenTrue?: string[]
 }
+
+// Meilisearch's own default order, kept as is ahead of the tie-breakers.
+const DEFAULT_RANKING = ["words", "typo", "proximity", "attributeRank", "sort", "wordPosition", "exactness"]
 
 // Meilisearch index settings derived from a Medusa index definition.
 export function buildIndexSettings(
@@ -40,6 +48,8 @@ export function buildIndexSettings(
   ])
   const sortable = fields.filter((f) => f.def.sortable).map((f) => f.path)
   const typo = index.settings?.typo_tolerance
+  const paths = new Set(fields.map((f) => f.path))
+  const demoted = (options.demoteWhenTrue ?? ["price_on_request"]).filter((f) => paths.has(f))
 
   const embedder = options.embedder
     ? {
@@ -57,6 +67,9 @@ export function buildIndexSettings(
     searchableAttributes: searchable.length ? searchable : ["*"],
     filterableAttributes: [...filterable],
     sortableAttributes: sortable,
+    // "price_on_request:asc": priced products first; relevance still decides
+    // first whenever there is a query.
+    rankingRules: [...DEFAULT_RANKING, ...demoted.map((f) => `${f}:asc`)],
     displayedAttributes: ["*"],
     distinctAttribute: index.settings?.distinct_attribute ?? null,
     typoTolerance: {

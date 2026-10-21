@@ -35,8 +35,9 @@ function groupItems(
     const title = item.label.slice(0, separator)
     const label = item.label.slice(separator + 1)
 
-    // Single-variant products carry an internal "Default" option; not a filter.
-    if (title === "Default") {
+    // Single-variant products carry an internal default option ("Default" from
+    // imports, "Default option" from the admin); not a filter.
+    if (DEFAULT_OPTION_TITLES.has(title)) {
       continue
     }
 
@@ -54,6 +55,8 @@ function groupItems(
 
   return Array.from(groups.values())
 }
+
+const DEFAULT_OPTION_TITLES = new Set(["Default", "Default option"])
 
 const OptionRefinements = () => {
   const { items, refine } = useRefinementList({
@@ -104,9 +107,11 @@ const OptionRefinements = () => {
                   <span className="text-sm font-extrabold text-laly-ink">
                     {group.title}
                   </span>
-                  <span className="text-xs text-laly-faint">
-                    ({selectedCount})
-                  </span>
+                  {selectedCount > 0 && (
+                    <span className="text-xs font-bold text-laly-teal">
+                      ({selectedCount})
+                    </span>
+                  )}
                 </div>
                 <span
                   className={clsx(

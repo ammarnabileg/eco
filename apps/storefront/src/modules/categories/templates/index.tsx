@@ -11,11 +11,14 @@ export default function CategoryTemplate({
   countryCode,
   currencyCode,
   attributes,
+  childrenWithProducts,
 }: {
   category: HttpTypes.StoreProductCategory
   countryCode: string
   currencyCode: string
   attributes: SpecAttribute[]
+  /** Sub-categories that hold products, directly or below them. */
+  childrenWithProducts: string[]
 }) {
   if (!category || !countryCode) notFound()
 
@@ -34,9 +37,8 @@ export default function CategoryTemplate({
   const trail = [...parents].reverse()
 
   // Sub-categories without products are hidden until they get some.
-  const children = (category.category_children ?? []).filter(
-    (c) =>
-      (c.products?.length ?? 0) > 0 || (c.category_children?.length ?? 0) > 0
+  const children = (category.category_children ?? []).filter((c) =>
+    childrenWithProducts.includes(c.id)
   )
 
   const header = (

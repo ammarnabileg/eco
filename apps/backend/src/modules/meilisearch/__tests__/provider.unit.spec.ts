@@ -21,16 +21,17 @@ const index: SearchTypes.ResolvedSearchIndexDefinition = {
     category: { type: "keyword", array: true, filterable: true, facetable: true, retrievable: true },
     price: { type: "float", filterable: true, sortable: true, facetable: true, retrievable: true },
     on_sale: { type: "boolean", filterable: true, facetable: true, retrievable: true },
+    price_on_request: { type: "boolean", filterable: true, retrievable: true },
     created_at: { type: "date", sortable: true, filterable: true, retrievable: true },
   },
   seed: async function* () {},
 }
 
 const docs = [
-  { id: "p1", title: "كاميرا Hikvision Bullet دقة 2MP", category: ["كاميرات"], price: 12.5, on_sale: true, created_at: "2026-01-01T00:00:00.000Z" },
-  { id: "p2", title: "كاميرا Tapo C200 منزلية Wi-Fi", category: ["كاميرات"], price: 9.9, on_sale: false, created_at: "2026-02-01T00:00:00.000Z" },
-  { id: "p3", title: "راوتر TP-Link Archer C6 AC1200", category: ["الشبكات"], price: 12.9, on_sale: false, created_at: "2026-03-01T00:00:00.000Z" },
-  { id: "p4", title: "لمبة Tapo L530E ذكية Wi-Fi", category: ["البيت الذكي"], price: 3.5, on_sale: true, created_at: "2026-04-01T00:00:00.000Z" },
+  { id: "p1", title: "كاميرا Hikvision Bullet دقة 2MP", category: ["كاميرات"], price: 12.5, on_sale: true, price_on_request: true, created_at: "2026-01-01T00:00:00.000Z" },
+  { id: "p2", title: "كاميرا Tapo C200 منزلية Wi-Fi", category: ["كاميرات"], price: 9.9, on_sale: false, price_on_request: false, created_at: "2026-02-01T00:00:00.000Z" },
+  { id: "p3", title: "راوتر TP-Link Archer C6 AC1200", category: ["الشبكات"], price: 12.9, on_sale: false, price_on_request: false, created_at: "2026-03-01T00:00:00.000Z" },
+  { id: "p4", title: "لمبة Tapo L530E ذكية Wi-Fi", category: ["البيت الذكي"], price: 3.5, on_sale: true, price_on_request: false, created_at: "2026-04-01T00:00:00.000Z" },
 ]
 
 suite("Meilisearch provider (live)", () => {
@@ -49,6 +50,13 @@ suite("Meilisearch provider (live)", () => {
 
   afterAll(async () => {
     await provider.deleteIndex({ index: index.physical_name })
+  })
+
+  it("lists priced products before price-on-request ones when nothing is searched", async () => {
+    const all = await search(undefined, { pagination: { take: 10 } })
+    expect(titles(all).at(-1)).toContain("Hikvision")
+    // A search still ranks by relevance first.
+    expect(titles(await search("Hikvision"))[0]).toContain("Hikvision")
   })
 
   it("forgives Arabic spelling variants and typos", async () => {

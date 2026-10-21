@@ -64,7 +64,14 @@ export default async function CategoryPage(props: Props) {
     notFound()
   }
 
-  const { attributes } = await getCatalogFilters(productCategory.id)
+  // The store API leaves products out of nested categories, so ask per
+  // sub-category whether it (or one of its own) has products to show.
+  const children = productCategory.category_children ?? []
+  const [{ attributes }, filled] = await Promise.all([
+    getCatalogFilters(productCategory.id),
+    Promise.all(children.map((c) => hasProducts(categoryTreeIds(c), params.countryCode))),
+  ])
+  const childrenWithProducts = children.filter((_, i) => filled[i]).map((c) => c.id)
 
   return (
     <CategoryTemplate
@@ -72,6 +79,7 @@ export default async function CategoryPage(props: Props) {
       countryCode={params.countryCode}
       currencyCode={region.currency_code}
       attributes={attributes}
+      childrenWithProducts={childrenWithProducts}
     />
   )
 }
