@@ -255,6 +255,22 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         help: "اسم الموديل زي ما هو مكتوب في openrouter.ai/models. لازم يدعم Tool calling.",
       },
       {
+        key: "max_steps",
+        label: "أقصى عدد خطوات للسؤال",
+        type: "select",
+        options: ["2", "3", "4", "5", "6", "8", "10"].map((v) => ({ value: v, label: v })),
+        default: "4",
+        help: "كل خطوة طلب للموديل. آخر خطوة لازم تجاوب بالكلام. الأقل أرخص.",
+      },
+      {
+        key: "history_turns",
+        label: "عدد الأسئلة السابقة اللي بتتبعت",
+        type: "select",
+        options: ["0", "2", "4", "6", "10"].map((v) => ({ value: v, label: v })),
+        default: "6",
+        help: "الأسئلة السابقة وردودها بس، من غير نتايج الأدوات. الأقل أرخص.",
+      },
+      {
         key: "image_model",
         label: "موديل تحسين الصور (OpenRouter)",
         type: "text",

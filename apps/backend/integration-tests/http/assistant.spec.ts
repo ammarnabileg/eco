@@ -170,11 +170,15 @@ medusaIntegrationTestRunner({
       expect(applied.data.result).toContain("تم")
       expect(await kwdPrice()).toEqual([["kwd", 12.9], ["usd", 47]]) // other currencies kept
 
-      // The next turn carries the whole history back, thinking and tool blocks included.
+      // The next question carries only the earlier question and written answer, not the tool results.
       script = [() => ({ content: [{ type: "text", text: "تمام" }], stop_reason: "end_turn" })]
       const next = await chat("شكراً", res.data.messages)
       expect(next.status).toBe(200)
-      expect(requests.at(-1)!.body.messages).toHaveLength(res.data.messages.length + 1)
+      expect(requests.at(-1)!.body.messages).toEqual([
+        { role: "user", content: "خلي سعر تابو C200 بـ 12.900" },
+        { role: "assistant", content: "جهزت التعديل، اضغط تنفيذ." },
+        { role: "user", content: "شكراً" },
+      ])
     })
 
     it("proposes a percentage change over several products with rounding", async () => {
@@ -224,6 +228,30 @@ medusaIntegrationTestRunner({
       // The proposal applies the same way.
       await api.post("/admin/assistant/execute", { action: res.data.actions[0] }, admin)
       expect(await kwdPrice()).toEqual([["kwd", 13], ["usd", 47]])
+    })
+
+    it("stops calling tools at the step limit and answers with what it has", async () => {
+      await api.post("/admin/integrations/assistant", { enabled: true, values: { api_key: "sk-ant-test", max_steps: "2" } }, admin)
+      script = [
+        () => toolUse("t1", "search_products", { q: "Tapo" }),
+        () => ({ content: [{ type: "text", text: "دي النتيجة." }], stop_reason: "end_turn" }),
+      ]
+      const res = await chat("دوّر")
+      expect(res.data.reply).toBe("دي النتيجة.")
+      expect(requests).toHaveLength(2)
+      expect(requests[0].body.tool_choice).toBeUndefined()
+      expect(requests[1].body.tool_choice).toEqual({ type: "none" })
+    })
+
+    it("answers a repeated identical tool call from the first result", async () => {
+      await api.post("/admin/integrations/assistant", { enabled: true, values: { api_key: "sk-ant-test" } }, admin)
+      script = [
+        () => toolUse("t1", "search_products", { q: "Tapo" }),
+        () => toolUse("t2", "search_products", { q: "Tapo" }),
+        () => ({ content: [{ type: "text", text: "تمام" }], stop_reason: "end_turn" }),
+      ]
+      await chat("دوّر")
+      expect(requests[2].body.messages.at(-1).content[0].content).toContain("Same call as before")
     })
 
     it("tells the model when a tool fails instead of breaking the chat", async () => {

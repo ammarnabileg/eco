@@ -197,11 +197,18 @@ medusaIntegrationTestRunner({
       // Assistant: four questions in one conversation, history carried like the admin page does.
       let messages: unknown[] = []
       let provider: string | undefined
+      let lastActions: { tool: string; input: { changes?: { variant_id: string; price_kwd: number }[] } }[] = []
       for (const text of ["إيه أكتر المنتجات مبيعاً الشهر ده؟", "وريني راوترات TP-Link", "تفاصيل Archer AX55", "زوّد أسعار كل راوترات TP-Link 5%"]) {
         const { data } = await api.post("/admin/assistant/chat", { messages, text, provider }, admin)
         messages = data.messages
         provider = data.provider
+        lastActions = data.actions
       }
+      // The bulk price change is one proposal listing every TP-Link router, fixed at proposal time.
+      expect(lastActions).toHaveLength(1)
+      expect(lastActions[0].tool).toBe("adjust_prices")
+      expect(lastActions[0].input.changes).toHaveLength(15)
+      expect(lastActions[0].input.changes![0]).toEqual({ variant_id: expect.stringMatching(/^variant_/), price_kwd: 10.5 })
       const chat = await totals("admin_chat")
       expect(chat.requests).toBeGreaterThanOrEqual(9)
 

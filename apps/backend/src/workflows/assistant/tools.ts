@@ -37,12 +37,18 @@ const PRODUCT_FIELDS = [
 ]
 
 const priceOf = (v: Variant) => v.prices?.find((p) => p.currency_code === KWD) ?? null
+// Only what the model needs to answer or propose a change; one-variant
+// products carry no variant title.
 const productLine = (p: Product) => ({
   id: p.id,
   title: p.title,
-  handle: p.handle,
   status: p.status,
-  variants: (p.variants ?? []).map((v) => ({ id: v.id, sku: v.sku ?? null, title: v.title ?? null, price_kwd: priceOf(v)?.amount ?? null })),
+  variants: (p.variants ?? []).map((v) => ({
+    id: v.id,
+    ...(v.sku ? { sku: v.sku } : {}),
+    ...(v.title && !/^default/i.test(v.title) ? { title: v.title } : {}),
+    price_kwd: priceOf(v)?.amount ?? null,
+  })),
 })
 
 async function findProduct(container: MedusaContainer, ref: string): Promise<Product> {
@@ -143,7 +149,13 @@ async function runRead(container: MedusaContainer, name: ToolName, raw: unknown)
     }
     case "get_product": {
       const p = await findProduct(container, schemas.get_product.parse(raw).product)
-      return { ...productLine(p), subtitle: p.subtitle ?? null, description: p.description ?? null }
+      const description = p.description ?? null
+      return {
+        ...productLine(p),
+        handle: p.handle,
+        subtitle: p.subtitle ?? null,
+        description: description && description.length > 800 ? `${description.slice(0, 800)}…` : description,
+      }
     }
     case "list_orders": {
       const i = schemas.list_orders.parse(raw)

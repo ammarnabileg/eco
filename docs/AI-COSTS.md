@@ -31,3 +31,28 @@ Where it comes from (from the code):
   - The extracted page text (menus, related products and footer included) is sent in full.
   - It is sent twice per draft: once to pick the category, then again with that category's spec fields.
   - "Update with answers" fetches the page and does both calls again.
+
+## Phase 2: assistant context
+- **Earlier questions go back as plain text:** the staff message and the written answer. Their tool calls, tool
+  results and reasoning are dropped (`workflows/assistant/history.ts`).
+- **Only the last N questions are sent:** `history_turns`, default 6.
+- **At most N model requests per question:** `max_steps`, default 4 (was 10). The last one is sent with
+  `tool_choice: none`, so it answers with what it found instead of stopping silently.
+- **A repeated identical tool call in the same question** is answered from the first result.
+- **Smaller tool results:** search results drop handles and "Default" variant titles; product descriptions are cut
+  at 800 characters; each tool result is capped at 8,000 characters (was 20,000).
+- **Bulk price change:** "raise all TP-Link routers 5%" stays one `adjust_prices` proposal. It lists every
+  matching variant with its new price, fixed when proposed, and completes within the 4 steps (checked in the
+  baseline test).
+
+| Scenario | Requests | Characters sent | Largest request | ≈ input tokens |
+|---|---:|---:|---:|---:|
+| Assistant, 4 questions — before | 9 | 106,211 | 20,346 | 26,557 |
+| Assistant, 4 questions — after | 9 | 67,091 | 11,897 | 16,776 |
+
+**Result:** −37% characters sent, and −42% for the largest request.
+
+About 47,000 of the remaining 67,000 characters are the system instructions and the tool definitions (5.2k per
+request), which every request needs. They are the identical start of every request, the part providers cache
+automatically. Whether and how much OpenRouter's DeepSeek caches them shows in `cached_tokens` in the usage table
+after deployment; the scripted test cannot measure it.

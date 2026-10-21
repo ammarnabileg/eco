@@ -6,6 +6,7 @@ import { INTEGRATIONS_MODULE } from "../../modules/integrations"
 import IntegrationsModuleService from "../../modules/integrations/service"
 import { resolveIntegration } from "../../modules/integrations/store"
 import { anthropicUsage, newRunId, openRouterUsage, recordAiUsage } from "../ai/usage"
+import { compactHistory } from "./history"
 import { Action, assistantTools, runTool } from "./tools"
 
 // The admin assistant: one chat turn runs the model with the store tools until
@@ -18,8 +19,16 @@ export type Provider = "anthropic" | "openrouter"
 export type ChatMessage = Anthropic.Beta.BetaMessageParam
 type TurnResult = { messages: unknown[]; reply: string; actions: Action[]; provider: Provider }
 
-const MAX_STEPS = 10
-const RESULT_LIMIT = 20_000
+/** Model requests per question; the last one must answer in words. */
+export const DEFAULT_MAX_STEPS = 4
+/** Earlier questions (with their written answers) sent back with a new one. */
+export const DEFAULT_HISTORY_TURNS = 6
+const RESULT_LIMIT = 8_000
+
+const intSetting = (v: unknown, fallback: number, min: number, max: number) => {
+  const n = Number(v)
+  return Number.isInteger(n) && n >= min && n <= max ? n : fallback
+}
 
 const SYSTEM = `You are the admin assistant of Laly, an electronics store in Kuwait (prices in KWD with 3 decimals).
 You help the store staff in the admin panel: look up products, orders and sales, and prepare changes to products and prices.
@@ -44,6 +53,8 @@ export async function assistantSettings(container: MedusaContainer) {
     provider,
     apiKey,
     model,
+    maxSteps: intSetting(v.max_steps, DEFAULT_MAX_STEPS, 2, 10),
+    historyTurns: intSetting(v.history_turns, DEFAULT_HISTORY_TURNS, 0, 20),
     // Images and video always go through OpenRouter.
     openRouterKey: String(v.openrouter_api_key ?? ""),
     imageModel: String(v.image_model ?? ""),
@@ -56,14 +67,29 @@ const MISSING = {
   openrouter: "Add the OpenRouter API key and model in Integrations ← المساعد الذكي first",
 }
 
-/** Runs the model's tool calls; failures go back to the model as errors. */
-async function runCalls(container: MedusaContainer, calls: { id: string; name: string; input: unknown }[], actions: Action[]) {
+/**
+ * Runs the model's tool calls; failures go back to the model as errors. A call
+ * repeated with the same input in the same question is answered from `seen`
+ * instead of running (and paying for its result) again.
+ */
+async function runCalls(
+  container: MedusaContainer,
+  calls: { id: string; name: string; input: unknown }[],
+  actions: Action[],
+  seen: Map<string, string>
+) {
   const out: { id: string; content: string; error: boolean }[] = []
   for (const call of calls) {
+    const key = `${call.name}:${JSON.stringify(call.input)}`
+    if (seen.has(key)) {
+      out.push({ id: call.id, content: "Same call as before in this question; use the earlier result.", error: false })
+      continue
+    }
     try {
       const { action, result } = await runTool(container, call.name, call.input)
       if (action) actions.push(action)
       const json = JSON.stringify(result)
+      seen.set(key, json)
       out.push({ id: call.id, content: json.length > RESULT_LIMIT ? `${json.slice(0, RESULT_LIMIT)}… (truncated; narrow the request)` : json, error: false })
     } catch (error) {
       out.push({ id: call.id, content: (error as Error).message, error: true })
@@ -81,7 +107,9 @@ export async function assistantTurn(
   const settings = await assistantSettings(container)
   if (!settings.active) throw new MedusaError(MedusaError.Types.NOT_ALLOWED, MISSING[settings.provider])
   // Conversations from before the provider choice are Anthropic ones.
-  const history = (input.provider ?? "anthropic") === settings.provider ? input.history : []
+  const own = (input.provider ?? "anthropic") === settings.provider ? input.history : []
+  // Earlier questions go back as plain text: no old tool results or reasoning.
+  const history = compactHistory(own, settings.historyTurns)
   return settings.provider === "openrouter"
     ? openRouterTurn(container, settings, history, input.text)
     : anthropicTurn(container, settings, [...(history as ChatMessage[]), { role: "user", content: input.text }], options)
@@ -96,7 +124,7 @@ const textOf = (content: Anthropic.Beta.BetaContentBlock[]) =>
 
 async function anthropicTurn(
   container: MedusaContainer,
-  settings: { apiKey: string; model: string },
+  settings: { apiKey: string; model: string; maxSteps: number },
   history: ChatMessage[],
   options: { client?: Anthropic }
 ): Promise<TurnResult> {
@@ -105,8 +133,10 @@ async function anthropicTurn(
   const actions: Action[] = []
   const replies: string[] = []
   const runId = newRunId()
+  const seen = new Map<string, string>()
 
-  for (let step = 0; step < MAX_STEPS; step++) {
+  for (let step = 0; step < settings.maxSteps; step++) {
+    const last = step === settings.maxSteps - 1
     let response: Anthropic.Beta.BetaMessage
     const started = Date.now()
     const usage = { run_id: runId, task: "admin_chat" as const, provider: "anthropic" as const, model: settings.model }
@@ -122,6 +152,8 @@ async function anthropicTurn(
         cache_control: { type: "ephemeral" },
         system: SYSTEM,
         tools: assistantTools,
+        // Out of steps: answer with what was found instead of calling more tools.
+        ...(last ? { tool_choice: { type: "none" as const } } : {}),
         messages,
       })
     } catch (error) {
@@ -158,7 +190,7 @@ async function anthropicTurn(
     if (response.stop_reason !== "tool_use") break
 
     const calls = response.content.filter((b): b is Anthropic.Beta.BetaToolUseBlock => b.type === "tool_use")
-    const results = await runCalls(container, calls, actions)
+    const results = await runCalls(container, calls, actions, seen)
     messages.push({
       role: "user",
       content: results.map((r) => ({ type: "tool_result" as const, tool_use_id: r.id, content: r.content, ...(r.error ? { is_error: true } : {}) })),
@@ -185,7 +217,7 @@ const openRouterTools = assistantTools.map((t) => ({
 
 async function openRouterTurn(
   container: MedusaContainer,
-  settings: { apiKey: string; model: string },
+  settings: { apiKey: string; model: string; maxSteps: number },
   history: unknown[],
   text: string
 ): Promise<TurnResult> {
@@ -194,8 +226,10 @@ async function openRouterTurn(
   const actions: Action[] = []
   const replies: string[] = []
   const runId = newRunId()
+  const seen = new Map<string, string>()
 
-  for (let step = 0; step < MAX_STEPS; step++) {
+  for (let step = 0; step < settings.maxSteps; step++) {
+    const last = step === settings.maxSteps - 1
     let res: Response
     const started = Date.now()
     const usage = { run_id: runId, task: "admin_chat" as const, provider: "openrouter" as const, model: settings.model }
@@ -203,6 +237,7 @@ async function openRouterTurn(
       model: settings.model,
       messages: [{ role: "system", content: SYSTEM }, ...messages],
       tools: openRouterTools,
+      ...(last ? { tool_choice: "none" } : {}),
     })
     try {
       res = await fetch(`${base}/chat/completions`, {
@@ -257,7 +292,8 @@ async function openRouterTurn(
     const results = await runCalls(
       container,
       parsed.filter((p) => typeof p.input !== "symbol"),
-      actions
+      actions,
+      seen
     )
     for (const p of parsed) {
       const r = results.find((x) => x.id === p.id)
