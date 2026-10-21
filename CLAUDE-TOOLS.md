@@ -66,6 +66,7 @@ decimals.
 | Instalment eligibility per product and category, enforced on the server | `api/store/bnpl`, `api/store/carts/bnpl-guard.ts`, admin widgets | `docs/PAYMENTS.md` |
 | Integrations page: keys entered in the admin, encrypted with AES-GCM, live within about 15s | `modules/integrations`, `admin/routes/integrations` | — |
 | QuickBooks Online: OAuth, product/order/refund sync, webhook, currency handling | `modules/quickbooks`, `workflows/quickbooks` | `docs/QUICKBOOKS.md` |
+| Personal homepage and account: recently viewed (cookie `_laly_viewed`), picks from orders/views, buy again, last order status | `api/store/recommendations`, `workflows/recommendations`, storefront `modules/home/components/for-you` | — |
 | WhatsApp via Evolution API (see below) | `modules/whatsapp`, `workflows/whatsapp`, `admin/routes/whatsapp` | `docs/WHATSAPP.md` |
 
 **WhatsApp features:**
@@ -93,8 +94,7 @@ decimals.
 
 - WhatsApp needs a working API key in the admin, then "ضبط الـ Webhook" and a real test.
 - Task backlog:
-  - Personalised homepage and account per customer.
-  - AI admin assistant.
+    - AI admin assistant.
   - Product enrichment pilot of 15 products with official specs (in progress).
 
 ## 3. Tools Claude uses here
@@ -155,6 +155,8 @@ Storefront checks, from `apps/storefront`: `npx tsc --noEmit`, `pnpm lint`, `pnp
   public fields. Run `pnpm test:unit` too, not only the suite you touched.
 - **Nested relation filters in `query.graph`** (e.g. on `shipping_address.phone`) are not reliable. Match through a
   joined query or by ids, and test with real records.
+- **The HTTP suites run in one process (`--runInBand`)** and outgrew the default Node heap at 10 suites. The script
+  sets `--max-old-space-size=4096`; raise it again if a new suite brings back "heap out of memory".
 - **Integration test imports:** core flows come from `@medusajs/medusa/core-flows`, not `@medusajs/core-flows`.
 - **QuickBooks:**
   - Request ids must stay within 50 characters (hashed).

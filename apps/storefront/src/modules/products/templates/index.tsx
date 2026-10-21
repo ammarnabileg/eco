@@ -13,6 +13,7 @@ import ProductActions from "@modules/products/components/product-actions"
 import ProductDetails from "@modules/products/components/product-details"
 import ProductJsonLd from "@modules/products/components/product-json-ld"
 import RelatedProducts from "@modules/products/components/related-products"
+import TrackViewed from "@modules/products/components/track-viewed"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
@@ -140,6 +141,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       data-testid="product-container"
     >
       <ProductJsonLd product={product} countryCode={countryCode} />
+      <TrackViewed productId={product.id} />
       <nav
         aria-label="مسار التنقل"
         className="content-container py-4 text-xs small:text-sm text-laly-mut"

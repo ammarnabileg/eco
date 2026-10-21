@@ -114,6 +114,11 @@ export default defineMiddlewares({
     body("/admin/quickbooks/settings", UpdateQuickbooksSettings),
     body("/admin/quickbooks/sync", SyncQuickbooks),
     {
+      method: ["GET"],
+      matcher: "/store/recommendations",
+      middlewares: [authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true })],
+    },
+    {
       method: ["POST"],
       matcher: "/store/quote-requests",
       middlewares: [

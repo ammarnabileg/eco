@@ -6,7 +6,8 @@ import ProductCard, {
 } from "@modules/laly/components/product-card"
 
 // A row of products, either as a horizontal rail (scrolls on phones) or as a
-// grid. Products come from a collection or from an explicit id list (offers).
+// grid. Products come from a collection or from an explicit id list (offers,
+// personal picks).
 export default async function ProductSection({
   title,
   href,
@@ -18,6 +19,7 @@ export default async function ProductSection({
   offerEnds = {},
   extra,
   limit = 8,
+  contained = true,
 }: {
   title: string
   href?: string
@@ -29,6 +31,8 @@ export default async function ProductSection({
   offerEnds?: Record<string, string>
   extra?: React.ReactNode
   limit?: number
+  /** False inside a page that already has its own container (account). */
+  contained?: boolean
 }) {
   if (!collectionId && !productIds?.length) {
     return null
@@ -45,12 +49,17 @@ export default async function ProductSection({
     },
   })
 
+  // An id list keeps its own order (most relevant first).
+  if (productIds?.length && !collectionId) {
+    products.sort((a, b) => productIds.indexOf(a.id) - productIds.indexOf(b.id))
+  }
+
   if (!products.length) {
     return null
   }
 
   return (
-    <section className="content-container mt-10 small:mt-14">
+    <section className={contained ? "content-container mt-10 small:mt-14" : "mt-8"}>
       <SectionHeading eyebrow={eyebrow} title={title} href={href} extra={extra} />
       {layout === "rail" ? (
         <ul className="flex gap-3 small:gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 small:mx-0 small:px-0 small:grid small:grid-cols-4">

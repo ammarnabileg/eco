@@ -7,6 +7,7 @@ import { getActiveOffers, offerEndsByProduct } from "@lib/data/offers"
 import { getRegion } from "@lib/data/regions"
 import Brands from "@modules/home/components/brands"
 import CategoryTiles from "@modules/home/components/category-tiles"
+import ForYou from "@modules/home/components/for-you"
 import Hero from "@modules/home/components/hero"
 import InstallCta from "@modules/home/components/install-cta"
 import ProductSection from "@modules/home/components/product-section"
@@ -45,6 +46,7 @@ export default async function Home(props: {
     <div className="pb-4">
       <Hero slides={content.hero_slides} whatsapp={content.settings.whatsapp} />
       <TrustStrip badges={content.trust_badges} />
+      <ForYou region={region} offerEnds={offerEnds} />
       <CategoryTiles categories={categories} />
       <ProductSection
         title={offers.length === 1 ? offers[0].title : "عروض الأسبوع"}
