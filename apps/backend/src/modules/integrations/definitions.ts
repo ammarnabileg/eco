@@ -254,6 +254,20 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
         placeholder: "anthropic/claude-sonnet-...",
         help: "اسم الموديل زي ما هو مكتوب في openrouter.ai/models. لازم يدعم Tool calling.",
       },
+      {
+        key: "image_model",
+        label: "موديل تحسين الصور (OpenRouter)",
+        type: "text",
+        default: "google/gemini-2.5-flash-image",
+        help: "لخلفية بيضا وصور تسويقية حوالين صورة المنتج الحقيقية. محتاج مفتاح OpenRouter.",
+      },
+      {
+        key: "video_model",
+        label: "موديل الفيديو (OpenRouter)",
+        type: "text",
+        default: "google/veo-3.1",
+        help: "فيديو قصير من صورة المنتج. غالي وبياخد دقايق.",
+      },
     ],
   },
   {

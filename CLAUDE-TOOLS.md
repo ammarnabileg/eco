@@ -68,6 +68,7 @@ decimals.
 | QuickBooks Online: OAuth, product/order/refund sync, webhook, currency handling | `modules/quickbooks`, `workflows/quickbooks` | `docs/QUICKBOOKS.md` |
 | Personal homepage and account: recently viewed (cookie `_laly_viewed`), picks from orders/views, buy again, last order status | `api/store/recommendations`, `workflows/recommendations`, storefront `modules/home/components/for-you` | — |
 | AI admin assistant (Claude direct or OpenRouter): reads products/orders/sales, proposes price and product changes that staff confirm | `workflows/assistant`, `api/admin/assistant`, `admin/routes/assistant` | `docs/ASSISTANT.md` |
+| Add a product with AI: official page → grounded copy/specs/SEO, add-on and variant questions, official photos + AI edits, optional video (OpenRouter), saved as draft | `workflows/ai-product`, `api/admin/ai-products`, `admin/routes/ai-product` | `docs/AI-PRODUCTS.md` |
 | WhatsApp via Evolution API (see below) | `modules/whatsapp`, `workflows/whatsapp`, `admin/routes/whatsapp` | `docs/WHATSAPP.md` |
 
 **WhatsApp features:**

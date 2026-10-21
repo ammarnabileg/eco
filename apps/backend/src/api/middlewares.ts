@@ -24,6 +24,7 @@ import {
   UpdateSiteSettings,
   UpdateTrustBadge,
 } from "./admin/content/validators"
+import { CreateAiProduct, DraftAiProduct, EnhanceAiImage, ImportAiImages, PublishAiVideo, StartAiVideo } from "./admin/ai-products/validators"
 import { AssistantChat, AssistantExecute } from "./admin/assistant/validators"
 import { SaveIntegration } from "./admin/integrations/validators"
 import { SyncQuickbooks, UpdateQuickbooksSettings } from "./admin/quickbooks/validators"
@@ -112,6 +113,12 @@ export default defineMiddlewares({
     body("/admin/catalog/quote-requests/:id", UpdateQuoteRequest),
     body("/admin/catalog/products/:id", UpdateProductCatalog),
     body("/store/carts/:id/configured-items", AddConfiguredItem),
+    body("/admin/ai-products/draft", DraftAiProduct),
+    body("/admin/ai-products/images/import", ImportAiImages),
+    body("/admin/ai-products/images/enhance", EnhanceAiImage),
+    body("/admin/ai-products/create", CreateAiProduct),
+    body("/admin/ai-products/:id/video", StartAiVideo),
+    body("/admin/ai-products/:id/video/publish", PublishAiVideo),
     body("/admin/assistant/chat", AssistantChat),
     body("/admin/assistant/execute", AssistantExecute),
     body("/admin/quickbooks/settings", UpdateQuickbooksSettings),

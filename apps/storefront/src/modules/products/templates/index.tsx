@@ -12,6 +12,7 @@ import Gallery from "@modules/products/components/gallery"
 import ProductActions from "@modules/products/components/product-actions"
 import ProductDetails from "@modules/products/components/product-details"
 import ProductJsonLd from "@modules/products/components/product-json-ld"
+import ProductVideo from "@modules/products/components/product-video"
 import RelatedProducts from "@modules/products/components/related-products"
 import TrackViewed from "@modules/products/components/track-viewed"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
@@ -182,6 +183,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       {device === "mobile" ? (
         <div className="content-container flex flex-col gap-5">
           <Gallery images={images} title={product.title} layout="mobile" />
+          <ProductVideo product={product} />
           {header}
           {actions}
           <ProductDetails
@@ -194,6 +196,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         <div className="content-container grid grid-cols-1 small:grid-cols-[1.05fr_1fr] gap-6 small:gap-10 items-start">
           <div className="sticky top-28">
             <Gallery images={images} title={product.title} layout="desktop" />
+            <div className="mt-4">
+              <ProductVideo product={product} />
+            </div>
           </div>
           <div className="flex flex-col gap-6">
             <div className="bg-white border border-laly-line rounded-card p-6 flex flex-col gap-6">

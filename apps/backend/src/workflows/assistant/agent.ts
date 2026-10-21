@@ -37,7 +37,17 @@ export async function assistantSettings(container: MedusaContainer) {
   const provider: Provider = v.provider === "openrouter" ? "openrouter" : "anthropic"
   const apiKey = String((provider === "openrouter" ? v.openrouter_api_key : v.api_key) ?? "")
   const model = String((provider === "openrouter" ? v.openrouter_model : v.model) ?? "") || (provider === "anthropic" ? "claude-opus-5-5" : "")
-  return { enabled: r.enabled, active: r.enabled && !!apiKey && !!model, provider, apiKey, model }
+  return {
+    enabled: r.enabled,
+    active: r.enabled && !!apiKey && !!model,
+    provider,
+    apiKey,
+    model,
+    // Images and video always go through OpenRouter.
+    openRouterKey: String(v.openrouter_api_key ?? ""),
+    imageModel: String(v.image_model ?? ""),
+    videoModel: String(v.video_model ?? ""),
+  }
 }
 
 const MISSING = {
