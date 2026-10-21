@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react"
 import { sdk } from "../../lib/sdk"
 
 type Action = { tool: string; input: Record<string, unknown>; summary: string; signature: string }
-type ApiMessage = { role: "user" | "assistant"; content: unknown }
+type ApiMessage = Record<string, unknown>
 type Entry =
   | { kind: "user"; text: string }
   | { kind: "assistant"; text: string }
@@ -21,7 +21,7 @@ const EXAMPLES = [
   "فيه طلبات لسه ما اتشحنتش؟",
 ]
 
-type Saved = { messages: ApiMessage[]; entries: Entry[]; notes: string[] }
+type Saved = { messages: ApiMessage[]; entries: Entry[]; notes: string[]; provider?: string }
 const load = (): Saved => {
   try {
     return JSON.parse(localStorage.getItem(STORAGE) ?? "") as Saved
@@ -46,16 +46,17 @@ const AssistantPage = () => {
 
   const chat = useMutation({
     mutationFn: (message: string) =>
-      sdk.client.fetch<{ messages: ApiMessage[]; reply: string; actions: Action[] }>("/admin/assistant/chat", {
+      sdk.client.fetch<{ messages: ApiMessage[]; reply: string; actions: Action[]; provider: string }>("/admin/assistant/chat", {
         method: "POST",
         // Changes applied since the last message are told to the assistant.
-        body: { messages: state.messages, text: [...state.notes, message].join("\n") },
+        body: { messages: state.messages, provider: state.provider, text: [...state.notes, message].join("\n") },
       }),
     onMutate: (message) =>
       setState((s) => ({ ...s, entries: [...s.entries, { kind: "user", text: message }] })),
     onSuccess: (data) =>
       setState((s) => ({
         messages: data.messages,
+        provider: data.provider,
         notes: [],
         entries: [
           ...s.entries,

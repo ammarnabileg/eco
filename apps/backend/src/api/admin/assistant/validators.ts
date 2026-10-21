@@ -3,8 +3,10 @@ import { z } from "@medusajs/framework/zod"
 // The conversation is kept by the admin's browser and returned as is.
 export const AssistantChat = z
   .object({
-    messages: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.unknown() })).max(200).default([]),
+    // Anthropic or OpenRouter (OpenAI chat) messages, whichever produced them.
+    messages: z.array(z.object({ role: z.enum(["user", "assistant", "tool"]) }).passthrough()).max(300).default([]),
     text: z.string().trim().min(1).max(4000),
+    provider: z.enum(["anthropic", "openrouter"]).nullish(),
   })
   .strict()
 

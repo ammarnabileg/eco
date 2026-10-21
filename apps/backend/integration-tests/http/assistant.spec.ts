@@ -10,6 +10,8 @@ jest.setTimeout(120 * 1000)
 type Req = { headers: IncomingHttpHeaders; body: Record<string, any> }
 const requests: Req[] = []
 let script: ((req: Req) => Record<string, unknown>)[] = []
+// OpenRouter answers in the OpenAI chat format.
+let orScript: ((req: Req) => Record<string, unknown>)[] = []
 let claude: Server
 beforeAll(async () => {
   claude = createServer((req, res) => {
@@ -18,8 +20,17 @@ beforeAll(async () => {
     req.on("end", () => {
       const r = { headers: req.headers, body: JSON.parse(raw) }
       requests.push(r)
-      const next = script.shift()
       res.setHeader("content-type", "application/json")
+      if (req.url?.endsWith("/chat/completions")) {
+        const step = orScript.shift()
+        return res.end(
+          JSON.stringify({
+            id: `gen_${requests.length}`,
+            choices: [step ? step(r) : { finish_reason: "stop", message: { role: "assistant", content: "done" } }],
+          })
+        )
+      }
+      const next = script.shift()
       res.end(
         JSON.stringify({
           id: `msg_${requests.length}`,
@@ -35,6 +46,7 @@ beforeAll(async () => {
   })
   await new Promise<void>((resolve) => claude.listen(0, "127.0.0.1", resolve))
   process.env.ANTHROPIC_BASE_URL = `http://127.0.0.1:${(claude.address() as AddressInfo).port}`
+  process.env.OPENROUTER_BASE_URL = process.env.ANTHROPIC_BASE_URL
 })
 afterAll(() => new Promise<void>((resolve) => claude.close(() => resolve())))
 
@@ -58,6 +70,7 @@ medusaIntegrationTestRunner({
     beforeEach(async () => {
       requests.length = 0
       script = []
+      orScript = []
       const container = getContainer()
       const user = await container.resolve(Modules.USER).createUsers({ email: "admin@test.local" })
       const identity = await container.resolve(Modules.AUTH).createAuthIdentities({
@@ -105,10 +118,13 @@ medusaIntegrationTestRunner({
       return data.product.variants[0].prices.map((p: { currency_code: string; amount: number }) => [p.currency_code, p.amount]).sort()
     }
 
-    it("asks for the API key before anything else", async () => {
+    it("asks for the provider's key before anything else", async () => {
       const res = await chat("hi")
       expect(res.status).toBe(400)
       expect(res.data.message).toContain("Anthropic API key")
+      await api.post("/admin/integrations/assistant", { enabled: true, values: { provider: "openrouter", openrouter_api_key: "sk-or" } }, admin)
+      const noModel = await chat("hi")
+      expect(noModel.data.message).toContain("OpenRouter API key and model")
       expect(requests).toHaveLength(0)
     })
 
@@ -169,6 +185,45 @@ medusaIntegrationTestRunner({
       expect(action.summary).toContain("14.500 KWD ← 16.000 KWD") // 15.95 rounded to 0.1
       await api.post("/admin/assistant/execute", { action }, admin)
       expect(await kwdPrice()).toEqual([["kwd", 16], ["usd", 47]])
+    })
+
+    it("runs the same tools through OpenRouter and starts fresh when the provider changes", async () => {
+      await api.post(
+        "/admin/integrations/assistant",
+        { enabled: true, values: { provider: "openrouter", openrouter_api_key: "sk-or-test", openrouter_model: "vendor/model-x" } },
+        admin
+      )
+      const call = (id: string, name: string, args: string) => ({
+        finish_reason: "tool_calls",
+        message: { role: "assistant", content: null, tool_calls: [{ id, type: "function", function: { name, arguments: args } }] },
+      })
+      orScript = [
+        () => call("c1", "search_products", JSON.stringify({ q: "Tapo" })),
+        (r) => {
+          const found = JSON.parse(r.body.messages.at(-1).content).products[0]
+          return call("c2", "set_price", JSON.stringify({ variant_id: found.variants[0].id, price_kwd: 13 }))
+        },
+        () => call("c3", "get_product", "{not json"),
+        () => ({ finish_reason: "stop", message: { role: "assistant", content: "جاهز، اضغط تنفيذ." } }),
+      ]
+      const res = await chat("سعر تابو 13", [{ role: "user", content: [{ type: "text", text: "old anthropic turn" }] }])
+      expect(res.status).toBe(200)
+      expect(res.data).toMatchObject({ provider: "openrouter", reply: "جاهز، اضغط تنفيذ." })
+      expect(res.data.actions[0].summary).toContain("14.500 KWD ← 13.000 KWD")
+
+      const first = requests[0]
+      expect(first.headers.authorization).toBe("Bearer sk-or-test")
+      expect(first.body.model).toBe("vendor/model-x")
+      expect(first.body.messages[0].role).toBe("system")
+      expect(first.body.messages.slice(1)).toEqual([{ role: "user", content: "سعر تابو 13" }]) // no Anthropic history
+      expect(first.body.tools[0]).toMatchObject({ type: "function", function: { name: "search_products" } })
+      // A call with broken arguments is answered with an error, not dropped.
+      expect(requests[3].body.messages.at(-1)).toMatchObject({ role: "tool", tool_call_id: "c3" })
+      expect(requests[3].body.messages.at(-1).content).toContain("not valid JSON")
+
+      // The proposal applies the same way.
+      await api.post("/admin/assistant/execute", { action: res.data.actions[0] }, admin)
+      expect(await kwdPrice()).toEqual([["kwd", 13], ["usd", 47]])
     })
 
     it("tells the model when a tool fails instead of breaking the chat", async () => {
