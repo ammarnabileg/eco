@@ -5,6 +5,7 @@ import { CATALOG_MODULE } from "../../modules/catalog"
 import CatalogModuleService from "../../modules/catalog/service"
 import { SpecAttribute, validateSpecs } from "../../modules/catalog/specs"
 import { attributesByCategory } from "../catalog/steps/product-attributes"
+import { newRunId } from "../ai/usage"
 import { aiText, parseJsonObject } from "./ai"
 import { fetchPage } from "./source"
 
@@ -121,14 +122,17 @@ export async function draftProduct(container: MedusaContainer, input: DraftInput
       .filter(Boolean)
       .join("\n\n")
 
-  let out = parseJsonObject(await aiText(container, SYSTEM, prompt(attributes)))
+  const runId = newRunId()
+  let out = parseJsonObject(await aiText(container, SYSTEM, prompt(attributes), { task: "product_draft", runId }))
 
   // The model chose the category: write the specs again with that category's fields.
   const suggested = str(out.category_id, 100)
   if (!categoryId && categoryRows.some((c) => c.id === suggested)) {
     categoryId = suggested
     attributes = await fieldsOf(categoryId)
-    if (attributes.length && sourceText) out = parseJsonObject(await aiText(container, SYSTEM, prompt(attributes)))
+    if (attributes.length && sourceText) {
+      out = parseJsonObject(await aiText(container, SYSTEM, prompt(attributes), { task: "product_draft", runId }))
+    }
   }
 
   const notes: string[] = []

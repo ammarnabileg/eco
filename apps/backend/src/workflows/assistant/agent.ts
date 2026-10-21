@@ -5,6 +5,7 @@ import { MedusaError } from "@medusajs/framework/utils"
 import { INTEGRATIONS_MODULE } from "../../modules/integrations"
 import IntegrationsModuleService from "../../modules/integrations/service"
 import { resolveIntegration } from "../../modules/integrations/store"
+import { anthropicUsage, newRunId, openRouterUsage, recordAiUsage } from "../ai/usage"
 import { Action, assistantTools, runTool } from "./tools"
 
 // The admin assistant: one chat turn runs the model with the store tools until
@@ -103,9 +104,13 @@ async function anthropicTurn(
   const messages = [...history]
   const actions: Action[] = []
   const replies: string[] = []
+  const runId = newRunId()
 
   for (let step = 0; step < MAX_STEPS; step++) {
     let response: Anthropic.Beta.BetaMessage
+    const started = Date.now()
+    const usage = { run_id: runId, task: "admin_chat" as const, provider: "anthropic" as const, model: settings.model }
+    const request_chars = JSON.stringify(messages).length + SYSTEM.length
     try {
       response = await client.beta.messages.create({
         model: settings.model,
@@ -120,6 +125,7 @@ async function anthropicTurn(
         messages,
       })
     } catch (error) {
+      await recordAiUsage(container, { ...usage, request_chars, duration_ms: Date.now() - started, status: "error", error: (error as Error).message })
       if (error instanceof Anthropic.AuthenticationError) {
         throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "Anthropic rejected the API key. Check it in Integrations.")
       }
@@ -132,6 +138,14 @@ async function anthropicTurn(
       throw error
     }
 
+    await recordAiUsage(container, {
+      ...usage,
+      ...anthropicUsage(response.usage),
+      request_chars,
+      tool_calls: response.content.filter((b) => b.type === "tool_use").length,
+      duration_ms: Date.now() - started,
+      status: "ok",
+    })
     messages.push({ role: "assistant", content: response.content })
     const text = textOf(response.content)
     if (text) replies.push(text)
@@ -179,9 +193,17 @@ async function openRouterTurn(
   const messages = [...(history as OrMessage[]), { role: "user", content: text } as OrMessage]
   const actions: Action[] = []
   const replies: string[] = []
+  const runId = newRunId()
 
   for (let step = 0; step < MAX_STEPS; step++) {
     let res: Response
+    const started = Date.now()
+    const usage = { run_id: runId, task: "admin_chat" as const, provider: "openrouter" as const, model: settings.model }
+    const body = JSON.stringify({
+      model: settings.model,
+      messages: [{ role: "system", content: SYSTEM }, ...messages],
+      tools: openRouterTools,
+    })
     try {
       res = await fetch(`${base}/chat/completions`, {
         method: "POST",
@@ -191,20 +213,27 @@ async function openRouterTurn(
           "HTTP-Referer": process.env.STOREFRONT_URL?.split(",")[0]?.trim() || "https://www.lalykw.com",
           "X-OpenRouter-Title": "Laly Admin",
         },
-        body: JSON.stringify({
-          model: settings.model,
-          messages: [{ role: "system", content: SYSTEM }, ...messages],
-          tools: openRouterTools,
-        }),
+        body,
         signal: AbortSignal.timeout(180_000),
       })
     } catch (error) {
+      await recordAiUsage(container, { ...usage, request_chars: body.length, duration_ms: Date.now() - started, status: "error", error: (error as Error).message })
       throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, `OpenRouter unreachable: ${(error as Error).message}`)
     }
     const data = (await res.json().catch(() => ({}))) as {
       error?: { message?: string }
       choices?: { finish_reason?: string; message?: { content?: string | null; tool_calls?: OrToolCall[] } }[]
     }
+    const calls = data.choices?.[0]?.message?.tool_calls ?? []
+    await recordAiUsage(container, {
+      ...usage,
+      ...openRouterUsage(data),
+      request_chars: body.length,
+      tool_calls: calls.length,
+      duration_ms: Date.now() - started,
+      status: !res.ok || data.error ? "error" : "ok",
+      error: !res.ok || data.error ? data.error?.message ?? `HTTP ${res.status}` : null,
+    })
     if (!res.ok || data.error) {
       const detail = data.error?.message ?? `HTTP ${res.status}`
       if (res.status === 401) throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "OpenRouter rejected the API key. Check it in Integrations.")
@@ -214,7 +243,6 @@ async function openRouterTurn(
     }
     const message = data.choices?.[0]?.message
     if (!message) throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, "OpenRouter returned no answer")
-    const calls = message.tool_calls ?? []
     messages.push({ role: "assistant", content: message.content ?? null, ...(calls.length ? { tool_calls: calls } : {}) })
     if (message.content?.trim()) replies.push(message.content.trim())
     if (!calls.length) break

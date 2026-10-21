@@ -228,6 +228,8 @@ module.exports = defineConfig({
     { resolve: "./src/modules/integrations" },
     // WhatsApp messages and guest phone codes through Evolution API.
     { resolve: "./src/modules/whatsapp" },
+    // AI usage and cost per request (assistant, product drafts, images).
+    { resolve: "./src/modules/ai" },
     {
       // QuickBooks Online: optional; syncing starts once an admin connects.
       resolve: "./src/modules/quickbooks",

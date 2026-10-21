@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk"
 import { MedusaContainer } from "@medusajs/framework/types"
 import { MedusaError } from "@medusajs/framework/utils"
 
+import { AiTask, anthropicUsage, newRunId, openRouterUsage, recordAiUsage } from "../ai/usage"
 import { assistantSettings } from "../assistant/agent"
 
 // Model calls for creating products: text with the assistant's provider
@@ -9,8 +10,31 @@ import { assistantSettings } from "../assistant/agent"
 
 const openRouterBase = () => (process.env.OPENROUTER_BASE_URL ?? "https://openrouter.ai/api/v1").replace(/\/$/, "")
 
-async function openRouter<T>(key: string, path: string, init: { method?: string; body?: unknown; timeoutMs?: number } = {}) {
+type Track = { container: MedusaContainer; run_id: string; task: AiTask; model: string }
+
+/** One OpenRouter request; with `track`, its tokens and cost are recorded. */
+async function openRouter<T>(
+  key: string,
+  path: string,
+  init: { method?: string; body?: unknown; timeoutMs?: number; track?: Track } = {}
+) {
   let res: Response
+  const started = Date.now()
+  const request_chars = init.body ? JSON.stringify(init.body).length : 0
+  const record = (status: "ok" | "error", data?: unknown, error?: string) =>
+    init.track
+      ? recordAiUsage(init.track.container, {
+          run_id: init.track.run_id,
+          task: init.track.task,
+          provider: "openrouter",
+          model: init.track.model,
+          ...openRouterUsage(data),
+          request_chars,
+          duration_ms: Date.now() - started,
+          status,
+          error: error ?? null,
+        })
+      : Promise.resolve()
   try {
     res = await fetch(`${openRouterBase()}${path}`, {
       method: init.method ?? (init.body ? "POST" : "GET"),
@@ -24,9 +48,11 @@ async function openRouter<T>(key: string, path: string, init: { method?: string;
       signal: AbortSignal.timeout(init.timeoutMs ?? 180_000),
     })
   } catch (error) {
+    await record("error", undefined, (error as Error).message)
     throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, `OpenRouter unreachable: ${(error as Error).message}`)
   }
   const data = (await res.json().catch(() => ({}))) as T & { error?: { message?: string } }
+  await record(!res.ok || data.error ? "error" : "ok", data, !res.ok || data.error ? data.error?.message ?? `HTTP ${res.status}` : undefined)
   if (!res.ok || data.error) {
     if (res.status === 401) throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "OpenRouter rejected the API key. Check it in Integrations.")
     if (res.status === 402) throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "OpenRouter: not enough credits on the account.")
@@ -36,7 +62,13 @@ async function openRouter<T>(key: string, path: string, init: { method?: string;
 }
 
 /** One text completion with the provider chosen for the assistant. */
-export async function aiText(container: MedusaContainer, system: string, user: string): Promise<string> {
+export async function aiText(
+  container: MedusaContainer,
+  system: string,
+  user: string,
+  meta: { task: AiTask; runId?: string } = { task: "product_draft" }
+): Promise<string> {
+  const runId = meta.runId ?? newRunId()
   const s = await assistantSettings(container)
   if (!s.active) {
     throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "Set up the AI provider in Integrations ← المساعد الذكي first")
@@ -44,10 +76,13 @@ export async function aiText(container: MedusaContainer, system: string, user: s
   if (s.provider === "openrouter") {
     const data = await openRouter<{ choices?: { message?: { content?: string | null } }[] }>(s.apiKey, "/chat/completions", {
       body: { model: s.model, messages: [{ role: "system", content: system }, { role: "user", content: user }] },
+      track: { container, run_id: runId, task: meta.task, model: s.model },
     })
     return data.choices?.[0]?.message?.content ?? ""
   }
   const client = new Anthropic({ apiKey: s.apiKey })
+  const started = Date.now()
+  const base = { run_id: runId, task: meta.task, provider: "anthropic" as const, model: s.model, request_chars: system.length + user.length }
   try {
     // Long pages and two languages of copy: stream so the request does not time out.
     const message = await client.beta.messages
@@ -62,9 +97,13 @@ export async function aiText(container: MedusaContainer, system: string, user: s
         messages: [{ role: "user", content: user }],
       })
       .finalMessage()
+    await recordAiUsage(container, { ...base, ...anthropicUsage(message.usage), duration_ms: Date.now() - started, status: "ok" })
     if (message.stop_reason === "refusal") throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "The model declined this request.")
     return message.content.map((b) => (b.type === "text" ? b.text : "")).join("")
   } catch (error) {
+    if (error instanceof Anthropic.APIError) {
+      await recordAiUsage(container, { ...base, duration_ms: Date.now() - started, status: "error", error: error.message })
+    }
     if (error instanceof Anthropic.AuthenticationError) {
       throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "Anthropic rejected the API key. Check it in Integrations.")
     }
@@ -106,6 +145,7 @@ export async function aiEditImage(container: MedusaContainer, prompt: string, im
       n: 1,
       input_references: [{ type: "image_url", image_url: { url: `data:${image.type};base64,${image.bytes.toString("base64")}` } }],
     },
+    track: { container, run_id: newRunId(), task: "image_edit", model },
   })
   const out = data.data?.[0]
   if (!out?.b64_json) throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE, "The image model returned no image")
@@ -125,16 +165,29 @@ export async function aiStartVideo(container: MedusaContainer, prompt: string, i
         { type: "image_url", image_url: { url: `data:${image.type};base64,${image.bytes.toString("base64")}` }, frame_type: "first_frame" },
       ],
     },
+    // Submitting is free; the job's cost is recorded when it completes.
   })
   return { id: job.id, status: job.status }
 }
 
 export async function aiVideoStatus(container: MedusaContainer, id: string) {
-  const { key } = await mediaSettings(container, "video")
-  const job = await openRouter<{ id: string; status: VideoJob["status"]; error?: string | { message?: string } }>(
-    key,
-    `/videos/${encodeURIComponent(id)}`
-  )
+  const { key, model } = await mediaSettings(container, "video")
+  const job = await openRouter<{
+    id: string
+    status: VideoJob["status"]
+    error?: string | { message?: string }
+    usage?: { cost?: number }
+  }>(key, `/videos/${encodeURIComponent(id)}`)
+  if (job.status === "completed" || job.status === "failed") {
+    await recordAiUsage(container, {
+      run_id: `video_${id}`,
+      task: "video",
+      provider: "openrouter",
+      model,
+      cost_usd: typeof job.usage?.cost === "number" ? job.usage.cost : null,
+      status: job.status === "completed" ? "ok" : "error",
+    })
+  }
   return { id: job.id, status: job.status, error: typeof job.error === "string" ? job.error : job.error?.message }
 }
 

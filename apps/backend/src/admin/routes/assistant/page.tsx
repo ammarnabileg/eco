@@ -4,6 +4,7 @@ import { Button, Container, Heading, Text, Textarea, toast } from "@medusajs/ui"
 import { useMutation } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 
+import { AiUsagePanel } from "../../components/ai/usage-panel"
 import { sdk } from "../../lib/sdk"
 
 type Action = { tool: string; input: Record<string, unknown>; summary: string; signature: string }
@@ -107,6 +108,8 @@ const AssistantPage = () => {
           محادثة جديدة
         </Button>
       </Container>
+
+      <AiUsagePanel />
 
       <Container className="flex h-[calc(100vh-260px)] min-h-[420px] flex-col p-0">
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-ui-bg-subtle p-4">
