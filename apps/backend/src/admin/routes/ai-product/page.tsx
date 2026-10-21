@@ -80,6 +80,7 @@ const AiProductPage = () => {
   const [sku, setSku] = useState("")
   const [picked, setPicked] = useState<string[]>([])
   const [images, setImages] = useState<string[]>([])
+  const [imageLink, setImageLink] = useState("")
   const [publish, setPublish] = useState(false)
   const [created, setCreated] = useState<{ id: string; handle: string } | null>(null)
   const [video, setVideo] = useState<Video>(null)
@@ -125,10 +126,10 @@ const AiProductPage = () => {
   })
 
   const importImages = useMutation({
-    mutationFn: () =>
+    mutationFn: (urls: string[]) =>
       sdk.client.fetch<{ images: { source: string; url?: string; error?: string }[] }>("/admin/ai-products/images/import", {
         method: "POST",
-        body: { urls: picked, handle: draft!.handle },
+        body: { urls, handle: draft!.handle },
       }),
     onSuccess: ({ images: out }) => {
       const ok = out.filter((i) => i.url).map((i) => i.url as string)
@@ -136,6 +137,16 @@ const AiProductPage = () => {
       const failed = out.filter((i) => i.error).length
       if (failed) toast.warning(`${failed} صورة ما اتنسختش (الموقع رفض أو مش صورة)`)
       else toast.success(`اتنسخ ${ok.length} صورة`)
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
+  // Photos from the admin's computer go through Medusa's own upload endpoint.
+  const upload = useMutation({
+    mutationFn: (files: File[]) => sdk.admin.upload.create({ files }),
+    onSuccess: ({ files }) => {
+      setImages((prev) => [...prev, ...files.map((f) => f.url).filter((u) => !prev.includes(u))])
+      toast.success(`اترفع ${files.length} صورة`)
     },
     onError: (e: Error) => toast.error(e.message),
   })
@@ -446,14 +457,58 @@ const AiProductPage = () => {
               </div>
             ) : (
               <Text size="small" className="text-ui-fg-muted">
-                مفيش صور اتلاقت في الصفحة. ارفع الصور من صفحة المنتج بعد الحفظ.
+                مفيش صور اتلاقت في الصفحة. أضف رابط صورة أو ارفعها من جهازك تحت.
               </Text>
             )}
             {draft.images.length > 0 && (
-              <Button size="small" className="mt-2" disabled={!picked.length} isLoading={importImages.isPending} onClick={() => importImages.mutate()}>
+              <Button size="small" className="mt-2" disabled={!picked.length} isLoading={importImages.isPending} onClick={() => importImages.mutate(picked)}>
                 انسخ الصور المختارة ({picked.length})
               </Button>
             )}
+          </div>
+
+          <div className="flex flex-col gap-2 rounded-md border border-ui-border-base p-3">
+            <Heading level="h2">أضف صور بنفسك</Heading>
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                dir="ltr"
+                className="min-w-[280px] flex-1"
+                placeholder="https://... رابط صورة"
+                value={imageLink}
+                onChange={(e) => setImageLink(e.target.value)}
+              />
+              <Button
+                size="small"
+                variant="secondary"
+                disabled={!/^https:\/\/\S+$/.test(imageLink.trim())}
+                isLoading={importImages.isPending}
+                onClick={() => {
+                  importImages.mutate([imageLink.trim()])
+                  setImageLink("")
+                }}
+              >
+                أضف من الرابط
+              </Button>
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files ?? [])
+                    if (files.length) upload.mutate(files)
+                    e.target.value = ""
+                  }}
+                />
+                <span className="inline-flex h-8 items-center rounded-md border border-ui-border-base bg-ui-button-neutral px-3 text-sm shadow-buttons-neutral hover:bg-ui-button-neutral-hover">
+                  {upload.isPending ? "جاري الرفع…" : "ارفع من جهازك"}
+                </span>
+              </label>
+            </div>
+            <Text size="xsmall" className="text-ui-fg-muted">
+              JPG أو PNG أو WebP. الرابط لازم يكون صورة مباشرة (بيخلص بـ jpg/png/webp أو بيفتح الصورة لوحدها).
+            </Text>
           </div>
 
           <div>
