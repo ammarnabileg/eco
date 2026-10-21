@@ -21,7 +21,11 @@ jest.mock("../../src/workflows/ai-product/source", () => {
   const actual = jest.requireActual("../../src/workflows/ai-product/source")
   return {
     ...actual,
-    fetchPage: async (url: string) => ({ url, ...actual.extractPage((global as Record<string, unknown>).__MANUFACTURER_PAGE__ as string, url) }),
+    fetchPage: async (url: string) => {
+      const g = global as Record<string, unknown>
+      g.__PAGE_FETCHES__ = Number(g.__PAGE_FETCHES__ ?? 0) + 1
+      return { url, ...actual.extractPage(g.__MANUFACTURER_PAGE__ as string, url) }
+    },
   }
 })
 
@@ -214,9 +218,23 @@ medusaIntegrationTestRunner({
 
       // Product: draft from the manufacturer's page with no category chosen, then one update with answers.
       const draft1 = { name: "TP-Link Archer AX55", source_url: "https://www.tp-link.com/ae/archer-ax55/", price_kwd: 29.9 }
-      await api.post("/admin/ai-products/draft", draft1, admin)
-      await api.post("/admin/ai-products/draft", { ...draft1, notes: "هل تبيعه مع تركيب؟ نعم" }, admin)
-      const draft = await totals("product_draft")
+      const first = (await api.post("/admin/ai-products/draft", draft1, admin)).data.draft
+      // "Update with answers" as the admin page sends it: the first draft's text and category, no link.
+      await api.post(
+        "/admin/ai-products/draft",
+        { ...draft1, source_url: null, source_text: first.source_text, category_id: first.category_id, notes: "هل تبيعه مع تركيب؟ نعم" },
+        admin
+      )
+      expect((global as Record<string, unknown>).__PAGE_FETCHES__).toBe(1)
+      expect(first.source_text).toContain("Wireless Standards: IEEE 802.11ax")
+      const draftOnly = await totals("product_draft")
+      const category = await totals("product_category")
+      const draft = {
+        requests: draftOnly.requests + category.requests,
+        request_chars: draftOnly.request_chars + category.request_chars,
+        largest_request_chars: Math.max(draftOnly.largest_request_chars, category.largest_request_chars),
+        approx_input_tokens: draftOnly.approx_input_tokens + category.approx_input_tokens,
+      }
 
       console.log(`AI_BASELINE ${JSON.stringify({ chat, draft })}`)
     })

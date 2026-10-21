@@ -1,4 +1,4 @@
-import { assertPublicUrl, extractPage } from "../source"
+import { assertPublicUrl, extractPage, focusedText } from "../source"
 
 describe("extractPage", () => {
   const html = `<html><head><title>Archer AX55 | TP-Link</title>
@@ -31,5 +31,43 @@ describe("assertPublicUrl", () => {
     await expect(assertPublicUrl("https://127.0.0.1/x")).rejects.toThrow("not allowed")
     await expect(assertPublicUrl("https://192.168.1.10/x")).rejects.toThrow("not allowed")
     await expect(assertPublicUrl("https://[::1]/x")).rejects.toThrow("not allowed")
+  })
+})
+
+describe("focusedText", () => {
+  const page = `<html><head>
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"TP-Link"},
+      {"@type":"Product","name":"Archer AX55","model":"Archer AX55","brand":{"@type":"Brand","name":"TP-Link"},
+       "additionalProperty":[{"@type":"PropertyValue","name":"Ethernet Ports","value":"4","unitText":"x Gigabit"}]}]}</script>
+    <script>var tracking = "<p>Tracking text</p>"</script></head><body>
+    <header><a href="/">Home</a><a href="/routers">All routers</a></header>
+    <nav>${Array.from({ length: 50 }, (_, i) => `<a>Menu link ${i}</a>`).join("")}</nav>
+    <main><h1>Archer AX55</h1><p>AX3000 Dual-Band Wi-Fi 6 Router</p>
+      <table><tr><th>Wireless Standards</th><td>IEEE 802.11ax</td></tr><tr><th>Processor</th><td>1.5 GHz Tri-Core CPU</td></tr></table>
+      <dl><dt>USB</dt><dd>1× USB 3.0</dd></dl>
+      <div class="related-products"><h3>Archer AX73</h3><p>Another router</p></div>
+      <p>AX3000 Dual-Band Wi-Fi 6 Router</p></main>
+    <footer>Privacy policy · Terms</footer></body></html>`
+  const text = focusedText(page)
+
+  it("puts structured data and specification rows first", () => {
+    expect(text.indexOf("## STRUCTURED DATA")).toBe(0)
+    expect(text).toContain("brand: TP-Link")
+    expect(text).toContain("Ethernet Ports: 4 x Gigabit")
+    expect(text).toContain("Wireless Standards: IEEE 802.11ax")
+    expect(text).toContain("USB: 1× USB 3.0")
+    expect(text.indexOf("## SPECIFICATIONS")).toBeLessThan(text.indexOf("## PAGE TEXT"))
+  })
+
+  it("leaves out menus, header, footer, related products, scripts and repeats", () => {
+    for (const noise of ["Menu link", "All routers", "Privacy policy", "Archer AX73", "Tracking text"]) expect(text).not.toContain(noise)
+    expect(text.match(/AX3000 Dual-Band Wi-Fi 6 Router/g)).toHaveLength(1)
+  })
+
+  it("stays within the size limit on huge pages", () => {
+    const huge = `<main>${Array.from({ length: 5000 }, (_, i) => `<p>Marketing paragraph number ${i} that keeps going.</p>`).join("")}</main>`
+    const out = focusedText(huge)
+    expect(out.length).toBeGreaterThan(11_000)
+    expect(out.length).toBeLessThanOrEqual(12_000)
   })
 })

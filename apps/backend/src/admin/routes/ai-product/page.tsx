@@ -28,6 +28,7 @@ type Content = {
 }
 type Draft = {
   source: { url: string; title: string } | null
+  source_text: string
   images: string[]
   category_id: string | null
   brand: { id: string; name: string } | null
@@ -98,27 +99,36 @@ const AiProductPage = () => {
     queryFn: () => sdk.client.fetch<{ addon_groups: { id: string; name_ar: string; kind?: string | null }[] }>("/admin/catalog/addon-groups"),
   })
 
+  // An update with answers reuses the page text and category of the first
+  // draft: the manufacturer's page is not fetched or read again.
   const runDraft = useMutation({
-    mutationFn: (notes: string) =>
+    mutationFn: ({ notes, update }: { notes: string; update: boolean }) =>
       sdk.client.fetch<{ draft: Draft }>("/admin/ai-products/draft", {
         method: "POST",
         body: {
           name: info.name,
           brand: info.brand || null,
-          category_id: info.category_id || null,
-          source_url: info.source_url || null,
-          source_text: info.source_text || null,
+          category_id: (update ? draft?.category_id : info.category_id) || null,
+          source_url: update ? null : info.source_url || null,
+          source_text: (update ? draft?.source_text : info.source_text) || null,
           price_kwd: info.price_kwd ? Number(info.price_kwd) : null,
           notes: notes || null,
         },
       }),
-    onSuccess: ({ draft }) => {
-      setDraft(draft)
-      setAddons(draft.addon_group_ids)
-      setPicked(draft.images.slice(0, 6))
-      if (draft.variants) {
+    onSuccess: ({ draft: next }, { update }) => {
+      if (update && draft) {
+        // Keep the page, its photos and the admin's choices; take the new copy.
+        setDraft({ ...next, source: draft.source, images: draft.images, source_text: draft.source_text })
+        toast.success("المحتوى اتحدّث بالإجابات")
+        return
+      }
+      const draft_ = next
+      setDraft(draft_)
+      setAddons(draft_.addon_group_ids)
+      setPicked(draft_.images.slice(0, 6))
+      if (draft_.variants) {
         setUseVariants(true)
-        setVariants(draft.variants.values.map((value) => ({ value, price: info.price_kwd, sku: "" })))
+        setVariants(draft_.variants.values.map((value) => ({ value, price: info.price_kwd, sku: "" })))
       }
       setStep(1)
     },
@@ -332,7 +342,7 @@ const AiProductPage = () => {
             </Field>
           </div>
           <div className="md:col-span-2 flex justify-end">
-            <Button disabled={info.name.trim().length < 2 || !(Number(info.price_kwd) > 0)} isLoading={runDraft.isPending} onClick={() => runDraft.mutate(info.notes)}>
+            <Button disabled={info.name.trim().length < 2 || !(Number(info.price_kwd) > 0)} isLoading={runDraft.isPending} onClick={() => runDraft.mutate({ notes: info.notes, update: false })}>
               اكتب المنتج بالذكاء الاصطناعي
             </Button>
           </div>
@@ -419,7 +429,7 @@ const AiProductPage = () => {
                 className="self-start"
                 disabled={!answered.length}
                 isLoading={runDraft.isPending}
-                onClick={() => runDraft.mutate([info.notes, ...answered].filter(Boolean).join("\n"))}
+                onClick={() => runDraft.mutate({ notes: [info.notes, ...answered].filter(Boolean).join("\n"), update: true })}
               >
                 حدّث المحتوى بالإجابات
               </Button>

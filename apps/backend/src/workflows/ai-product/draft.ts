@@ -61,7 +61,6 @@ const OUTPUT = `{
   "handle": "latin-lowercase-words-with-dashes",
   "mpn": "official model number or null",
   "warranty_months": null,
-  "category_id": "<one id from CATEGORIES or null>",
   "brand": "<brand name>",
   "addon_group_ids": ["<ids from ADDON_GROUPS that fit>"],
   "variants": null,
@@ -89,7 +88,7 @@ export async function draftProduct(container: MedusaContainer, input: DraftInput
   const sourceText = [page ? `Page: ${page.url}\nTitle: ${page.title}\n\n${page.text}` : "", input.source_text?.trim() ?? ""]
     .filter(Boolean)
     .join("\n\n---\n\n")
-    .slice(0, 80_000)
+    .slice(0, 30_000)
 
   const [{ data: categories }, brands, addonGroups] = await Promise.all([
     query.graph({ entity: "product_category", fields: ["id", "name", "handle", "parent_category_id"], pagination: { take: 400 } }),
@@ -101,16 +100,37 @@ export async function draftProduct(container: MedusaContainer, input: DraftInput
   // Spec fields of the chosen category (or, after the model picks one, of that one).
   const fieldsOf = async (categoryId: string | null) =>
     categoryId ? ((await attributesByCategory(query, [categoryId])).get(categoryId) ?? []) : []
+  const runId = newRunId()
   let categoryId = categoryRows.some((c) => c.id === input.category_id) ? (input.category_id as string) : null
-  let attributes: SpecAttribute[] = await fieldsOf(categoryId)
+  // No category chosen: a small separate request picks one from the name and
+  // the start of the page, so the long page is sent once, with the right specs.
+  if (!categoryId && categoryRows.length) {
+    const pick = parseJsonObject(
+      await aiText(
+        container,
+        'You file products into a store\'s categories. Answer with JSON only: {"category_id": "<id from the list, or null>"}.',
+        [
+          `PRODUCT: ${input.name}${input.brand ? ` (${input.brand})` : ""}`,
+          page?.title ? `PAGE TITLE: ${page.title}` : "",
+          `CATEGORIES (id: name): ${categoryRows.map((c) => `${c.id}: ${c.name}`).join(" | ")}`,
+          sourceText ? `START OF SOURCE:\n${sourceText.slice(0, 1500)}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+        { task: "product_category", runId }
+      )
+    )
+    const picked = str(pick.category_id, 100)
+    if (categoryRows.some((c) => c.id === picked)) categoryId = picked
+  }
+  const attributes: SpecAttribute[] = await fieldsOf(categoryId)
 
   const prompt = (attrs: SpecAttribute[]) =>
     [
       `PRODUCT: ${input.name}`,
       input.brand ? `BRAND: ${input.brand}` : "",
       input.notes ? `STORE NOTES: ${input.notes}` : "",
-      `CATEGORIES (id: name): ${categoryRows.map((c) => `${c.id}: ${c.name}`).join(" | ")}`,
-      categoryId ? `CHOSEN CATEGORY: ${categoryId}` : "Pick the best category_id from CATEGORIES.",
+      categoryId ? `CATEGORY: ${categoryRows.find((c) => c.id === categoryId)?.name}` : "CATEGORY: none fits; leave category_id null.",
       `SPEC_FIELDS: ${JSON.stringify(
         attrs.map((a) => ({ key: a.key, label: a.label_en, type: a.type, unit: a.unit ?? undefined, options: a.options?.map((o) => o.value) }))
       )}`,
@@ -122,18 +142,7 @@ export async function draftProduct(container: MedusaContainer, input: DraftInput
       .filter(Boolean)
       .join("\n\n")
 
-  const runId = newRunId()
-  let out = parseJsonObject(await aiText(container, SYSTEM, prompt(attributes), { task: "product_draft", runId }))
-
-  // The model chose the category: write the specs again with that category's fields.
-  const suggested = str(out.category_id, 100)
-  if (!categoryId && categoryRows.some((c) => c.id === suggested)) {
-    categoryId = suggested
-    attributes = await fieldsOf(categoryId)
-    if (attributes.length && sourceText) {
-      out = parseJsonObject(await aiText(container, SYSTEM, prompt(attributes), { task: "product_draft", runId }))
-    }
-  }
+  const out = parseJsonObject(await aiText(container, SYSTEM, prompt(attributes), { task: "product_draft", runId }))
 
   const notes: string[] = []
   const { specs, errors } = validateSpecs(attributes, (out.specs && typeof out.specs === "object" ? out.specs : {}) as Record<string, unknown>)
@@ -149,6 +158,8 @@ export async function draftProduct(container: MedusaContainer, input: DraftInput
 
   return {
     source: page ? { url: page.url, title: page.title } : null,
+    // Sent back as source_text with "update with answers", so the page is not fetched again.
+    source_text: sourceText,
     images: page?.images ?? [],
     category_id: categoryId,
     brand: brand ? { id: brand.id, name: brand.name } : null,

@@ -56,3 +56,27 @@ About 47,000 of the remaining 67,000 characters are the system instructions and 
 request), which every request needs. They are the identical start of every request, the part providers cache
 automatically. Whether and how much OpenRouter's DeepSeek caches them shows in `cached_tokens` in the usage table
 after deployment; the scripted test cannot measure it.
+
+## Phase 3: product drafts
+- **The page reader sends a focused text** (`focusedText` in `workflows/ai-product/source.ts`), at most 12,000
+  characters, in this order:
+  1. schema.org Product data (JSON-LD);
+  2. specification tables and definition lists as "key: value" lines;
+  3. the readable main text.
+  - Left out: menus, header, footer, related products, sidebars, cookie banners, scripts, and repeated lines.
+  - The whole source sent to the model is capped at 30,000 characters (was 80,000).
+- **Choosing the category is a small separate request** (`product_category`): product name, page title, the first
+  1,500 characters, and the category list. The page is then written up once, with that category's spec fields.
+  Before, it was written up twice.
+- **The draft returns its `source_text`.** "Update with answers" sends it back with the chosen category and no link,
+  so the page is not fetched or re-read, and no category request is made. The page, its photos and the admin's
+  choices are kept.
+- **Output is not limited:** the full Arabic and English copy, FAQ and SEO are still asked for.
+
+| Scenario | Requests | Characters sent | Largest request | ≈ input tokens |
+|---|---:|---:|---:|---:|
+| Product draft + 1 update — before | 4 | 134,704 | 33,798 | 33,678 |
+| Product draft + 1 update — after | 3 | 19,269 | 8,687 | 4,818 |
+
+**Result:** −86% characters sent. The page is fetched once (checked in the test), and the specification rows still
+reach the model (checked).
