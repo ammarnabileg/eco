@@ -1,14 +1,23 @@
 import { getLocale, getT } from "@i18n/server"
-import type { TrustBadge } from "@lib/data/content"
+import { getStoreContent, TrustBadge } from "@lib/data/content"
 import { productBrand, productDetail, SpecGroup } from "@lib/util/catalog"
 import { localize } from "@lib/util/localize"
 import { HttpTypes } from "@medusajs/types"
 import Icon, { isIconName } from "@modules/laly/components/icon"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ProductSpecs from "@modules/products/components/product-specs"
+import ProductTabs, {
+  ProductTab,
+} from "@modules/products/components/product-tabs"
 import { productText } from "@modules/products/lib/product-text"
 
-// Description, specifications, and the store's commitments (warranty,
-// returns, delivery) taken from the admin-managed trust badges.
+// Policy pages linked from the warranty tab, once published in the admin.
+const POLICY_PAGES = ["warranty", "shipping-policy", "return-policy"]
+
+// The product's tabs: overview (description, highlights, FAQ),
+// specifications, what is in the box (only when entered), and the store's
+// commitments (warranty, returns, delivery) from the admin-managed trust
+// badges plus links to the published policy pages.
 export default async function ProductDetails({
   product,
   badges,
@@ -18,8 +27,15 @@ export default async function ProductDetails({
   badges: TrustBadge[]
   specGroups?: SpecGroup[]
 }) {
-  const [t, locale] = await Promise.all([getT(), getLocale()])
-  const description = productText(product, locale).description
+  const [t, locale, { pages = [] }] = await Promise.all([
+    getT(),
+    getLocale(),
+    getStoreContent(),
+  ])
+  const { description, highlights, boxContents } = productText(product, locale)
+  const policies = POLICY_PAGES.flatMap((slug) =>
+    pages.filter((p) => p.slug === slug)
+  )
   const metadata = (product.metadata ?? {}) as Record<string, unknown>
   const detail = productDetail(product)
   const variant =
@@ -68,25 +84,82 @@ export default async function ProductDetails({
       typeof s.value === "string" && !!s.value
   )
 
-  const sections = [
-    description && {
-      id: "description",
-      title: t("product.section_description"),
+  const faq = detail?.faq?.length ? (
+    <section className="flex flex-col gap-1">
+      <h2 className="text-base font-extrabold">{t("product.section_faq")}</h2>
+      <div
+        className="flex flex-col divide-y divide-laly-line"
+        data-testid="product-faq"
+      >
+        {detail.faq.map((f, i) => (
+          <details key={i} className="group/faq py-3">
+            <summary className="flex items-start justify-between gap-3 cursor-pointer list-none text-sm font-bold">
+              {localize(f, "question", locale)}
+              <span
+                aria-hidden="true"
+                className="shrink-0 text-laly-teal text-lg leading-none group-open/faq:rotate-45 transition-transform"
+              >
+                +
+              </span>
+            </summary>
+            <p className="mt-2 text-sm leading-7 text-laly-mut whitespace-pre-line">
+              {localize(f, "answer", locale)}
+            </p>
+          </details>
+        ))}
+      </div>
+    </section>
+  ) : null
+
+  const tabs = [
+    (description || highlights.length > 0 || faq) && {
+      id: "overview",
+      title: t("product.tab_overview"),
       body: (
-        <p
-          className="whitespace-pre-line leading-8 text-laly-mut"
-          data-testid="product-description"
-        >
-          {description}
-        </p>
+        <div className="flex flex-col gap-6">
+          {highlights.length > 0 && (
+            <section>
+              <h2 className="sr-only">{t("product.section_highlights")}</h2>
+              <ul
+                className="grid gap-2 text-sm"
+                data-testid="product-highlights"
+              >
+                {highlights.map((h) => (
+                  <li key={h} className="flex items-start gap-2">
+                    <Icon
+                      name="check"
+                      size={16}
+                      className="mt-0.5 shrink-0 text-laly-teal"
+                    />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          {description && (
+            <section>
+              <h2 className="sr-only">{t("product.section_description")}</h2>
+              <p
+                className="whitespace-pre-line leading-8 text-laly-mut"
+                data-testid="product-description"
+              >
+                {description}
+              </p>
+            </section>
+          )}
+          {faq}
+        </div>
       ),
     },
     (specGroups.length > 0 || specs.length > 0) && {
       id: "specs",
-      title: t("product.section_specs"),
+      title: t("product.tab_specs"),
       body: (
         <div className="flex flex-col gap-5">
-          {specGroups.length > 0 && <ProductSpecs groups={specGroups} locale={locale} />}
+          {specGroups.length > 0 && (
+            <ProductSpecs groups={specGroups} locale={locale} />
+          )}
           {specs.length > 0 && (
             <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 text-sm">
               {specs.map((s) => (
@@ -102,73 +175,85 @@ export default async function ProductDetails({
         </div>
       ),
     },
-    !!detail?.faq?.length && {
-      id: "faq",
-      title: t("product.section_faq"),
+    boxContents.length > 0 && {
+      id: "box",
+      title: t("product.tab_box"),
       body: (
-        <div
-          className="flex flex-col divide-y divide-laly-line"
-          data-testid="product-faq"
+        <ul
+          className="grid gap-2 small:grid-cols-2 text-sm"
+          data-testid="product-box-contents"
         >
-          {detail.faq.map((f, i) => (
-            <details key={i} className="group/faq py-3">
-              <summary className="flex items-start justify-between gap-3 cursor-pointer list-none text-sm font-bold">
-                {localize(f, "question", locale)}
-                <span
-                  aria-hidden="true"
-                  className="shrink-0 text-laly-teal text-lg leading-none group-open/faq:rotate-45 transition-transform"
-                >
-                  +
-                </span>
-              </summary>
-              <p className="mt-2 text-sm leading-7 text-laly-mut whitespace-pre-line">
-                {localize(f, "answer", locale)}
-              </p>
-            </details>
-          ))}
-        </div>
-      ),
-    },
-    badges.length > 0 && {
-      id: "service",
-      title: t("product.section_service"),
-      body: (
-        <ul className="grid gap-3">
-          {badges.map((b) => (
-            <li key={b.id} className="flex items-center gap-3">
-              <span className="w-9 h-9 rounded-[10px] bg-laly-teal-soft text-laly-teal flex items-center justify-center shrink-0">
-                <Icon name={isIconName(b.icon) ? b.icon : "check"} size={18} />
-              </span>
-              <span>
-                <span className="block text-sm font-bold">
-                  {localize(b, "title", locale)}
-                </span>
-                <span className="block text-xs text-laly-mut">
-                  {localize(b, "subtitle", locale)}
-                </span>
-              </span>
+          {boxContents.map((item, i) => (
+            <li
+              key={`${i}-${item}`}
+              className="flex items-center gap-2.5 rounded-[12px] bg-laly-bg px-3 py-2.5"
+            >
+              <Icon
+                name="check"
+                size={16}
+                className="shrink-0 text-laly-teal"
+              />
+              <span dir="auto">{item}</span>
             </li>
           ))}
         </ul>
       ),
     },
-  ].filter(Boolean) as { id: string; title: string; body: React.ReactNode }[]
+    (badges.length > 0 || policies.length > 0) && {
+      id: "service",
+      title: t("product.tab_service"),
+      body: (
+        <div className="flex flex-col gap-5">
+          {badges.length > 0 && (
+            <ul className="grid gap-3 small:grid-cols-2">
+              {badges.map((b) => (
+                <li key={b.id} className="flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-[10px] bg-laly-teal-soft text-laly-teal flex items-center justify-center shrink-0">
+                    <Icon
+                      name={isIconName(b.icon) ? b.icon : "check"}
+                      size={18}
+                    />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-bold">
+                      {localize(b, "title", locale)}
+                    </span>
+                    <span className="block text-xs text-laly-mut">
+                      {localize(b, "subtitle", locale)}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {policies.length > 0 && (
+            <nav aria-label={t("product.policy_links_label")}>
+              <ul
+                className="flex flex-wrap gap-2 text-sm"
+                data-testid="product-policy-links"
+              >
+                {policies.map((p) => (
+                  <li key={p.slug}>
+                    <LocalizedClientLink
+                      href={`/${p.slug}`}
+                      className="inline-flex items-center gap-1 rounded-full border border-laly-line px-3 py-1.5 font-bold text-laly-teal hover:bg-laly-teal-soft"
+                    >
+                      {localize(p, "title", locale)}
+                      <Icon
+                        name="chevr"
+                        size={14}
+                        className="rtl:-scale-x-100"
+                      />
+                    </LocalizedClientLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </div>
+      ),
+    },
+  ].filter(Boolean) as ProductTab[]
 
-  return (
-    <div className="bg-white border border-laly-line rounded-card divide-y divide-laly-line">
-      {sections.map((s, i) => (
-        <details key={s.id} open={i === 0} className="group">
-          <summary className="flex items-center justify-between cursor-pointer list-none px-5 py-4 font-extrabold">
-            {s.title}
-            <Icon
-              name="chevr"
-              size={18}
-              className="rotate-90 group-open:-rotate-90 transition-transform text-laly-mut"
-            />
-          </summary>
-          <div className="px-5 pb-5">{s.body}</div>
-        </details>
-      ))}
-    </div>
-  )
+  return <ProductTabs tabs={tabs} label={t("product.tabs_label")} />
 }

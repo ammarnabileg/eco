@@ -11,6 +11,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import MapPin from "@modules/common/icons/map-pin"
+import { ChatBubbleLeftRight } from "@medusajs/icons"
 import Package from "@modules/common/icons/package"
 import User from "@modules/common/icons/user"
 
@@ -115,6 +116,15 @@ const AccountNav = ({
                   </LocalizedClientLink>
                 </li>
                 <li>
+                  <LocalizedClientLink href="/account/support" className={mobileRowClass} data-testid="support-link">
+                    <div className="flex items-center gap-x-3">
+                      <ChatBubbleLeftRight />
+                      <span>{t("aftersales.nav_my_requests")}</span>
+                    </div>
+                    {forwardChevron}
+                  </LocalizedClientLink>
+                </li>
+                <li>
                   <button
                     type="button"
                     className={clx(mobileRowClass, "text-laly-red")}
@@ -178,6 +188,12 @@ const AccountNav = ({
                 >
                   <Package size={18} />
                   {t("account.orders")}
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink href="/account/support" route={route!} data-testid="support-link">
+                  <ChatBubbleLeftRight />
+                  {t("aftersales.nav_my_requests")}
                 </AccountNavLink>
               </li>
               <li className="border-t border-laly-line mt-2 pt-2">

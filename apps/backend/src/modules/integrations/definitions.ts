@@ -149,6 +149,13 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     description: "اشتري الآن وادفع لاحقاً على 4 دفعات.",
     docs: "docs/PAYMENTS.md",
     fields: [
+      {
+        key: "instalments",
+        label: "عدد الأقساط (للعرض في كروت المنتجات)",
+        type: "text",
+        default: "4",
+        help: "بيظهر للعميل: «قسّطها على N دفعات». لازم يطابق عقدك مع Taly.",
+      },
       { key: "username", label: "Username", type: "text", required: true, env: "TALY_USERNAME" },
       { key: "password", label: "Password", type: "secret", required: true, env: "TALY_PASSWORD" },
       {
@@ -168,6 +175,12 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     description: "تقسيط بدون فوائد. Deema تشترط ظهور الـ Widget في صفحة المنتج قبل التفعيل.",
     docs: "docs/PAYMENTS.md",
     fields: [
+      {
+        key: "instalments",
+        label: "عدد الأقساط (للعرض في كروت المنتجات)",
+        type: "text",
+        help: "فاضي = سطر Deema ما يظهرش في الكروت. اكتب العدد اللي في عقدك مع Deema.",
+      },
       { key: "api_key", label: "API Key", type: "secret", required: true, env: "DEEMA_API_KEY" },
       {
         key: "base_url",

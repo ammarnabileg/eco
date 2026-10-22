@@ -51,5 +51,8 @@
   "page_number": "Page {number}",
   "pagination": "Pagination",
   "search_placeholder": "Search for a product",
-  "clear_search": "Clear search"
+  "clear_search": "Clear search",
+  "bnpl_card": "Split in {count} payments — {amount}",
+  "bnpl_with_taly": "with Taly",
+  "bnpl_with_deema": "with Deema"
 }

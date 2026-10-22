@@ -1,10 +1,15 @@
 "use client"
 
 import type { Hit } from "instantsearch.js"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useHits, useInstantSearch } from "react-instantsearch"
 
-import { useT } from "@i18n/client"
+import { intlLocale } from "@i18n/config"
+import { useLocale, useT } from "@i18n/client"
+import { getListingBnpl } from "@lib/data/bnpl"
+import { BnplListing, EMPTY_BNPL_LISTING, bnplOffer } from "@lib/data/bnpl-offer"
+import { convertToLocale } from "@lib/util/money"
+import BnplLine from "@modules/laly/components/product-card/bnpl-line"
 import useSearchSettled from "@lib/hooks/use-search-settled"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
@@ -32,16 +37,23 @@ const HitCard = ({
   hit,
   currencyCode,
   priority,
+  bnpl,
 }: {
   hit: ProductHit
   currencyCode: string
   priority: boolean
+  bnpl: BnplListing
 }) => {
   const t = useT()
+  const locale = intlLocale(useLocale())
   const href = `/products/${hit.handle}`
-  const discount = hit.price_on_request
-    ? null
-    : getHitPricing(hit, currencyCode)?.discount
+  const pricing = hit.price_on_request ? null : getHitPricing(hit, currencyCode)
+  const discount = pricing?.discount
+  // A price range has no single instalment amount: no line then.
+  const instalment =
+    pricing && !pricing.isRange
+      ? bnplOffer(bnpl, hit.objectID, pricing.min_price, currencyCode)
+      : null
 
   return (
     <article
@@ -107,6 +119,20 @@ const HitCard = ({
           ) : (
             <HitPrice hit={hit} currencyCode={currencyCode} />
           )}
+          {instalment && pricing && (
+            <BnplLine
+              gateway={instalment.gateway}
+              text={t("catalog.bnpl_card", {
+                count: instalment.instalments,
+                amount: convertToLocale({
+                  amount: instalment.amount,
+                  currency_code: pricing.currency_code,
+                  locale,
+                }),
+              })}
+              providerLabel={t(`catalog.bnpl_with_${instalment.gateway}`)}
+            />
+          )}
         </div>
       </div>
     </article>
@@ -136,6 +162,24 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
     currentPage !== settled.current.page
 
   const showSkeleton = hasNoResultsYet || (isSearching && isPagingOnly)
+
+  // Instalment eligibility for the whole page of hits in one request,
+  // refreshed when the page of results changes.
+  const pageIds = items
+    .filter((h) => h.handle && !h.price_on_request)
+    .map((h) => h.objectID)
+    .join(",")
+  const [bnpl, setBnpl] = useState<BnplListing>(EMPTY_BNPL_LISTING)
+  useEffect(() => {
+    if (!pageIds) return
+    let current = true
+    getListingBnpl(pageIds.split(","))
+      .then((listing) => current && setBnpl(listing))
+      .catch(() => undefined)
+    return () => {
+      current = false
+    }
+  }, [pageIds])
 
   if (status === "error") {
     return (
@@ -184,6 +228,7 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
                   hit={hit}
                   currencyCode={currencyCode}
                   priority={index < 4}
+                  bnpl={bnpl}
                 />
               </li>
             ) : null

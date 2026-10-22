@@ -11,7 +11,16 @@ import { useT } from "@i18n/client"
 // a back arrow and its own title, like the phone design.
 const ROOTS = ["/", "/categories", "/cart", "/account"]
 
-export default function MobileBar({ logo, search }: { logo: ReactNode; search: ReactNode }) {
+export default function MobileBar({
+  logo,
+  search,
+  searchButton,
+}: {
+  logo: ReactNode
+  search: ReactNode
+  /** Search icon alone, for inner screens (back + title + search). */
+  searchButton?: ReactNode
+}) {
   const t = useT()
   const pathname = usePathname()
   const router = useRouter()
@@ -50,6 +59,7 @@ export default function MobileBar({ logo, search }: { logo: ReactNode; search: R
         <Icon name="arrowr" size={22} className="ltr:-scale-x-100" />
       </button>
       <p className="flex-1 min-w-0 truncate text-[16px] font-extrabold"><bdi>{title}</bdi></p>
+      {searchButton && <div className="shrink-0 -me-2">{searchButton}</div>}
     </>
   )
 }

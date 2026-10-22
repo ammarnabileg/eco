@@ -37,6 +37,9 @@ import { guardOtpComplete, guardOtpSession } from "./store/carts/otp-guard"
 import { SendInboxMessage, SendOtp, SendProducts, TestWhatsapp, VerifyOtp } from "./store/whatsapp/validators"
 import { AddConfiguredItem, CreateInstallRequest, CreateQuoteRequest } from "./store/catalog/validators"
 import { rateLimit } from "./utils/rate-limit"
+import { UpdateAfterSalesRequest } from "./admin/after-sales-requests/validators"
+import { CreateAfterSalesRequest } from "./store/after-sales-requests/validators"
+import { RequestTracking, VerifyTracking } from "./store/track-order/validators"
 
 // Request them as stars: +brand.*,+product_detail.*,+addon_groups.options.*
 const CATALOG_PRODUCT_FIELDS = ["brand", "product_detail", "addon_groups", "addon_groups.options"]
@@ -159,6 +162,41 @@ export default defineMiddlewares({
         validateAndTransformBody(CreateInstallRequest),
       ],
     },
+    // Guest order tracking and after-sales requests (see workflows/after-sales).
+    {
+      method: ["POST"],
+      matcher: "/store/track-order",
+      middlewares: [
+        rateLimit("track-order", 10, 15 * 60 * 1000),
+        authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true }),
+        validateAndTransformBody(RequestTracking),
+      ],
+    },
+    {
+      method: ["GET"],
+      matcher: "/store/track-order",
+      middlewares: [rateLimit("track-order-view", 60, 15 * 60 * 1000)],
+    },
+    {
+      method: ["POST"],
+      matcher: "/store/track-order/verify",
+      middlewares: [rateLimit("track-verify", 15, 15 * 60 * 1000), validateAndTransformBody(VerifyTracking)],
+    },
+    {
+      method: ["POST"],
+      matcher: "/store/after-sales-requests",
+      middlewares: [
+        rateLimit("after-sales", 5, 60 * 60 * 1000),
+        authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true }),
+        validateAndTransformBody(CreateAfterSalesRequest),
+      ],
+    },
+    {
+      method: ["GET"],
+      matcher: "/store/customers/me/support-requests",
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    body("/admin/after-sales-requests/:id", UpdateAfterSalesRequest),
     {
       method: ["POST"],
       matcher: "/store/payment-collections/:id/payment-sessions",

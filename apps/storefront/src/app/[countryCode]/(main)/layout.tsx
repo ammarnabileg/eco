@@ -10,6 +10,7 @@ import Nav from "@modules/layout/templates/nav"
 import BottomNav from "@modules/laly/components/bottom-nav"
 import WhatsAppButton from "@modules/laly/components/whatsapp-button"
 import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge"
+import CompareTray from "@modules/tools/components/compare-tray"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -45,6 +46,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
       <div aria-hidden className="small:hidden h-[calc(84px+env(safe-area-inset-bottom))]" />
       <Footer />
       <WhatsAppButton />
+      <CompareTray />
       <BottomNav
         cartCount={cart?.items?.reduce((n, item) => n + item.quantity, 0) ?? 0}
       />

@@ -22,6 +22,7 @@ import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-relat
 import { productText } from "@modules/products/lib/product-text"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
+import ProductToolButtons from "@modules/tools/components/product-tools"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -58,7 +59,6 @@ export default async function ProductTemplate({
   const brand =
     productBrand(product)?.name ??
     (product.metadata as Record<string, unknown> | null)?.brand
-  const highlights = text.highlights
   const offer = offerEndsAt ? (
     <div className="self-start">
       <Countdown endsAt={offerEndsAt} label={t("product.offer_ends_in")} />
@@ -122,23 +122,7 @@ export default async function ProductTemplate({
       {text.subtitle && (
         <p className="text-sm text-laly-mut">{text.subtitle}</p>
       )}
-      {highlights.length > 0 && (
-        <ul
-          className="mt-1 grid gap-1.5 text-sm"
-          data-testid="product-highlights"
-        >
-          {highlights.map((h) => (
-            <li key={h} className="flex items-start gap-2">
-              <Icon
-                name="check"
-                size={16}
-                className="mt-0.5 shrink-0 text-laly-teal"
-              />
-              <span>{h}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ProductToolButtons productId={product.id} variant="full" />
       {offer}
     </div>
   )

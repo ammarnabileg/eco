@@ -65,7 +65,7 @@ export default async function Nav() {
               <LocaleSwitch variant="text" />
             </Suspense>
             <LocalizedClientLink
-              href="/account/orders"
+              href="/track-order"
               className="flex items-center gap-1.5 hover:text-white"
             >
               <Icon name="truck" size={14} className="opacity-75" />
@@ -82,6 +82,7 @@ export default async function Nav() {
             <div className="small:hidden flex flex-1 min-w-0 items-center gap-2">
               <MobileBar
                 logo={<Logo inverted withTagline={false} />}
+                searchButton={<Search categories={searchCategories} brands={searchBrands} />}
                 search={
                   <div className="flex items-center gap-1">
                     <Suspense>

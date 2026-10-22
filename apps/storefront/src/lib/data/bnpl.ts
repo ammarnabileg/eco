@@ -2,6 +2,9 @@
 
 import { sdk } from "@lib/config"
 
+import { fetchBnplListing } from "./bnpl-batch"
+import type { BnplListing } from "./bnpl-offer"
+
 // Instalment eligibility decided by the backend (product and category
 // settings in the admin). Failing closed: on error nothing is eligible.
 
@@ -17,6 +20,13 @@ export const getProductBnpl = async (productId: string): Promise<BnplEligibility
     })
     .then((r) => r.products[productId] ?? NONE)
     .catch(() => NONE)
+
+/**
+ * Eligibility and gateway terms for a page of search hits, for client
+ * listings: one call per page of results.
+ */
+export const getListingBnpl = async (productIds: string[]): Promise<BnplListing> =>
+  fetchBnplListing(productIds.slice(0, 100))
 
 export const getCartBnpl = async (cartId: string): Promise<BnplEligibility> =>
   sdk.client

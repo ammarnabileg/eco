@@ -19,6 +19,12 @@ export function productText(product: HttpTypes.StoreProduct, locale: Locale) {
   const highlightsAr = (detail?.highlights_ar ?? []).filter(filled)
   const highlightsEn = (detail?.highlights_en ?? []).filter(filled)
 
+  // box_contents_* are newer than the shared ProductDetail type: read them defensively.
+  const box = (detail ?? {}) as { box_contents_ar?: unknown; box_contents_en?: unknown }
+  const list = (value: unknown) => (Array.isArray(value) ? value.filter(filled) : [])
+  const boxAr = list(box.box_contents_ar)
+  const boxEn = list(box.box_contents_en)
+
   const title = pick(detail?.title_en, product.title) ?? ""
   const description = pick(detail?.description_en, product.description) || undefined
 
@@ -28,6 +34,8 @@ export function productText(product: HttpTypes.StoreProduct, locale: Locale) {
     subtitle: (english ? (filled(detail?.subtitle_en) ? detail.subtitle_en : undefined) : detail?.subtitle_ar) || undefined,
     description,
     highlights: english && highlightsEn.length ? highlightsEn : highlightsAr,
+    /** What is in the box; empty when the product has none entered. */
+    boxContents: english && boxEn.length ? boxEn : boxAr,
     /** Search title: the SEO title, else the product title (English first on English pages). */
     seoTitle:
       (english && (filled(detail?.seo_title_en) ? detail.seo_title_en : filled(detail?.title_en) ? detail.title_en : null)) ||

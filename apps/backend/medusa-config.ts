@@ -216,6 +216,8 @@ module.exports = defineConfig({
     { resolve: "./src/modules/whatsapp" },
     // AI usage and cost per request (assistant, product drafts, images).
     { resolve: "./src/modules/ai" },
+    // Return, exchange and warranty requests; staff decide, nothing is automatic.
+    { resolve: "./src/modules/after-sales" },
     {
       // QuickBooks Online: optional; syncing starts once an admin connects.
       resolve: "./src/modules/quickbooks",

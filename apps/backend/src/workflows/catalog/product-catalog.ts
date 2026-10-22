@@ -20,6 +20,8 @@ export type ProductDetailInput = {
   description_en?: string | null
   highlights_ar?: string[] | null
   highlights_en?: string[] | null
+  box_contents_ar?: string[] | null
+  box_contents_en?: string[] | null
   specs?: Record<string, unknown> | null
   faq?: FaqEntry[] | null
   seo_title_ar?: string | null

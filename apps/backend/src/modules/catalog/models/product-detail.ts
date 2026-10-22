@@ -12,6 +12,9 @@ const ProductDetail = model.define("product_detail", {
   // string[]
   highlights_ar: model.json().nullable(),
   highlights_en: model.json().nullable(),
+  // string[]: what is in the box, from the manufacturer's page
+  box_contents_ar: model.json().nullable(),
+  box_contents_en: model.json().nullable(),
   // Record<spec key, SpecValue>, validated against the category spec templates
   specs: model.json().nullable(),
   // FaqEntry[]

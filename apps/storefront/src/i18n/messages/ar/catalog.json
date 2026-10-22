@@ -51,5 +51,8 @@
   "page_number": "الصفحة {number}",
   "pagination": "التنقل بين الصفحات",
   "search_placeholder": "ابحث عن منتج",
-  "clear_search": "مسح البحث"
+  "clear_search": "مسح البحث",
+  "bnpl_card": "قسّطها على {count} دفعات — {amount}",
+  "bnpl_with_taly": "مع Taly",
+  "bnpl_with_deema": "مع Deema"
 }

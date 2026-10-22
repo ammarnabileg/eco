@@ -37,6 +37,8 @@ type Detail = {
   description_en?: string | null
   highlights_ar?: string[] | null
   highlights_en?: string[] | null
+  box_contents_ar?: string[] | null
+  box_contents_en?: string[] | null
   specs?: Record<string, SpecValue> | null
   faq?: FaqEntry[] | null
   seo_title_ar?: string | null
@@ -83,6 +85,8 @@ type FormState = {
   brand_id: string
   highlights_ar: string
   highlights_en: string
+  box_contents_ar: string
+  box_contents_en: string
   faq: FaqEntry[]
   specs: Record<string, SpecValue | "">
   addon_group_ids: string[]
@@ -100,6 +104,8 @@ const toForm = (c: Catalog): FormState => {
     brand_id: c.brand?.id ?? NONE,
     highlights_ar: (d.highlights_ar ?? []).join("\n"),
     highlights_en: (d.highlights_en ?? []).join("\n"),
+    box_contents_ar: (d.box_contents_ar ?? []).join("\n"),
+    box_contents_en: (d.box_contents_en ?? []).join("\n"),
     faq: d.faq ?? [],
     specs: { ...(d.specs ?? {}) },
     addon_group_ids: c.addon_group_ids ?? [],
@@ -313,6 +319,8 @@ const ProductCatalogWidget = ({ data: product }: DetailWidgetProps<AdminProduct>
             price_on_request: f.price_on_request,
             highlights_ar: linesToList(f.highlights_ar),
             highlights_en: linesToList(f.highlights_en),
+            box_contents_ar: linesToList(f.box_contents_ar),
+            box_contents_en: linesToList(f.box_contents_en),
             faq: f.faq.filter((q) => q.question_ar.trim() || q.question_en.trim()),
             specs: cleanSpecs(f.specs, attributes),
           },
@@ -454,7 +462,7 @@ const ProductCatalogWidget = ({ data: product }: DetailWidgetProps<AdminProduct>
         </Field>
       </Section>
 
-      <Section title="أهم المميزات" hint="ميزة في كل سطر، تظهر كنقاط بجانب صور المنتج (حتى 12).">
+      <Section title="أهم المميزات" hint="ميزة في كل سطر، تظهر كنقاط في تبويب «نظرة عامة» بصفحة المنتج (حتى 12).">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="المميزات (عربي)">
             <Textarea
@@ -469,6 +477,29 @@ const ProductCatalogWidget = ({ data: product }: DetailWidgetProps<AdminProduct>
               rows={5}
               value={form.highlights_en}
               onChange={(e) => setForm({ ...form, highlights_en: e.target.value })}
+            />
+          </Field>
+        </div>
+      </Section>
+
+      <Section
+        title="محتويات الصندوق"
+        hint="عنصر في كل سطر، من صفحة الشركة المصنّعة الرسمية فقط (حتى 30). يظهر تبويب «محتويات الصندوق» في صفحة المنتج لما تتملى."
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Field label="محتويات الصندوق (عربي)">
+            <Textarea
+              rows={5}
+              value={form.box_contents_ar}
+              onChange={(e) => setForm({ ...form, box_contents_ar: e.target.value })}
+            />
+          </Field>
+          <Field label="In the box (English)">
+            <Textarea
+              dir="ltr"
+              rows={5}
+              value={form.box_contents_en}
+              onChange={(e) => setForm({ ...form, box_contents_en: e.target.value })}
             />
           </Field>
         </div>

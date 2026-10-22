@@ -117,6 +117,8 @@ export const UpdateProductCatalog = z
         description_en: optionalText(20000),
         highlights_ar: z.array(text(300)).max(12).nullish(),
         highlights_en: z.array(text(300)).max(12).nullish(),
+        box_contents_ar: z.array(text(200)).max(30).nullish(),
+        box_contents_en: z.array(text(200)).max(30).nullish(),
         specs: z.record(z.string(), specValue).nullish(),
         faq: z.array(faqEntry).max(20).nullish(),
         seo_title_ar: optionalText(70),

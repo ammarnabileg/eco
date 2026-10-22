@@ -10,7 +10,7 @@ import { categoryName } from "@lib/util/category-name"
 import { PAYMENT_METHODS } from "@modules/laly/lib/content"
 
 const CARE_LINKS = [
-  { href: "/account/orders", label: "layout.track_order" },
+  { href: "/track-order", label: "layout.track_order" },
   { href: "/account", label: "layout.my_account" },
   { href: "/contact", label: "layout.contact_us" },
 ]

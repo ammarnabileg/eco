@@ -160,6 +160,34 @@ medusaIntegrationTestRunner({
       expect(filters.attributes.map((a) => a.key)).toEqual(["resolution_mp", "night_vision"])
     })
 
+    it("saves box contents in both languages and shows them on the store", async () => {
+      const tooLong = await api
+        .post(`/admin/catalog/products/${productId}`, { detail: { box_contents_ar: ["x".repeat(201)] } }, adminHeaders)
+        .catch((e) => e.response)
+      expect(tooLong.status).toEqual(400)
+
+      const { data } = await api.post(
+        `/admin/catalog/products/${productId}`,
+        { detail: { box_contents_ar: ["الكاميرا", "كابل USB-C"], box_contents_en: ["Camera", "USB-C cable"] } },
+        adminHeaders
+      )
+      expect(data.catalog.detail.box_contents_ar).toEqual(["الكاميرا", "كابل USB-C"])
+      expect(data.catalog.detail.box_contents_en).toEqual(["Camera", "USB-C cable"])
+
+      const { data: store } = await api.get(
+        `/store/products/${productId}?fields=${encodeURIComponent("id,+product_detail.*")}`,
+        storeHeaders
+      )
+      expect(store.product.product_detail.box_contents_en).toEqual(["Camera", "USB-C cable"])
+
+      const { data: cleared } = await api.post(
+        `/admin/catalog/products/${productId}`,
+        { detail: { box_contents_ar: null, box_contents_en: null } },
+        adminHeaders
+      )
+      expect(cleared.catalog.detail.box_contents_ar).toBeNull()
+    })
+
     it("lists only brands with published products, with their counts", async () => {
       const make = async (name: string, handle: string) =>
         (await api.post("/admin/catalog/brands", { name, handle }, adminHeaders)).data.brand.id as string

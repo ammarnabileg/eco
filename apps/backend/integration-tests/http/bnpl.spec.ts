@@ -158,6 +158,31 @@ medusaIntegrationTestRunner({
       expect(complete.data.message).toContain("Instalments are not available")
     })
 
+    it("answers a whole listing in one request, with the switched-on gateways and their terms", async () => {
+      const ids = ["dome", "router", "excepted"].map((k) => products[k].id)
+      const { data } = await api.get(`/store/bnpl?product_ids=${ids.join(",")}`, store)
+      expect(Object.keys(data.products).sort()).toEqual([...ids].sort())
+      expect(data.products[products.dome.id]).toEqual({ deema: true, taly: false })
+      expect(data.products[products.router.id]).toEqual({ deema: false, taly: false })
+      // No instalment count saved for Deema: nothing is promised on the cards.
+      expect(data.gateways.deema).toEqual({ active: false, instalments: 0, min_amount: 1, max_amount: null })
+      expect(data.gateways.taly).toMatchObject({ active: false, instalments: 4 })
+
+      // The count from the admin's Integrations page turns the card line on.
+      await api.post(
+        "/admin/integrations/deema",
+        { enabled: true, values: { api_key: "test-key", base_url: deemaUrl, instalments: "3" } },
+        admin
+      )
+      const counted = await api.get(`/store/bnpl?product_ids=${ids[0]}`, store)
+      expect(counted.data.gateways.deema).toEqual({ active: true, instalments: 3, min_amount: 1, max_amount: null })
+
+      // Switching Deema off in the admin turns it off for the storefront too.
+      await api.post("/admin/integrations/deema", { enabled: false }, admin)
+      const off = await api.get(`/store/bnpl?product_ids=${ids[0]}`, store)
+      expect(off.data.gateways.deema.active).toBe(false)
+    })
+
     it("keeps other category metadata when the admin saves instalment settings", async () => {
       const { data } = await api.get(`/admin/product-categories/${categories.cameras}?fields=metadata`, admin)
       expect(data.product_category.metadata).toMatchObject({ seo_title: "kept", bnpl: { deema: "allow" } })

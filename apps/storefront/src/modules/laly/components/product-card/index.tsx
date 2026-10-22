@@ -1,5 +1,8 @@
 import Image from "next/image"
 
+import { getCardBnpl } from "@lib/data/bnpl-batch"
+import { bnplOffer } from "@lib/data/bnpl-offer"
+import { convertToLocale } from "@lib/util/money"
 import { isPriceOnRequest } from "@lib/util/catalog"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
@@ -8,7 +11,9 @@ import PlaceholderImage from "@modules/common/icons/placeholder-image"
 import AddToCartButton from "@modules/laly/components/add-to-cart-button"
 import Countdown from "@modules/laly/components/countdown"
 import { intlLocale } from "@i18n/config"
+import BnplLine from "./bnpl-line"
 import { getLocale, getT } from "@i18n/server"
+import ProductToolButtons from "@modules/tools/components/product-tools"
 
 // Fields a product query must request for this card to render fully.
 export const PRODUCT_CARD_FIELDS =
@@ -30,9 +35,18 @@ export default async function ProductCard({
   // End of the sale price list this product is in, for a real countdown.
   offerEndsAt?: string
 }) {
-  const [t, locale] = await Promise.all([getT(), getLocale()])
   const onRequest = isPriceOnRequest(product)
+  const [t, locale, bnpl] = await Promise.all([
+    getT(),
+    getLocale(),
+    // Batched with the other cards on the page: one request per page.
+    onRequest ? null : getCardBnpl(product.id),
+  ])
   const { cheapestPrice } = getProductPrice({ product, locale: intlLocale(locale) })
+  const instalment =
+    bnpl && cheapestPrice
+      ? bnplOffer(bnpl, product.id, cheapestPrice.calculated_price_number, cheapestPrice.currency_code)
+      : null
   const variants = product.variants ?? []
   const onlyVariant = variants.length === 1 ? variants[0] : undefined
   const inStock = variants.some(isInStock)
@@ -94,6 +108,7 @@ export default async function ProductCard({
           {onSale && offerEndsAt && (
             <Countdown endsAt={offerEndsAt} variant="chip" />
           )}
+          <ProductToolButtons productId={product.id} className="ms-auto" />
         </div>
 
         <h3 className="mt-1 text-[13.5px] small:text-sm font-bold leading-snug line-clamp-2 min-h-[2.6em]">
@@ -132,6 +147,20 @@ export default async function ProductCard({
               )}
             </div>
           )
+        )}
+        {!onRequest && instalment && cheapestPrice && (
+          <BnplLine
+            gateway={instalment.gateway}
+            text={t("catalog.bnpl_card", {
+              count: instalment.instalments,
+              amount: convertToLocale({
+                amount: instalment.amount,
+                currency_code: cheapestPrice.currency_code,
+                locale: intlLocale(locale),
+              }),
+            })}
+            providerLabel={t(`catalog.bnpl_with_${instalment.gateway}`)}
+          />
         )}
 
         <div className="mt-auto pt-3">
