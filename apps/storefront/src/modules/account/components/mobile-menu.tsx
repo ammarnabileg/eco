@@ -1,0 +1,53 @@
+import { getStoreContent } from "@lib/data/content"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Icon, { type IconName } from "@modules/laly/components/icon"
+
+const PAGE_ICONS: Record<string, IconName> = {
+  faq: "chat",
+  "shipping-policy": "truck",
+  "return-policy": "ret",
+  warranty: "shield",
+  about: "smarthome",
+  "privacy-policy": "shield",
+  terms: "check",
+}
+const ORDER = ["faq", "shipping-policy", "return-policy", "warranty", "about", "privacy-policy", "terms"]
+
+function Row({ href, icon, label }: { href: string; icon: IconName; label: string }) {
+  return (
+    <li>
+      <LocalizedClientLink href={href} className="flex items-center gap-3 bg-white border border-laly-line rounded-card p-3.5 active:bg-laly-teal-faint">
+        <span className="w-10 h-10 rounded-[12px] bg-laly-teal-soft text-laly-teal flex items-center justify-center shrink-0">
+          <Icon name={icon} size={19} />
+        </span>
+        <span className="flex-1 font-bold text-[14.5px] text-laly-ink">{label}</span>
+        <Icon name="chevr" size={18} className="text-laly-mut rtl:-scale-x-100" />
+      </LocalizedClientLink>
+    </li>
+  )
+}
+
+// On phones the footer is hidden; its help and policy links live here.
+export default async function MobileMenu({ signedIn }: { signedIn: boolean }) {
+  const { pages = [] } = await getStoreContent()
+  const published = ORDER.flatMap((slug) => pages.filter((p) => p.slug === slug))
+  return (
+    <nav aria-label="المساعدة والمعلومات" className="small:hidden grid gap-2.5 mt-6">
+      <ul className="grid gap-2.5">
+        {signedIn && <Row href="/account/orders" icon="truck" label="طلباتي" />}
+        <Row href="/contact" icon="headset" label="تواصل معنا" />
+      </ul>
+      {published.length > 0 && (
+        <>
+          <p className="mt-3 text-xs font-bold text-laly-mut">معلومات وسياسات</p>
+          <ul className="grid gap-2.5">
+            {published.map((p) => (
+              <Row key={p.slug} href={`/${p.slug}`} icon={PAGE_ICONS[p.slug] ?? "check"} label={p.title_ar} />
+            ))}
+          </ul>
+        </>
+      )}
+      <p className="mt-4 text-center text-[11.5px] text-laly-mut">© {new Date().getFullYear()} Laly — جميع الحقوق محفوظة</p>
+    </nav>
+  )
+}

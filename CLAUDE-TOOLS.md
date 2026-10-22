@@ -70,6 +70,7 @@ decimals.
 | AI admin assistant (Claude direct or OpenRouter): reads products/orders/sales, proposes price and product changes that staff confirm | `workflows/assistant`, `api/admin/assistant`, `admin/routes/assistant` | `docs/ASSISTANT.md` |
 | Add a product with AI: official page → grounded copy/specs/SEO, add-on and variant questions, official photos + AI edits, optional video (OpenRouter), saved as draft | `workflows/ai-product`, `api/admin/ai-products`, `admin/routes/ai-product` | `docs/AI-PRODUCTS.md` |
 | AI image studio: AI backgrounds, original product photo on a white card, text and store price drawn on a canvas, PNG download, homepage banner slide | `workflows/studio`, `api/admin/studio`, `admin/routes/studio`, `admin/components/studio`, job `studio-stale-slides` | `docs/AI-STUDIO.md` |
+| Information and policy pages (about, FAQ, shipping, returns, warranty, privacy, terms): drafts in the admin, numbered published versions, 404 until published, footer/sitemap links | `modules/store-content` (`content_page`, `content_page_revision`), `admin/routes/content/pages`, storefront `modules/content`, `app/sitemap.ts` | — |
 | WhatsApp via Evolution API (see below) | `modules/whatsapp`, `workflows/whatsapp`, `admin/routes/whatsapp` | `docs/WHATSAPP.md` |
 
 **WhatsApp features:**
@@ -155,6 +156,12 @@ Storefront checks, from `apps/storefront`: `npx tsc --noEmit`, `pnpm lint`, `pnp
   (Playwright, `executablePath: /opt/pw-browsers/chromium`) and look at them.
 - **Integration tests that store files write into `apps/backend/static`.** Test images were committed this way once.
   The folder is now git-ignored (Docker creates it), and tests should still delete what they write.
+- **Two storefront designs.** Phones follow `index (1).html` (dark app bar, bottom tabs, no footer: its links live
+  on the account tab). Desktop follows `laly-site3.html`. Don't shrink the desktop design for phones.
+- **Phone screenshots need a phone user-agent.** Some pages (product) pick their layout on the server from the
+  user-agent, so a 390px desktop browser shows the desktop layout. Use Playwright `devices["iPhone 13"]`.
+- **Policy text is the owner's.** Never write return periods, delivery fees or warranty terms; the pages stay
+  unpublished (404) until the owner publishes them.
 - **Medusa's production build drops any folder named `test`** under `src/api`. A route at `admin/whatsapp/test`
   worked in development and returned 404 in production. Name such folders differently (`send-test`) and check
   `.medusa/server` after `pnpm build`.

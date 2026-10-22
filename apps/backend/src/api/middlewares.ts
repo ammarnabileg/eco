@@ -23,6 +23,7 @@ import {
   UpdateHeroSlide,
   UpdateSiteSettings,
   UpdateTrustBadge,
+  SavePage,
 } from "./admin/content/validators"
 import { CreateAiProduct, DraftAiProduct, EnhanceAiImage, ImportAiImages, PublishAiVideo, StartAiVideo } from "./admin/ai-products/validators"
 import { AssistantChat, AssistantExecute } from "./admin/assistant/validators"
@@ -104,6 +105,7 @@ export default defineMiddlewares({
       matcher: "/admin/content/trust-badges/:id",
       middlewares: [validateAndTransformBody(UpdateTrustBadge)],
     },
+    body("/admin/content/pages/:slug", SavePage),
     // Catalog: brands, spec templates, add-ons, quotes, per-product data.
     body("/admin/catalog/brands", CreateBrand),
     body("/admin/catalog/brands/:id", UpdateBrand),

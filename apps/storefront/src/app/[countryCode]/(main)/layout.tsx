@@ -41,6 +41,8 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
         />
       )}
       {props.children}
+      {/* Room above the phone's bottom navigation / action bar. */}
+      <div aria-hidden className="small:hidden h-[calc(84px+env(safe-area-inset-bottom))]" />
       <Footer />
       <WhatsAppButton />
       <BottomNav

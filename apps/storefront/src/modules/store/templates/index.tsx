@@ -43,7 +43,7 @@ const StoreTemplate = ({
 
   return (
     <div className="py-6 content-container" data-testid="category-container">
-      <div className="mb-6 small:mb-8">
+      <div className="mb-4 small:mb-8">
         {header ?? (
           <h1
             className="text-xl small:text-[28px] font-extrabold leading-tight text-laly-ink"

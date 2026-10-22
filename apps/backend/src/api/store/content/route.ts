@@ -8,10 +8,11 @@ import StoreContentModuleService from "../../../modules/store-content/service"
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const service: StoreContentModuleService = req.scope.resolve(STORE_CONTENT_MODULE)
 
-  const [settings, trustBadges, heroSlides] = await Promise.all([
+  const [settings, trustBadges, heroSlides, pages] = await Promise.all([
     service.getSettings(),
     service.listTrustBadges({ is_active: true }, { order: { rank: "ASC" } }),
     service.listLiveHeroSlides(),
+    service.listContentPages({ is_published: true }, { select: ["slug", "title_ar", "title_en"], take: 50 }),
   ])
 
   res.setHeader("Cache-Control", "public, max-age=60")
@@ -19,5 +20,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     settings,
     trust_badges: trustBadges,
     hero_slides: heroSlides,
+    // Published information pages, for footer links.
+    pages: pages.map((p) => ({ slug: p.slug, title_ar: p.title_ar, title_en: p.title_en })),
   })
 }

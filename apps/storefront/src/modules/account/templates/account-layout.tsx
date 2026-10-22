@@ -3,6 +3,7 @@ import React from "react"
 import UnderlineLink from "@modules/common/components/interactive-link"
 
 import AccountNav from "../components/account-nav"
+import MobileMenu from "../components/mobile-menu"
 import { HttpTypes } from "@medusajs/types"
 
 interface AccountLayoutProps {
@@ -21,7 +22,8 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
           <div>{customer && <AccountNav customer={customer} />}</div>
           <div className="flex-1 min-w-0">{children}</div>
         </div>
-        <div className="flex flex-col small:flex-row items-start small:items-center justify-between gap-6 mt-4 mb-8 small:mt-12 small:mb-0 bg-white border border-laly-line rounded-card p-6">
+        <MobileMenu signedIn={!!customer} />
+        <div className="hidden small:flex flex-row items-center justify-between gap-6 mt-12 bg-white border border-laly-line rounded-card p-6">
           <div>
             <h3 className="text-xl font-bold text-laly-ink mb-2">
               هل لديك أسئلة؟

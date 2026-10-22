@@ -5,6 +5,7 @@ import CartButton from "@modules/layout/components/cart-button"
 import Search from "@modules/layout/components/search"
 import Icon from "@modules/laly/components/icon"
 import Logo from "@modules/laly/components/logo"
+import MobileBar from "@modules/layout/components/mobile-bar"
 import { getStoreContent } from "@lib/data/content"
 
 const NAV_LINKS = [
@@ -45,9 +46,15 @@ export default async function Nav() {
       </div>
 
       <div className="sticky top-0 inset-x-0 z-50">
-        <header className="bg-white border-b border-laly-line">
-          <nav className="content-container flex items-center gap-4 small:gap-7 h-16 small:h-[82px]">
-            <Logo />
+        {/* Phones: dark app bar (logo on the tab screens, back + title elsewhere). Desktop: white bar. */}
+        <header className="bg-[linear-gradient(160deg,#0A2A31_0%,#0B333B_55%,#0E4652_100%)] text-white small:bg-none small:bg-white small:text-laly-ink small:border-b small:border-laly-line">
+          <nav className="content-container flex items-center gap-2 small:gap-7 h-14 small:h-[82px]">
+            <div className="small:hidden flex flex-1 min-w-0 items-center gap-2">
+              <MobileBar logo={<Logo inverted withTagline={false} />} search={<Search />} />
+            </div>
+            <div className="hidden small:block">
+              <Logo />
+            </div>
 
             <div className="hidden small:flex flex-1 justify-center">
               <Search variant="bar" />
@@ -66,10 +73,7 @@ export default async function Nav() {
               ))}
             </ul>
 
-            <div className="flex items-center gap-1 ms-auto small:ms-0">
-              <div className="small:hidden">
-                <Search />
-              </div>
+            <div className="flex items-center gap-1 small:ms-0">
               <Suspense
                 fallback={
                   <LocalizedClientLink

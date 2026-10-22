@@ -77,3 +77,28 @@ export type CreateTrustBadgeType = z.infer<typeof CreateTrustBadge>
 
 export const UpdateTrustBadge = z.object(trustBadgeFields).partial().strict()
 export type UpdateTrustBadgeType = z.infer<typeof UpdateTrustBadge>
+
+// Information pages: plain text with "## " headings, never HTML.
+const pageText = (max: number) => z.string().max(max).refine((s) => !/<\s*\/?\s*[a-z!]/i.test(s), "HTML is not allowed")
+const faqItem = z
+  .object({
+    group_ar: z.string().trim().max(80).nullish(),
+    group_en: z.string().trim().max(80).nullish(),
+    q_ar: z.string().trim().min(1).max(300),
+    a_ar: pageText(3000).pipe(z.string().trim().min(1)),
+    q_en: z.string().trim().max(300).nullish(),
+    a_en: pageText(3000).nullish(),
+  })
+  .strict()
+export const SavePage = z
+  .object({
+    title_ar: z.string().trim().min(1).max(150),
+    title_en: z.string().trim().max(150).nullish(),
+    summary_ar: z.string().trim().max(400).nullish(),
+    summary_en: z.string().trim().max(400).nullish(),
+    body_ar: pageText(60000).nullish(),
+    body_en: pageText(60000).nullish(),
+    faq: z.array(faqItem).max(150).nullish(),
+  })
+  .strict()
+export type SavePageType = z.infer<typeof SavePage>

@@ -10,22 +10,29 @@ import { PAYMENT_METHODS } from "@modules/laly/lib/content"
 const CARE_LINKS = [
   { href: "/account/orders", label: "تتبع الطلب" },
   { href: "/account", label: "حسابي" },
-  { href: "/cart", label: "السلة" },
   { href: "/contact", label: "تواصل معنا" },
 ]
+// Information pages, linked only once they are published in the admin.
+const CARE_PAGES = ["faq", "shipping-policy", "return-policy", "warranty", "about"]
+const LEGAL_PAGES = ["privacy-policy", "terms"]
 
 export default async function Footer() {
-  const [categories, { settings }] = await Promise.all([
+  const [categories, { settings, pages = [] }] = await Promise.all([
     listCategories().catch(() => []),
     getStoreContent(),
   ])
   const whatsapp = whatsappLink(settings.whatsapp)
+  const published = (slugs: string[]) =>
+    slugs.flatMap((slug) => pages.filter((p) => p.slug === slug)).map((p) => ({ href: `/${p.slug}`, label: p.title_ar }))
+  const careLinks = [...CARE_LINKS.slice(0, 1), ...published(CARE_PAGES), ...CARE_LINKS.slice(1)]
+  const legalLinks = published(LEGAL_PAGES)
   const topLevel = nonEmptyCategories(categories)
     .filter((c) => !c.parent_category)
     .slice(0, 6)
 
+  // Phones get these links on the account tab instead, like the app design.
   return (
-    <footer className="bg-laly-deep text-[#B9D3D8] mt-16 pb-20 small:pb-0">
+    <footer className="hidden small:block bg-laly-deep text-[#B9D3D8] mt-16">
       <div className="content-container grid gap-10 py-12 small:py-14 small:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
           <Logo inverted withTagline={false} />
@@ -66,7 +73,7 @@ export default async function Footer() {
         <div>
           <h3 className="text-white font-extrabold mb-4">خدمة العملاء</h3>
           <ul className="grid gap-2.5 text-[13.5px]">
-            {CARE_LINKS.map((l) => (
+            {careLinks.map((l) => (
               <li key={l.href}>
                 <LocalizedClientLink href={l.href} className="hover:text-white">
                   {l.label}
@@ -124,9 +131,20 @@ export default async function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <p className="content-container py-5 text-xs">
-          © {new Date().getFullYear()} Laly — جميع الحقوق محفوظة
-        </p>
+        <div className="content-container py-5 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <p>© {new Date().getFullYear()} Laly — جميع الحقوق محفوظة</p>
+          {legalLinks.length > 0 && (
+            <ul className="flex flex-wrap gap-4">
+              {legalLinks.map((l) => (
+                <li key={l.href}>
+                  <LocalizedClientLink href={l.href} className="hover:text-white">
+                    {l.label}
+                  </LocalizedClientLink>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </footer>
   )

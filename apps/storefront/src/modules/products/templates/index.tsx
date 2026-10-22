@@ -145,7 +145,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <TrackViewed productId={product.id} />
       <nav
         aria-label="مسار التنقل"
-        className="content-container py-4 text-xs small:text-sm text-laly-mut"
+        className="hidden small:block content-container py-4 text-sm text-laly-mut"
       >
         <ol className="flex items-center gap-1.5 flex-wrap">
           <li>

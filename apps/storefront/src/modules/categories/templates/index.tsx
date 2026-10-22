@@ -76,12 +76,12 @@ export default function CategoryTemplate({
         </p>
       )}
       {children.length > 0 && (
-        <ul className="flex flex-wrap gap-2">
+        <ul className="-mx-4 px-4 small:mx-0 small:px-0 flex gap-2 overflow-x-auto no-scrollbar small:flex-wrap">
           {children.map((c) => (
             <li key={c.id}>
               <LocalizedClientLink
                 href={`/categories/${c.handle}`}
-                className="h-9 px-4 flex items-center rounded-full bg-white border border-laly-line text-[13px] font-bold text-laly-ink hover:border-laly-teal hover:text-laly-teal transition-colors"
+                className="h-9 px-4 shrink-0 whitespace-nowrap flex items-center rounded-full bg-white border border-laly-line text-[13px] font-bold text-laly-ink hover:border-laly-teal hover:text-laly-teal transition-colors"
               >
                 {c.name}
               </LocalizedClientLink>
