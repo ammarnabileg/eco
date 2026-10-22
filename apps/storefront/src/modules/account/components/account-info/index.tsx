@@ -4,6 +4,7 @@ import { useEffect } from "react"
 
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { useFormStatus } from "react-dom"
+import { useT } from "@i18n/client"
 
 type AccountInfoProps = {
   label: string
@@ -22,10 +23,11 @@ const AccountInfo = ({
   isSuccess,
   isError,
   clearState,
-  errorMessage = "حدث خطأ، يرجى المحاولة مرة أخرى",
+  errorMessage,
   children,
   'data-testid': dataTestid
 }: AccountInfoProps) => {
+  const t = useT()
   const { state, close, toggle } = useToggleState()
 
   const { pending } = useFormStatus()
@@ -68,7 +70,7 @@ const AccountInfo = ({
             data-testid="edit-button"
             data-active={state}
           >
-            {state ? "إلغاء" : "تعديل"}
+            {state ? t("account.cancel") : t("account.edit")}
           </Button>
         </div>
       </div>
@@ -87,7 +89,7 @@ const AccountInfo = ({
           data-testid="success-message"
         >
           <Badge className="p-2 my-4" color="green">
-            <span>تم تحديث {label} بنجاح</span>
+            <span>{t("account.updated_success", { label })}</span>
           </Badge>
         </Disclosure.Panel>
       </Disclosure>
@@ -106,7 +108,7 @@ const AccountInfo = ({
           data-testid="error-message"
         >
           <Badge className="p-2 my-4" color="red">
-            <span>{errorMessage}</span>
+            <span>{errorMessage ?? t("account.generic_error")}</span>
           </Badge>
         </Disclosure.Panel>
       </Disclosure>
@@ -131,7 +133,7 @@ const AccountInfo = ({
                 type="submit"
                 data-testid="save-button"
               >
-                حفظ التغييرات
+                {t("account.save_changes")}
               </Button>
             </div>
           </div>

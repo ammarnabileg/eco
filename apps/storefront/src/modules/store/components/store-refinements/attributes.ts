@@ -1,3 +1,4 @@
+import type { Translate } from "@i18n/translate"
 import { PRODUCT_INDEX_NAME, priceAttribute } from "@lib/search-client"
 
 export const OPTION_VALUES_ATTRIBUTE = "option_values"
@@ -8,24 +9,24 @@ export const BRAND_ATTRIBUTE = "brand"
 // Filterable specs as "key:value", labelled by the category's spec template.
 export const SPECS_ATTRIBUTE = "specs"
 
-export const getSortOptions = (currencyCode: string) => {
+export const getSortOptions = (currencyCode: string, t: Translate) => {
   const minPrice = priceAttribute("min_price", currencyCode)
 
   return [
-    { value: PRODUCT_INDEX_NAME, label: "الأكثر صلة" },
+    { value: PRODUCT_INDEX_NAME, label: t("catalog.sort_relevance") },
     {
       value: `${PRODUCT_INDEX_NAME}/sort/created_at:desc`,
-      label: "الأحدث",
+      label: t("catalog.sort_newest"),
     },
     {
       value: `${PRODUCT_INDEX_NAME}/sort/${minPrice}:asc`,
-      label: "السعر: من الأقل للأعلى",
+      label: t("catalog.sort_price_asc"),
     },
     {
       value: `${PRODUCT_INDEX_NAME}/sort/${minPrice}:desc`,
-      label: "السعر: من الأعلى للأقل",
+      label: t("catalog.sort_price_desc"),
     },
-    { value: `${PRODUCT_INDEX_NAME}/sort/title:asc`, label: "الاسم: أ - ي" },
-    { value: `${PRODUCT_INDEX_NAME}/sort/title:desc`, label: "الاسم: ي - أ" },
+    { value: `${PRODUCT_INDEX_NAME}/sort/title:asc`, label: t("catalog.sort_name_asc") },
+    { value: `${PRODUCT_INDEX_NAME}/sort/title:desc`, label: t("catalog.sort_name_desc") },
   ]
 }

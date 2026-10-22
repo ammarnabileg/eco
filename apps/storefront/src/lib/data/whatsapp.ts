@@ -1,5 +1,6 @@
 "use server"
 
+import { getT } from "@i18n/server"
 import { sdk } from "@lib/config"
 
 // Guest phone check on WhatsApp before paying (required when switched on in
@@ -12,15 +13,17 @@ export const getOtpStatus = async (cartId: string): Promise<OtpStatus> =>
     .fetch<OtpStatus>("/store/whatsapp/otp", { method: "GET", query: { cart_id: cartId }, cache: "no-store" })
     .catch(() => ({ required: false, verified: true, phone: null }))
 
-const ARABIC: Record<string, string> = {
-  "Too many codes requested": "طلبت رموز كتير. جرّب بعد شوية.",
-  "Add a valid phone number": "أضف رقم موبايل صحيح في عنوان التوصيل.",
-  "The code expired": "الرمز انتهى. اطلب رمز جديد.",
-  "Wrong code": "الرمز غير صحيح.",
+// Backend error text → message key shown to the customer.
+const ERROR_KEYS: Record<string, string> = {
+  "Too many codes requested": "checkout.otp_error_too_many",
+  "Add a valid phone number": "checkout.otp_error_invalid_phone",
+  "The code expired": "checkout.otp_error_expired",
+  "Wrong code": "checkout.otp_error_wrong",
 }
-const arabic = (e: unknown) => {
+const errorText = async (e: unknown) => {
   const msg = (e as Error)?.message ?? ""
-  return Object.entries(ARABIC).find(([k]) => msg.includes(k))?.[1] ?? "تعذر الإرسال على واتساب. جرّب مرة أخرى."
+  const key = Object.entries(ERROR_KEYS).find(([k]) => msg.includes(k))?.[1] ?? "checkout.otp_error_send_failed"
+  return (await getT())(key)
 }
 
 export async function sendOtp(cartId: string): Promise<{ ok: boolean; error?: string }> {
@@ -28,7 +31,7 @@ export async function sendOtp(cartId: string): Promise<{ ok: boolean; error?: st
     await sdk.client.fetch("/store/whatsapp/otp", { method: "POST", body: { cart_id: cartId } })
     return { ok: true }
   } catch (e) {
-    return { ok: false, error: arabic(e) }
+    return { ok: false, error: await errorText(e) }
   }
 }
 
@@ -37,6 +40,6 @@ export async function verifyOtp(cartId: string, code: string): Promise<{ ok: boo
     await sdk.client.fetch("/store/whatsapp/otp/verify", { method: "POST", body: { cart_id: cartId, code } })
     return { ok: true }
   } catch (e) {
-    return { ok: false, error: arabic(e) }
+    return { ok: false, error: await errorText(e) }
   }
 }

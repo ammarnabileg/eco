@@ -1,14 +1,15 @@
+import { getT } from "@i18n/server"
 import { listBrands } from "@lib/data/catalog"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SectionHeading from "@modules/laly/components/section-heading"
 
 // The brands the store actually sells (from the catalog), each linked to its page.
 export default async function Brands() {
-  const brands = await listBrands()
+  const [brands, t] = await Promise.all([listBrands(), getT()])
   if (!brands.length) return null
   return (
     <section className="content-container mt-10 small:mt-14">
-      <SectionHeading eyebrow="الماركات" title="تسوّق حسب الماركة" href="/brands" />
+      <SectionHeading eyebrow={t("home.brands_eyebrow")} title={t("home.brands_title")} href="/brands" />
       <ul className="flex flex-wrap gap-2 small:gap-3">
         {brands.map((b) => (
           <li key={b.id}>

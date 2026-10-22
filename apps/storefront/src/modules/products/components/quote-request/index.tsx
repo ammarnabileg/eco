@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react"
 
+import { useT } from "@i18n/client"
 import { submitQuoteRequest } from "@lib/data/catalog"
 import { whatsappLink } from "@lib/util/localize"
 import Icon from "@modules/laly/components/icon"
@@ -28,6 +29,7 @@ export default function QuoteRequest({
   whatsapp?: string | null
   layout?: "mobile" | "desktop"
 }) {
+  const t = useT()
   const [open, setOpen] = useState(false)
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
     "idle"
@@ -43,7 +45,7 @@ export default function QuoteRequest({
 
   const wa = whatsappLink(
     whatsapp ?? null,
-    `السلام عليكم، أرغب بعرض سعر لـ: ${productTitle}`
+    t("product.quote_whatsapp_message", { title: productTitle })
   )
 
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) =>
@@ -53,11 +55,11 @@ export default function QuoteRequest({
     e.preventDefault()
     setError(null)
     if (form.customer_name.trim().length < 2) {
-      setError("اكتب اسمك من فضلك.")
+      setError(t("product.quote_error_name"))
       return
     }
     if (!PHONE.test(form.phone.trim())) {
-      setError("رقم الهاتف غير صحيح. مثال: 9999 1234")
+      setError(t("product.quote_error_phone"))
       return
     }
     setStatus("sending")
@@ -74,7 +76,7 @@ export default function QuoteRequest({
       setStatus("sent")
     } else {
       setStatus("error")
-      setError("تعذّر إرسال الطلب. حاول مرة أخرى أو راسلنا على واتساب.")
+      setError(t("product.quote_error_send"))
     }
   }
 
@@ -101,18 +103,18 @@ export default function QuoteRequest({
         data-testid="quote-request-button"
       >
         <Icon name="tag" size={19} />
-        اطلب عرض سعر
+        {t("product.quote_request_button")}
       </button>
       {wa && (
         <a
           href={wa}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="اطلب السعر عبر واتساب"
+          aria-label={t("product.quote_whatsapp_aria")}
           className="h-12 px-4 flex items-center justify-center gap-2 rounded-btn border-[1.6px] border-laly-green text-laly-green font-bold text-sm hover:bg-laly-green hover:text-white transition-colors"
         >
           <Icon name="chat" size={19} />
-          <span className={layout === "mobile" ? "sr-only" : ""}>واتساب</span>
+          <span className={layout === "mobile" ? "sr-only" : ""}>{t("product.whatsapp")}</span>
         </a>
       )}
     </div>
@@ -125,11 +127,10 @@ export default function QuoteRequest({
           className="text-[22px] font-extrabold"
           data-testid="price-on-request"
         >
-          السعر عند الطلب
+          {t("product.price_on_request")}
         </p>
         <p className="text-sm text-laly-mut">
-          سعر هذا المنتج يعتمد على الكمية والتركيب. أرسل طلبك وسيتواصل معك
-          فريقنا بعرض سعر.
+          {t("product.price_on_request_note")}
         </p>
       </div>
       {buttons("")}
@@ -140,7 +141,7 @@ export default function QuoteRequest({
         </div>
       )}
 
-      <Sheet open={open} onClose={close} title="طلب عرض سعر" layout={layout}>
+      <Sheet open={open} onClose={close} title={t("product.quote_sheet_title")} layout={layout}>
         {status === "sent" ? (
           <div
             className="flex flex-col items-center text-center gap-3 py-6"
@@ -149,16 +150,16 @@ export default function QuoteRequest({
             <span className="w-14 h-14 rounded-full bg-laly-teal-soft text-laly-teal flex items-center justify-center">
               <Icon name="check" size={28} />
             </span>
-            <p className="text-lg font-extrabold">وصلنا طلبك</p>
+            <p className="text-lg font-extrabold">{t("product.quote_sent_title")}</p>
             <p className="text-sm text-laly-mut">
-              سيتواصل معك فريق المبيعات قريباً بعرض السعر.
+              {t("product.quote_sent_note")}
             </p>
             <button
               type="button"
               onClick={close}
               className="mt-2 h-11 px-6 rounded-btn bg-laly-teal text-white font-bold"
             >
-              تم
+              {t("product.done")}
             </button>
           </div>
         ) : (
@@ -167,7 +168,7 @@ export default function QuoteRequest({
               {productTitle}
             </p>
             <label className="flex flex-col gap-1.5 text-sm font-bold">
-              الاسم
+              {t("product.quote_name")}
               <input
                 className={inputClass}
                 value={form.customer_name}
@@ -177,7 +178,7 @@ export default function QuoteRequest({
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm font-bold">
-              رقم الهاتف
+              {t("product.quote_phone")}
               <input
                 className={inputClass}
                 dir="ltr"
@@ -190,7 +191,7 @@ export default function QuoteRequest({
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm font-bold">
-              الكمية
+              {t("product.quote_quantity")}
               <input
                 className={inputClass}
                 type="number"
@@ -202,11 +203,11 @@ export default function QuoteRequest({
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm font-bold">
-              ملاحظات (اختياري)
+              {t("product.quote_notes")}
               <textarea
                 className={`${inputClass} h-24 py-2`}
                 maxLength={1000}
-                placeholder="مثال: أحتاج تركيب في الأحمدي"
+                placeholder={t("product.quote_notes_placeholder")}
                 value={form.message}
                 onChange={set("message")}
               />
@@ -232,7 +233,7 @@ export default function QuoteRequest({
               disabled={status === "sending"}
               className="h-12 rounded-btn bg-laly-teal text-white font-bold hover:bg-laly-teal-d disabled:bg-laly-line disabled:text-laly-faint"
             >
-              {status === "sending" ? "جاري الإرسال…" : "إرسال الطلب"}
+              {status === "sending" ? t("product.quote_sending") : t("product.quote_send")}
             </button>
             {wa && (
               <a
@@ -241,7 +242,7 @@ export default function QuoteRequest({
                 rel="noopener noreferrer"
                 className="text-center text-sm font-bold text-laly-green hover:underline"
               >
-                أو راسلنا مباشرة على واتساب
+                {t("product.quote_whatsapp_direct")}
               </a>
             )}
           </form>

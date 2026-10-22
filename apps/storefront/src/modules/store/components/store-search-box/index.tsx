@@ -4,6 +4,8 @@ import { MagnifyingGlass, XMarkMini } from "@medusajs/icons"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useSearchBox } from "react-instantsearch"
 
+import { useT } from "@i18n/client"
+
 const DEBOUNCE_MS = 250
 
 /**
@@ -12,6 +14,7 @@ const DEBOUNCE_MS = 250
  * while the query itself is debounced.
  */
 const StoreSearchBox = () => {
+  const t = useT()
   const timer = useRef<number | undefined>(undefined)
 
   const queryHook = useCallback(
@@ -49,8 +52,8 @@ const StoreSearchBox = () => {
           setInputValue(event.target.value)
           refine(event.target.value)
         }}
-        placeholder="ابحث عن منتج"
-        aria-label="ابحث عن منتج"
+        placeholder={t("catalog.search_placeholder")}
+        aria-label={t("catalog.search_placeholder")}
         className="text-sm w-full h-full bg-transparent text-laly-ink outline-none placeholder:text-laly-faint [&::-webkit-search-cancel-button]:hidden"
         data-testid="store-search-input"
       />
@@ -58,7 +61,7 @@ const StoreSearchBox = () => {
         <button
           type="button"
           onClick={clear}
-          aria-label="مسح البحث"
+          aria-label={t("catalog.clear_search")}
           className="shrink-0 text-laly-mut hover:text-laly-ink"
           data-testid="store-search-clear"
         >

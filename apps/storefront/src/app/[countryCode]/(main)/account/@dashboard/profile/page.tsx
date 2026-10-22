@@ -7,15 +7,20 @@ import ProfileName from "@modules/account/components/profile-name"
 import { notFound } from "next/navigation"
 import { listRegions } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
+import { getT } from "@i18n/server"
 
-export const metadata: Metadata = {
-  title: "الملف الشخصي",
-  description: "اعرض بيانات ملفك الشخصي وعدّلها.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT()
+  return {
+    title: t("account.profile"),
+    description: t("account.meta_profile_description"),
+  }
 }
 
 export default async function Profile() {
   const customer = await retrieveCustomer()
   const regions = await listRegions()
+  const t = await getT()
 
   if (!customer || !regions) {
     notFound()
@@ -24,10 +29,9 @@ export default async function Profile() {
   return (
     <div className="w-full" data-testid="profile-page-wrapper">
       <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl font-bold text-laly-ink">الملف الشخصي</h1>
+        <h1 className="text-2xl font-bold text-laly-ink">{t("account.profile")}</h1>
         <p className="text-base-regular text-laly-mut">
-          اعرض بياناتك الشخصية وحدّثها، بما في ذلك الاسم والبريد الإلكتروني
-          ورقم الهاتف، ويمكنك أيضًا تحديث عنوان الفاتورة.
+          {t("account.profile_intro")}
         </p>
       </div>
       <div className="flex flex-col gap-y-6 w-full bg-white border border-laly-line rounded-card p-5 small:p-6">

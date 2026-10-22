@@ -7,6 +7,8 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
 import AddToCartButton from "@modules/laly/components/add-to-cart-button"
 import Countdown from "@modules/laly/components/countdown"
+import { intlLocale } from "@i18n/config"
+import { getLocale, getT } from "@i18n/server"
 
 // Fields a product query must request for this card to render fully.
 export const PRODUCT_CARD_FIELDS =
@@ -18,7 +20,7 @@ const isInStock = (variant?: HttpTypes.StoreProductVariant) =>
     variant.allow_backorder ||
     (variant.inventory_quantity ?? 0) > 0)
 
-export default function ProductCard({
+export default async function ProductCard({
   product,
   priority = false,
   offerEndsAt,
@@ -28,8 +30,9 @@ export default function ProductCard({
   // End of the sale price list this product is in, for a real countdown.
   offerEndsAt?: string
 }) {
+  const [t, locale] = await Promise.all([getT(), getLocale()])
   const onRequest = isPriceOnRequest(product)
-  const { cheapestPrice } = getProductPrice({ product })
+  const { cheapestPrice } = getProductPrice({ product, locale: intlLocale(locale) })
   const variants = product.variants ?? []
   const onlyVariant = variants.length === 1 ? variants[0] : undefined
   const inStock = variants.some(isInStock)
@@ -86,7 +89,7 @@ export default function ProductCard({
                 inStock ? "bg-laly-green" : "bg-laly-faint"
               }`}
             />
-            {inStock ? "متوفر" : "غير متوفر"}
+            {inStock ? t("layout.in_stock") : t("layout.unavailable")}
           </span>
           {onSale && offerEndsAt && (
             <Countdown endsAt={offerEndsAt} variant="chip" />
@@ -99,7 +102,7 @@ export default function ProductCard({
             className="hover:text-laly-teal"
             data-testid="product-title"
           >
-            {product.title}
+            <bdi>{product.title}</bdi>
           </LocalizedClientLink>
         </h3>
 
@@ -108,7 +111,7 @@ export default function ProductCard({
             className="mt-2 text-sm font-extrabold text-laly-teal"
             data-testid="price-on-request"
           >
-            السعر عند الطلب
+            {t("layout.price_on_request")}
           </p>
         ) : (
           cheapestPrice && (
@@ -137,7 +140,7 @@ export default function ProductCard({
               href={href}
               className="w-full h-10 rounded-btn flex items-center justify-center text-[13px] font-bold bg-laly-teal-soft text-laly-teal hover:bg-laly-teal hover:text-white transition-colors"
             >
-              اطلب عرض سعر
+              {t("layout.request_quote")}
             </LocalizedClientLink>
           ) : onlyVariant ? (
             <AddToCartButton
@@ -149,7 +152,7 @@ export default function ProductCard({
               href={href}
               className="w-full h-10 rounded-btn flex items-center justify-center text-[13px] font-bold bg-laly-teal-soft text-laly-teal hover:bg-laly-teal hover:text-white transition-colors"
             >
-              اختر المواصفات
+              {t("layout.choose_options")}
             </LocalizedClientLink>
           )}
         </div>

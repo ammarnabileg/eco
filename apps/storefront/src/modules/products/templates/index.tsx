@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation"
-import React, { Suspense } from "react"
+import { Suspense } from "react"
+
+import { getLocale, getT } from "@i18n/server"
+import { categoryName } from "@lib/util/category-name"
 
 import type { TrustBadge } from "@lib/data/content"
 import { productBrand, productDetail, SpecGroup } from "@lib/util/catalog"
@@ -16,6 +19,7 @@ import ProductVideo from "@modules/products/components/product-video"
 import RelatedProducts from "@modules/products/components/related-products"
 import TrackViewed from "@modules/products/components/track-viewed"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
+import { productText } from "@modules/products/lib/product-text"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
 
@@ -31,7 +35,7 @@ type ProductTemplateProps = {
   whatsapp?: string | null
 }
 
-const ProductTemplate: React.FC<ProductTemplateProps> = ({
+export default async function ProductTemplate({
   product,
   region,
   countryCode,
@@ -41,20 +45,23 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   offerEndsAt,
   specGroups = [],
   whatsapp,
-}) => {
+}: ProductTemplateProps) {
   if (!product || !product.id) {
     return notFound()
   }
+
+  const [t, locale] = await Promise.all([getT(), getLocale()])
+  const text = productText(product, locale)
 
   const category = product.categories?.[0]
   const detail = productDetail(product)
   const brand =
     productBrand(product)?.name ??
     (product.metadata as Record<string, unknown> | null)?.brand
-  const highlights = detail?.highlights_ar?.filter(Boolean) ?? []
+  const highlights = text.highlights
   const offer = offerEndsAt ? (
     <div className="self-start">
-      <Countdown endsAt={offerEndsAt} label="ينتهي العرض خلال" />
+      <Countdown endsAt={offerEndsAt} label={t("product.offer_ends_in")} />
     </div>
   ) : null
 
@@ -94,7 +101,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           )}
           {detail?.mpn && (
             <span className="text-laly-mut">
-              رقم الموديل:{" "}
+              {t("product.model_number_label")}{" "}
               <span
                 dir="ltr"
                 className="font-latin font-bold text-laly-ink select-all"
@@ -110,10 +117,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         className="text-xl small:text-[28px] font-extrabold leading-snug"
         data-testid="product-title"
       >
-        {product.title}
+        <bdi>{text.title}</bdi>
       </h1>
-      {detail?.subtitle_ar && (
-        <p className="text-sm text-laly-mut">{detail.subtitle_ar}</p>
+      {text.subtitle && (
+        <p className="text-sm text-laly-mut">{text.subtitle}</p>
       )}
       {highlights.length > 0 && (
         <ul
@@ -144,13 +151,13 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <ProductJsonLd product={product} countryCode={countryCode} />
       <TrackViewed productId={product.id} />
       <nav
-        aria-label="مسار التنقل"
+        aria-label={t("product.breadcrumb")}
         className="hidden small:block content-container py-4 text-sm text-laly-mut"
       >
         <ol className="flex items-center gap-1.5 flex-wrap">
           <li>
             <LocalizedClientLink href="/" className="hover:text-laly-teal">
-              الرئيسية
+              {t("product.home")}
             </LocalizedClientLink>
           </li>
           {category && (
@@ -163,7 +170,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
                   href={`/categories/${category.handle}`}
                   className="hover:text-laly-teal"
                 >
-                  {category.name}
+                  {categoryName(category, locale)}
                 </LocalizedClientLink>
               </li>
             </>
@@ -175,14 +182,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
             className="text-laly-ink font-bold line-clamp-1"
             aria-current="page"
           >
-            {product.title}
+            <bdi>{text.title}</bdi>
           </li>
         </ol>
       </nav>
 
       {device === "mobile" ? (
         <div className="content-container flex flex-col gap-5">
-          <Gallery images={images} title={product.title} layout="mobile" />
+          <Gallery images={images} title={text.title} layout="mobile" />
           <ProductVideo product={product} />
           {header}
           {actions}
@@ -195,7 +202,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       ) : (
         <div className="content-container grid grid-cols-1 small:grid-cols-[1.05fr_1fr] gap-6 small:gap-10 items-start">
           <div className="sticky top-28">
-            <Gallery images={images} title={product.title} layout="desktop" />
+            <Gallery images={images} title={text.title} layout="desktop" />
             <div className="mt-4">
               <ProductVideo product={product} />
             </div>
@@ -225,5 +232,3 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     </div>
   )
 }
-
-export default ProductTemplate

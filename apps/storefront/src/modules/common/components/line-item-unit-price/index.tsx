@@ -1,3 +1,7 @@
+"use client"
+
+import { intlLocale } from "@i18n/config"
+import { useLocale, useT } from "@i18n/client"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@modules/common/components/ui"
@@ -13,6 +17,8 @@ const LineItemUnitPrice = ({
   style = "default",
   currencyCode,
 }: LineItemUnitPriceProps) => {
+  const t = useT()
+  const locale = useLocale()
   const total = item.total ?? 0
   const original_total = item.original_total ?? 0
   const hasReducedPrice = total < original_total
@@ -27,7 +33,7 @@ const LineItemUnitPrice = ({
         <>
           <p>
             {style === "default" && (
-              <span className="text-ui-fg-muted">Original: </span>
+              <span className="text-ui-fg-muted">{t("cart.original_price")}</span>
             )}
             <span
               className="line-through"
@@ -36,6 +42,7 @@ const LineItemUnitPrice = ({
               {convertToLocale({
                 amount: original_total / item.quantity,
                 currency_code: currencyCode,
+                locale: intlLocale(locale),
               })}
             </span>
           </p>
@@ -53,6 +60,7 @@ const LineItemUnitPrice = ({
         {convertToLocale({
           amount: total / item.quantity,
           currency_code: currencyCode,
+          locale: intlLocale(locale),
         })}
       </span>
     </div>

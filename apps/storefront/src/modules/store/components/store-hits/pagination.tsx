@@ -2,9 +2,11 @@
 
 import { usePagination } from "react-instantsearch"
 
+import { useT } from "@i18n/client"
 import { clx } from "@modules/common/components/ui"
 
 const SearchPagination = () => {
+  const t = useT()
   const { pages, currentRefinement, nbPages, refine } = usePagination({
     padding: 2,
   })
@@ -23,7 +25,7 @@ const SearchPagination = () => {
           : "bg-white border-laly-line text-laly-ink hover:border-laly-teal hover:text-laly-teal"
       )}
       disabled={page === currentRefinement}
-      aria-label={`الصفحة ${page + 1}`}
+      aria-label={t("catalog.page_number", { number: page + 1 })}
       aria-current={page === currentRefinement ? "page" : undefined}
       onClick={() => refine(page)}
     >
@@ -46,7 +48,7 @@ const SearchPagination = () => {
     <div className="flex justify-center w-full mt-10">
       <nav
         className="flex flex-wrap justify-center gap-2 items-center"
-        aria-label="التنقل بين الصفحات"
+        aria-label={t("catalog.pagination")}
         data-testid="product-pagination"
       >
         {!pages.includes(0) && renderPage(0)}

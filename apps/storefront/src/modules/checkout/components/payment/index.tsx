@@ -6,6 +6,8 @@ import {
   isStripeLike,
   paymentInfoMap,
 } from "@lib/constants"
+import { intlLocale } from "@i18n/config"
+import { useLocale, useT } from "@i18n/client"
 import { initiatePaymentSession, startGatewayCheckout } from "@lib/data/cart"
 import { gatewaySessionData } from "@lib/util/gateway-session"
 import { convertToLocale } from "@lib/util/money"
@@ -50,6 +52,8 @@ const Payment = ({
     (paymentSession) => paymentSession.status === "pending"
   )
 
+  const t = useT()
+  const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [paymentComplete, setPaymentComplete] = useState(false)
@@ -77,13 +81,16 @@ const Payment = ({
   const bnplNote = (providerId: string) => {
     if (providerId.startsWith("pp_taly_")) {
       const quarter = Math.round(((cart.total ?? 0) / 4) * 1000) / 1000
-      return `ادفع على 4 دفعات بدون فوائد — ${convertToLocale({
-        amount: quarter,
-        currency_code: cart.currency_code,
-      })} الآن`
+      return t("checkout.taly_note", {
+        amount: convertToLocale({
+          amount: quarter,
+          currency_code: cart.currency_code,
+          locale: intlLocale(locale),
+        }),
+      })
     }
     if (providerId.startsWith("pp_deema_")) {
-      return "قسّمها بدون فوائد مع Deema"
+      return t("checkout.deema_note")
     }
     return null
   }
@@ -179,7 +186,7 @@ const Payment = ({
             }
           )}
         >
-          الدفع
+          {t("checkout.payment")}
           {!isOpen && paymentReady && <CheckCircleSolid />}
         </Heading>
         {!isOpen && paymentReady && (
@@ -189,7 +196,7 @@ const Payment = ({
               className="text-laly-teal hover:text-laly-teal-d"
               data-testid="edit-payment-button"
             >
-              تعديل
+              {t("checkout.edit")}
             </button>
           </Text>
         )}
@@ -202,9 +209,7 @@ const Payment = ({
               role="alert"
               data-testid="payment-failed-message"
             >
-              لم نتمكن من تأكيد الدفع. لو تم الخصم من حسابك فسيتأكد طلبك
-              تلقائياً خلال دقائق وتصلك رسالة التأكيد، فلا تدفع مرة أخرى.
-              وإن لم يتم الخصم، جرّب مرة أخرى أو اختر طريقة دفع أخرى.
+              {t("checkout.payment_failed")}
             </div>
           )}
           {otp?.required && !phoneVerified && (
@@ -244,7 +249,7 @@ const Payment = ({
               </RadioGroup>
               {bnplHidden && (
                 <p className="mt-2 text-xs text-laly-mut" data-testid="bnpl-hidden">
-                  التقسيط غير متاح لبعض منتجات السلة.
+                  {t("checkout.bnpl_unavailable")}
                 </p>
               )}
             </>
@@ -253,13 +258,13 @@ const Payment = ({
           {paidByGiftcard && (
             <div className="flex flex-col w-1/3">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                طريقة الدفع
+                {t("checkout.payment_method")}
               </Text>
               <Text
                 className="txt-medium text-ui-fg-subtle"
                 data-testid="payment-method-summary"
               >
-                بطاقة هدية
+                {t("checkout.gift_card")}
               </Text>
             </div>
           )}
@@ -282,8 +287,8 @@ const Payment = ({
             data-testid="submit-payment-button"
           >
             {!activeSession && isStripeLike(selectedPaymentMethod)
-              ? "أدخل بيانات الدفع"
-              : "متابعة إلى مراجعة الطلب"}
+              ? t("checkout.enter_payment_details")
+              : t("checkout.continue_to_review")}
           </Button>
         </div>
 
@@ -292,19 +297,20 @@ const Payment = ({
             <div className="flex items-start gap-x-1 w-full">
               <div className="flex flex-col w-1/3">
                 <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  طريقة الدفع
+                  {t("checkout.payment_method")}
                 </Text>
                 <Text
                   className="txt-medium text-ui-fg-subtle"
                   data-testid="payment-method-summary"
                 >
-                  {paymentInfoMap[activeSession?.provider_id]?.title ||
-                    activeSession?.provider_id}
+                  {paymentInfoMap[activeSession?.provider_id]
+                    ? t(paymentInfoMap[activeSession.provider_id].titleKey)
+                    : activeSession?.provider_id}
                 </Text>
               </div>
               <div className="flex flex-col w-1/3">
                 <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  بيانات الدفع
+                  {t("checkout.payment_details")}
                 </Text>
                 <div
                   className="flex gap-2 txt-medium text-ui-fg-subtle items-center"
@@ -317,8 +323,8 @@ const Payment = ({
                   </Container>
                   <Text>
                     {isRedirectGateway(activeSession?.provider_id)
-                      ? "ستنتقل لصفحة الدفع الآمنة عند تأكيد الطلب"
-                      : "ستظهر خطوة إضافية"}
+                      ? t("checkout.redirect_on_confirm")
+                      : t("checkout.extra_step")}
                   </Text>
                 </div>
               </div>
@@ -326,13 +332,13 @@ const Payment = ({
           ) : paidByGiftcard ? (
             <div className="flex flex-col w-1/3">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                طريقة الدفع
+                {t("checkout.payment_method")}
               </Text>
               <Text
                 className="txt-medium text-ui-fg-subtle"
                 data-testid="payment-method-summary"
               >
-                بطاقة هدية
+                {t("checkout.gift_card")}
               </Text>
             </div>
           ) : null}

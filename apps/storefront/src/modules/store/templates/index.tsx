@@ -4,6 +4,7 @@ import type { SearchClient } from "instantsearch.js"
 import { ReactNode, useMemo } from "react"
 import { Configure, InstantSearch } from "react-instantsearch"
 
+import { useT } from "@i18n/client"
 import type { SpecAttribute } from "@lib/util/catalog"
 import {
   makeSearchClient,
@@ -35,6 +36,7 @@ const StoreTemplate = ({
   attributes?: SpecAttribute[]
   header?: ReactNode
 }) => {
+  const t = useT()
   const scope = categoryIds?.join(",")
   const client = useMemo(
     () =>
@@ -54,7 +56,7 @@ const StoreTemplate = ({
             className="text-xl small:text-[28px] font-extrabold leading-tight text-laly-ink"
             data-testid="store-page-title"
           >
-            جميع المنتجات
+            {t("catalog.all_products")}
           </h1>
         )}
       </div>

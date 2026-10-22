@@ -1,3 +1,5 @@
+import { localePath, LOCALE_COOKIE } from "@i18n/config"
+import { localeFromCookie } from "@i18n/server"
 import { sdk } from "@lib/config"
 import { setCartId } from "@lib/data/cookies"
 import { HttpTypes } from "@medusajs/types"
@@ -11,7 +13,9 @@ export async function GET(
 ) {
   const { countryCode, id } = await params
   const { origin } = req.nextUrl
-  const prefix = /^[a-z]{2}$/.test(countryCode) ? `/${countryCode}` : ""
+  const prefix = /^[a-z]{2}$/.test(countryCode)
+    ? localePath(countryCode, localeFromCookie(req.cookies.get(LOCALE_COOKIE)?.value))
+    : ""
   if (!/^cart_[A-Za-z0-9]+$/.test(id)) {
     return NextResponse.redirect(`${origin}${prefix}`)
   }

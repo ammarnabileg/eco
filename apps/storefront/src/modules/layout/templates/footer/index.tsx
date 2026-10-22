@@ -4,27 +4,36 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Icon from "@modules/laly/components/icon"
 import Logo from "@modules/laly/components/logo"
 import { getStoreContent } from "@lib/data/content"
-import { whatsappLink } from "@lib/util/localize"
+import { localize, whatsappLink } from "@lib/util/localize"
+import { getLocale, getT } from "@i18n/server"
+import { categoryName } from "@lib/util/category-name"
 import { PAYMENT_METHODS } from "@modules/laly/lib/content"
 
 const CARE_LINKS = [
-  { href: "/account/orders", label: "تتبع الطلب" },
-  { href: "/account", label: "حسابي" },
-  { href: "/contact", label: "تواصل معنا" },
+  { href: "/account/orders", label: "layout.track_order" },
+  { href: "/account", label: "layout.my_account" },
+  { href: "/contact", label: "layout.contact_us" },
 ]
 // Information pages, linked only once they are published in the admin.
 const CARE_PAGES = ["faq", "shipping-policy", "return-policy", "warranty", "about"]
 const LEGAL_PAGES = ["privacy-policy", "terms"]
 
 export default async function Footer() {
-  const [categories, { settings, pages = [] }] = await Promise.all([
+  const [categories, { settings, pages = [] }, t, locale] = await Promise.all([
     listCategories().catch(() => []),
     getStoreContent(),
+    getT(),
+    getLocale(),
   ])
+  const address = localize(settings, "address", locale)
   const whatsapp = whatsappLink(settings.whatsapp)
   const published = (slugs: string[]) =>
-    slugs.flatMap((slug) => pages.filter((p) => p.slug === slug)).map((p) => ({ href: `/${p.slug}`, label: p.title_ar }))
-  const careLinks = [...CARE_LINKS.slice(0, 1), ...published(CARE_PAGES), ...CARE_LINKS.slice(1)]
+    slugs.flatMap((slug) => pages.filter((p) => p.slug === slug)).map((p) => ({ href: `/${p.slug}`, label: localize(p, "title", locale) }))
+  const careLinks = [
+    ...CARE_LINKS.slice(0, 1).map((l) => ({ ...l, label: t(l.label) })),
+    ...published(CARE_PAGES),
+    ...CARE_LINKS.slice(1).map((l) => ({ ...l, label: t(l.label) })),
+  ]
   const legalLinks = published(LEGAL_PAGES)
   const topLevel = nonEmptyCategories(categories)
     .filter((c) => !c.parent_category)
@@ -37,10 +46,9 @@ export default async function Footer() {
         <div>
           <Logo inverted withTagline={false} />
           <p className="mt-4 text-[13.5px] leading-7 max-w-sm">
-            متجر كويتي متخصص في أنظمة المراقبة والشبكات والبيت الذكي — منتجات
-            أصلية بضمان، وخدمة تركيب في جميع المحافظات.
+            {t("layout.store_description")}
           </p>
-          <ul className="mt-5 flex flex-wrap gap-2" aria-label="طرق الدفع">
+          <ul className="mt-5 flex flex-wrap gap-2" aria-label={t("layout.payment_methods")}>
             {PAYMENT_METHODS.map((m) => (
               <li
                 key={m}
@@ -54,7 +62,7 @@ export default async function Footer() {
         </div>
 
         <div>
-          <h3 className="text-white font-extrabold mb-4">تسوّق</h3>
+          <h3 className="text-white font-extrabold mb-4">{t("layout.shop")}</h3>
           <ul className="grid gap-2.5 text-[13.5px]" data-testid="footer-categories">
             {topLevel.map((c) => (
               <li key={c.id}>
@@ -63,7 +71,7 @@ export default async function Footer() {
                   className="hover:text-white"
                   data-testid="category-link"
                 >
-                  {c.name}
+                  {categoryName(c, locale)}
                 </LocalizedClientLink>
               </li>
             ))}
@@ -71,7 +79,7 @@ export default async function Footer() {
         </div>
 
         <div>
-          <h3 className="text-white font-extrabold mb-4">خدمة العملاء</h3>
+          <h3 className="text-white font-extrabold mb-4">{t("layout.customer_service")}</h3>
           <ul className="grid gap-2.5 text-[13.5px]">
             {careLinks.map((l) => (
               <li key={l.href}>
@@ -84,7 +92,7 @@ export default async function Footer() {
         </div>
 
         <div>
-          <h3 className="text-white font-extrabold mb-4">تواصل معنا</h3>
+          <h3 className="text-white font-extrabold mb-4">{t("layout.contact_us")}</h3>
           <ul className="grid gap-3 text-[13.5px]">
             {settings.phone && (
               <li>
@@ -106,7 +114,7 @@ export default async function Footer() {
                   className="flex items-center gap-2.5 hover:text-white"
                 >
                   <Icon name="chat" size={16} className="text-laly-sand" />
-                  واتساب
+                  {t("layout.whatsapp")}
                 </a>
               </li>
             )}
@@ -121,10 +129,10 @@ export default async function Footer() {
                 </a>
               </li>
             )}
-            {settings.address_ar && (
+            {address && (
               <li className="flex items-center gap-2.5">
                 <Icon name="pin" size={16} className="text-laly-sand" />
-                {settings.address_ar}
+                {address}
               </li>
             )}
           </ul>
@@ -132,7 +140,7 @@ export default async function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="content-container py-5 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <p>© {new Date().getFullYear()} Laly — جميع الحقوق محفوظة</p>
+          <p>{t("layout.copyright", { year: new Date().getFullYear() })}</p>
           {legalLinks.length > 0 && (
             <ul className="flex flex-wrap gap-4">
               {legalLinks.map((l) => (

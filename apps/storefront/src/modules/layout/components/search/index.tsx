@@ -15,6 +15,7 @@ import useToggleState from "@lib/hooks/use-toggle-state"
 import { PRODUCT_INDEX_NAME, searchClient } from "@lib/search-client"
 import { Text } from "@modules/common/components/ui"
 import Icon from "@modules/laly/components/icon"
+import { useT } from "@i18n/client"
 import SearchDrawer from "./drawer"
 import SearchHit, { ProductHit } from "./hit"
 
@@ -22,6 +23,7 @@ const HITS_PER_PAGE = 12
 const DEBOUNCE_MS = 250
 
 const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
+  const t = useT()
   const timer = useRef<number | undefined>(undefined)
 
   const queryHook = useCallback(
@@ -56,8 +58,8 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
             setInputValue(event.target.value)
             refine(event.target.value)
           }}
-          placeholder="ابحث عن كاميرا، راوتر، أي منتج…"
-          aria-label="ابحث في المنتجات"
+          placeholder={t("layout.search_placeholder")}
+          aria-label={t("layout.search_products")}
           autoFocus
           className="txt-medium w-full bg-transparent py-4 text-ui-fg-base outline-none placeholder:text-ui-fg-muted"
           data-testid="search-input"
@@ -70,14 +72,14 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
             className="px-4 py-6 text-center text-ui-fg-muted"
             data-testid="search-empty"
           >
-            اكتب اسم المنتج للبحث.
+            {t("layout.search_hint")}
           </Text>
         ) : status === "error" ? (
           <Text
             className="px-4 py-6 text-center text-ui-fg-error"
             data-testid="search-error"
           >
-            تعذّر البحث
+            {t("layout.search_failed")}
             {error?.message ? `: ${error.message}` : "."}
           </Text>
         ) : !isSettled ? (
@@ -85,7 +87,7 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
             className="px-4 py-6 text-center text-ui-fg-muted"
             data-testid="search-loading"
           >
-            جاري البحث…
+            {t("layout.searching")}
           </Text>
         ) : hasResults ? (
           <ul className="py-2" data-testid="search-results">
@@ -98,14 +100,14 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
             className="px-4 py-6 text-center text-ui-fg-muted"
             data-testid="search-loading"
           >
-            جاري البحث…
+            {t("layout.searching")}
           </Text>
         ) : (
           <Text
             className="px-4 py-6 text-center text-ui-fg-subtle"
             data-testid="search-no-results"
           >
-            لا توجد نتائج لـ &quot;{query}&quot;
+            {t("layout.no_results_for", { query })}
           </Text>
         )}
       </div>
@@ -114,6 +116,7 @@ const SearchPanel = ({ onNavigate }: { onNavigate: () => void }) => {
 }
 
 const Search = ({ variant = "icon" }: { variant?: "icon" | "bar" }) => {
+  const t = useT()
   const { state: isOpen, open, close } = useToggleState()
 
   return (
@@ -122,11 +125,11 @@ const Search = ({ variant = "icon" }: { variant?: "icon" | "bar" }) => {
         <button
           type="button"
           onClick={open}
-          aria-label="ابحث في المنتجات"
+          aria-label={t("layout.search_products")}
           className="relative w-full max-w-[440px] h-11 rounded-full border border-laly-line bg-laly-bg ps-5 pe-12 text-start text-[13.5px] text-laly-faint hover:border-laly-teal transition-colors"
           data-testid="nav-search-button"
         >
-          ابحث عن كاميرا، راوتر، أي منتج…
+          {t("layout.search_placeholder")}
           <span className="absolute end-1 top-1 w-9 h-9 rounded-full bg-laly-teal text-white flex items-center justify-center">
             <Icon name="search" size={18} />
           </span>
@@ -135,7 +138,7 @@ const Search = ({ variant = "icon" }: { variant?: "icon" | "bar" }) => {
         <button
           type="button"
           onClick={open}
-          aria-label="ابحث في المنتجات"
+          aria-label={t("layout.search_products")}
           className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-laly-teal-soft hover:text-laly-teal"
           data-testid="nav-search-button"
         >

@@ -10,6 +10,8 @@ import ShippingDetails from "@modules/order/components/shipping-details"
 import PaymentDetails from "@modules/order/components/payment-details"
 import { HttpTypes } from "@medusajs/types"
 import { getPublicIntegrations } from "@lib/data/integrations"
+import { getT } from "@i18n/server"
+import { richText } from "@lib/util/rich-text"
 
 type OrderCompletedTemplateProps = {
   order: HttpTypes.StoreOrder
@@ -19,6 +21,7 @@ export default async function OrderCompletedTemplate({
   order,
 }: OrderCompletedTemplateProps) {
   const cookies = await nextCookies()
+  const t = await getT()
 
   const isOnboarding = cookies.get("_medusa_onboarding")?.value === "true"
   const { whatsapp } = await getPublicIntegrations()
@@ -36,24 +39,27 @@ export default async function OrderCompletedTemplate({
             level="h1"
             className="flex flex-col gap-y-3 text-laly-ink text-3xl mb-4"
           >
-            <span>شكرًا لك!</span>
-            <span className="text-laly-teal">تم تأكيد طلبك</span>
+            <span>{t("order.thank_you")}</span>
+            <span className="text-laly-teal">{t("order.order_confirmed")}</span>
           </Heading>
           {whatsappNotice && (
             <div
               className="rounded-xl border border-laly-teal-soft bg-laly-teal-faint p-4 text-sm text-laly-ink"
               data-testid="whatsapp-order-notice"
             >
-              <p className="font-bold">هتوصلك رسالة على واتساب بتفاصيل الطلب</p>
+              <p className="font-bold">{t("order.whatsapp_notice_title")}</p>
               <p className="mt-1 text-laly-mut">
-                على الرقم <span dir="ltr">{order.shipping_address?.phone}</span>. رد بـ <b>1</b> لتأكيد الطلب أو{" "}
-                <b>2</b> لو عايز تلغيه.
+                {richText(t("order.whatsapp_notice_body"), {
+                  phone: <span dir="ltr">{order.shipping_address?.phone}</span>,
+                  one: <b>1</b>,
+                  two: <b>2</b>,
+                })}
               </p>
             </div>
           )}
           <OrderDetails order={order} />
           <Heading level="h2" className="flex flex-row text-3xl-regular">
-            ملخص الطلب
+            {t("order.summary_title")}
           </Heading>
           <Items order={order} />
           <CartTotals totals={order} />

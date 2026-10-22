@@ -4,6 +4,8 @@ import { ArrowRightOnRectangle, House } from "@medusajs/icons"
 import { clx } from "@modules/common/components/ui"
 import { useParams, usePathname } from "next/navigation"
 
+import { useLocale, useT } from "@i18n/client"
+import { localePath } from "@i18n/config"
 import { signout } from "@lib/data/customer"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -19,6 +21,8 @@ const AccountNav = ({
 }) => {
   const route = usePathname()
   const { countryCode } = useParams() as { countryCode: string }
+  const t = useT()
+  const locale = useLocale()
 
   const handleLogout = async () => {
     await signout(countryCode)
@@ -36,7 +40,7 @@ const AccountNav = ({
   return (
     <div>
       <div className="small:hidden" data-testid="mobile-account-nav">
-        {route !== `/${countryCode}/account` ? (
+        {route !== localePath(countryCode, locale, "/account") ? (
           <LocalizedClientLink
             href="/account"
             className="inline-flex items-center gap-x-2 text-small-regular font-semibold text-laly-teal py-2 mb-4"
@@ -47,14 +51,14 @@ const AccountNav = ({
                 aria-hidden="true"
                 className="rotate-90 rtl:-rotate-90"
               />
-              <span>حسابي</span>
+              <span>{t("account.my_account")}</span>
             </>
           </LocalizedClientLink>
         ) : (
           <div className="flex flex-col gap-y-4 mb-6">
             <div className="rounded-card bg-laly-teal text-white p-5 shadow-laly">
               <div className="text-xl font-bold">
-                أهلاً {customer?.first_name}
+                {t("account.greeting", { name: customer?.first_name ?? "" })}
               </div>
               {customer?.email && (
                 <div
@@ -76,7 +80,7 @@ const AccountNav = ({
                     <>
                       <div className="flex items-center gap-x-3">
                         <User size={20} />
-                        <span>الملف الشخصي</span>
+                        <span>{t("account.profile")}</span>
                       </div>
                       {forwardChevron}
                     </>
@@ -91,7 +95,7 @@ const AccountNav = ({
                     <>
                       <div className="flex items-center gap-x-3">
                         <MapPin size={20} />
-                        <span>العناوين</span>
+                        <span>{t("account.addresses")}</span>
                       </div>
                       {forwardChevron}
                     </>
@@ -105,7 +109,7 @@ const AccountNav = ({
                   >
                     <div className="flex items-center gap-x-3">
                       <Package size={20} />
-                      <span>الطلبات</span>
+                      <span>{t("account.orders")}</span>
                     </div>
                     {forwardChevron}
                   </LocalizedClientLink>
@@ -119,7 +123,7 @@ const AccountNav = ({
                   >
                     <div className="flex items-center gap-x-3">
                       <ArrowRightOnRectangle className="rtl:-scale-x-100" />
-                      <span>تسجيل الخروج</span>
+                      <span>{t("account.sign_out")}</span>
                     </div>
                     {forwardChevron}
                   </button>
@@ -132,7 +136,7 @@ const AccountNav = ({
       <div className="hidden small:block" data-testid="account-nav">
         <div className="bg-white border border-laly-line rounded-card p-4">
           <div className="pb-3 px-3">
-            <h3 className="text-base-semi text-laly-ink">حسابي</h3>
+            <h3 className="text-base-semi text-laly-ink">{t("account.my_account")}</h3>
           </div>
           <div className="text-base-regular">
             <ul className="flex mb-0 justify-start items-stretch flex-col gap-y-1">
@@ -143,7 +147,7 @@ const AccountNav = ({
                   data-testid="overview-link"
                 >
                   <House />
-                  نظرة عامة
+                  {t("account.overview")}
                 </AccountNavLink>
               </li>
               <li>
@@ -153,7 +157,7 @@ const AccountNav = ({
                   data-testid="profile-link"
                 >
                   <User size={18} />
-                  الملف الشخصي
+                  {t("account.profile")}
                 </AccountNavLink>
               </li>
               <li>
@@ -163,7 +167,7 @@ const AccountNav = ({
                   data-testid="addresses-link"
                 >
                   <MapPin size={18} />
-                  العناوين
+                  {t("account.addresses")}
                 </AccountNavLink>
               </li>
               <li>
@@ -173,7 +177,7 @@ const AccountNav = ({
                   data-testid="orders-link"
                 >
                   <Package size={18} />
-                  الطلبات
+                  {t("account.orders")}
                 </AccountNavLink>
               </li>
               <li className="border-t border-laly-line mt-2 pt-2">
@@ -184,7 +188,7 @@ const AccountNav = ({
                   data-testid="logout-button"
                 >
                   <ArrowRightOnRectangle className="rtl:-scale-x-100" />
-                  تسجيل الخروج
+                  {t("account.sign_out")}
                 </button>
               </li>
             </ul>
@@ -209,8 +213,9 @@ const AccountNavLink = ({
   "data-testid": dataTestId,
 }: AccountNavLinkProps) => {
   const { countryCode }: { countryCode: string } = useParams()
+  const locale = useLocale()
 
-  const active = route.split(countryCode)[1] === href
+  const active = route === localePath(countryCode, locale, href)
   return (
     <LocalizedClientLink
       href={href}

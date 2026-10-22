@@ -1,3 +1,5 @@
+import { localePath, LOCALE_COOKIE } from "@i18n/config"
+import { localeFromCookie } from "@i18n/server"
 import { sdk } from "@lib/config"
 import { placeOrder } from "@lib/data/cart"
 import { getAuthHeaders, getCartId, setCartId } from "@lib/data/cookies"
@@ -17,7 +19,9 @@ export async function GET(req: NextRequest) {
   const result = searchParams.get("result")
   const sessionId = searchParams.get("session_id") ?? ""
 
-  const prefix = /^[a-z]{2}$/.test(countryCode) ? `/${countryCode}` : ""
+  const prefix = /^[a-z]{2}$/.test(countryCode)
+    ? localePath(countryCode, localeFromCookie(req.cookies.get(LOCALE_COOKIE)?.value))
+    : ""
   const backToPayment = () =>
     NextResponse.redirect(
       `${origin}${prefix}/checkout?step=payment&error=payment_failed`

@@ -26,7 +26,7 @@ const Item = ({ item, currencyCode }: ItemProps) => {
           className="txt-medium-plus text-ui-fg-base"
           data-testid="product-name"
         >
-          {item.product_title}
+          <bdi>{item.product_title}</bdi>
         </Text>
         <LineItemOptions variant={item.variant} data-testid="product-variant" />
         <LineItemAddons metadata={item.metadata} currencyCode={currencyCode} />

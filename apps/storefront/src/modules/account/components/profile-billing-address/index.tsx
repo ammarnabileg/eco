@@ -11,7 +11,9 @@ import AccountInfo from "../account-info"
 import {
   GovernorateSelect,
   KuwaitPhoneInput,
+  governorateLabel,
 } from "../kuwait-address-fields"
+import { useT } from "@i18n/client"
 
 type MyInformationProps = {
   customer: HttpTypes.StoreCustomer
@@ -22,6 +24,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
   customer,
   regions,
 }) => {
+  const t = useT()
   const regionOptions = useMemo(() => {
     return (
       regions
@@ -67,7 +70,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
 
   const currentInfo = useMemo(() => {
     if (!billingAddress) {
-      return "لا يوجد عنوان فاتورة"
+      return t("account.no_billing_address")
     }
 
     const country =
@@ -86,17 +89,21 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
         {billingAddress.company && <span>{billingAddress.company}</span>}
         <span>
           {billingAddress.address_1}
-          {billingAddress.address_2 ? `، ${billingAddress.address_2}` : ""}
+          {billingAddress.address_2 ? `${t("account.list_separator")}${billingAddress.address_2}` : ""}
         </span>
         <span>
-          {[billingAddress.city, billingAddress.province, billingAddress.postal_code]
+          {[
+            billingAddress.city,
+            billingAddress.province && governorateLabel(t, billingAddress.province),
+            billingAddress.postal_code,
+          ]
             .filter(Boolean)
-            .join("، ")}
+            .join(t("account.list_separator"))}
         </span>
         <span>{country}</span>
       </div>
     )
-  }, [billingAddress, regionOptions])
+  }, [billingAddress, regionOptions, t])
 
   const singleCountry = regionOptions.length === 1 ? regionOptions[0] : null
 
@@ -123,7 +130,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
         />
       )}
       <AccountInfo
-        label="عنوان الفاتورة"
+        label={t("account.billing_address")}
         currentInfo={currentInfo}
         isSuccess={successState}
         isError={!!state.error}
@@ -133,14 +140,14 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
         <div className="grid grid-cols-1 gap-y-3">
           <div className="grid grid-cols-2 gap-x-2">
             <Input
-              label="الاسم الأول"
+              label={t("account.first_name")}
               name="first_name"
               defaultValue={billingAddress?.first_name || undefined}
               required
               data-testid="billing-first-name-input"
             />
             <Input
-              label="اسم العائلة"
+              label={t("account.last_name")}
               name="last_name"
               defaultValue={billingAddress?.last_name || undefined}
               required
@@ -156,7 +163,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
             data-testid="billing-province-input"
           />
           <Input
-            label="المنطقة"
+            label={t("account.area")}
             name="city"
             autoComplete="address-level2"
             defaultValue={billingAddress?.city || undefined}
@@ -164,7 +171,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
             data-testid="billing-city-input"
           />
           <Input
-            label="القطعة، الشارع، الجادة"
+            label={t("account.address_1")}
             name="address_1"
             autoComplete="address-line1"
             defaultValue={billingAddress?.address_1 || undefined}
@@ -172,7 +179,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
             data-testid="billing-address-1-input"
           />
           <Input
-            label="المبنى، الدور، الشقة (اختياري)"
+            label={t("account.address_2")}
             name="address_2"
             autoComplete="address-line2"
             defaultValue={billingAddress?.address_2 || undefined}
@@ -181,7 +188,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
           {!singleCountry && (
             <NativeSelect
               name="country_code"
-              placeholder="الدولة"
+              placeholder={t("account.country")}
               defaultValue={billingAddress?.country_code || undefined}
               required
               data-testid="billing-country-code-select"

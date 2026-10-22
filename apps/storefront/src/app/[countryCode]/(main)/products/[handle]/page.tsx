@@ -1,13 +1,16 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { localePath, LOCALES, Locale } from "@i18n/config"
+import { getLocale } from "@i18n/server"
 import { getProductSpecs } from "@lib/data/catalog"
 import { getStoreContent } from "@lib/data/content"
-import { CATALOG_PRODUCT_FIELDS, productDetail } from "@lib/util/catalog"
+import { CATALOG_PRODUCT_FIELDS } from "@lib/util/catalog"
 import { getActiveOffers, offerEndsByProduct } from "@lib/data/offers"
 import { listProducts } from "@lib/data/products"
 import { getDevice } from "@lib/util/device"
 import { getRegion } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
+import { productText } from "@modules/products/lib/product-text"
 import { HttpTypes } from "@medusajs/types"
 
 type Props = {
@@ -53,17 +56,21 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  const detail = productDetail(product)
-  const title = detail?.seo_title_ar || product.title
-  const description =
-    detail?.seo_description_ar ||
-    product.description?.slice(0, 160) ||
-    product.title
+  const locale = await getLocale()
+  const text = productText(product, locale)
+  const title = text.seoTitle
+  const description = text.seoDescription
+  const path = (l: Locale) => localePath(params.countryCode, l, `/products/${handle}`)
 
   return {
     title,
     description,
-    alternates: { canonical: `/${params.countryCode}/products/${handle}` },
+    alternates: {
+      canonical: path(locale),
+      languages: Object.fromEntries(
+        (Object.keys(LOCALES) as Locale[]).map((l) => [l, path(l)])
+      ),
+    },
     openGraph: {
       title: `${title} | Laly`,
       description,

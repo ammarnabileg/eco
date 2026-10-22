@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation"
 
+import { getLocale, getT } from "@i18n/server"
+import { categoryDescription, categoryName } from "@lib/util/category-name"
+
+
 import type { SpecAttribute } from "@lib/util/catalog"
 import { categoryTreeIds } from "@lib/util/categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import StoreTemplate from "@modules/store/templates"
 import { HttpTypes } from "@medusajs/types"
 
-export default function CategoryTemplate({
+export default async function CategoryTemplate({
   category,
   countryCode,
   currencyCode,
@@ -22,6 +26,7 @@ export default function CategoryTemplate({
 }) {
   if (!category || !countryCode) notFound()
 
+  const [t, locale] = await Promise.all([getT(), getLocale()])
   const parents = [] as HttpTypes.StoreProductCategory[]
 
   const getParents = (category: HttpTypes.StoreProductCategory) => {
@@ -45,7 +50,7 @@ export default function CategoryTemplate({
     <>
       {trail.length > 0 && (
         <nav
-          aria-label="مسار التصفح"
+          aria-label={t("catalog.breadcrumb")}
           className="mb-2 flex flex-wrap items-center gap-x-2 text-[13px] text-laly-mut"
         >
           {trail.map((parent) => (
@@ -55,7 +60,7 @@ export default function CategoryTemplate({
                 href={`/categories/${parent.handle}`}
                 data-testid="sort-by-link"
               >
-                {parent.name}
+                {categoryName(parent, locale)}
               </LocalizedClientLink>
               <span aria-hidden="true" className="text-laly-faint">
                 /
@@ -68,11 +73,11 @@ export default function CategoryTemplate({
         className="mb-4 text-xl small:text-[28px] font-extrabold leading-tight text-laly-ink"
         data-testid="category-page-title"
       >
-        {category.name}
+        {categoryName(category, locale)}
       </h1>
-      {category.description && (
+      {categoryDescription(category, locale) && (
         <p className="mb-6 text-sm text-laly-mut leading-relaxed">
-          {category.description}
+          {categoryDescription(category, locale)}
         </p>
       )}
       {children.length > 0 && (
@@ -83,7 +88,7 @@ export default function CategoryTemplate({
                 href={`/categories/${c.handle}`}
                 className="h-9 px-4 shrink-0 whitespace-nowrap flex items-center rounded-full bg-white border border-laly-line text-[13px] font-bold text-laly-ink hover:border-laly-teal hover:text-laly-teal transition-colors"
               >
-                {c.name}
+                {categoryName(c, locale)}
               </LocalizedClientLink>
             </li>
           ))}

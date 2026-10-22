@@ -1,5 +1,8 @@
 "use client"
 import { Radio, RadioGroup } from "@headlessui/react"
+import { intlLocale } from "@i18n/config"
+import { useLocale, useT } from "@i18n/client"
+import type { Translate } from "@i18n/translate"
 import { setShippingMethod } from "@lib/data/cart"
 import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import { convertToLocale } from "@lib/util/money"
@@ -20,11 +23,12 @@ type ShippingProps = {
   availableShippingMethods: HttpTypes.StoreCartShippingOption[] | null
 }
 
-function formatAddress(address: HttpTypes.StoreCartAddress) {
+function formatAddress(address: HttpTypes.StoreCartAddress, t: Translate) {
   if (!address) {
     return ""
   }
 
+  const sep = t("checkout.list_separator")
   let ret = ""
 
   if (address.address_1) {
@@ -32,21 +36,21 @@ function formatAddress(address: HttpTypes.StoreCartAddress) {
   }
 
   if (address.address_2) {
-    ret += `، ${address.address_2}`
+    ret += `${sep}${address.address_2}`
   }
 
   if (address.city) {
-    ret += `، ${address.city}`
+    ret += `${sep}${address.city}`
   }
 
   if (address.province) {
-    ret += `، ${address.province}`
+    ret += `${sep}${address.province}`
   }
 
   if (address.country_code) {
-    ret += `، ${
+    ret += `${sep}${
       address.country_code === "kw"
-        ? "الكويت"
+        ? t("checkout.country_kw")
         : address.country_code.toUpperCase()
     }`
   }
@@ -58,6 +62,8 @@ const Shipping: React.FC<ShippingProps> = ({
   cart,
   availableShippingMethods,
 }) => {
+  const t = useT()
+  const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingPrices, setIsLoadingPrices] = useState(true)
 
@@ -172,7 +178,7 @@ const Shipping: React.FC<ShippingProps> = ({
             }
           )}
         >
-          التوصيل
+          {t("checkout.delivery")}
           {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
             <CheckCircleSolid />
           )}
@@ -187,7 +193,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 className="text-laly-teal hover:text-laly-teal-d"
                 data-testid="edit-delivery-button"
               >
-                تعديل
+                {t("checkout.edit")}
               </button>
             </Text>
           )}
@@ -197,10 +203,10 @@ const Shipping: React.FC<ShippingProps> = ({
           <div className="grid">
             <div className="flex flex-col">
               <span className="font-medium txt-medium text-ui-fg-base">
-                طريقة التوصيل
+                {t("checkout.delivery_method")}
               </span>
               <span className="mb-4 text-ui-fg-muted txt-medium">
-                كيف تريد استلام طلبك؟
+                {t("checkout.delivery_question")}
               </span>
             </div>
             <div data-testid="delivery-options-container">
@@ -234,7 +240,7 @@ const Shipping: React.FC<ShippingProps> = ({
                           checked={showPickupOptions === PICKUP_OPTION_ON}
                         />
                         <span className="text-base-regular">
-                          استلام الطلب من المتجر
+                          {t("checkout.pickup_in_store")}
                         </span>
                       </div>
                       <span className="justify-self-end text-ui-fg-base">
@@ -286,11 +292,13 @@ const Shipping: React.FC<ShippingProps> = ({
                             convertToLocale({
                               amount: option.amount!,
                               currency_code: cart?.currency_code,
+                              locale: intlLocale(locale),
                             })
                           ) : calculatedPricesMap[option.id] ? (
                             convertToLocale({
                               amount: calculatedPricesMap[option.id],
                               currency_code: cart?.currency_code,
+                              locale: intlLocale(locale),
                             })
                           ) : isLoadingPrices ? (
                             <Loader />
@@ -310,10 +318,10 @@ const Shipping: React.FC<ShippingProps> = ({
             <div className="grid">
               <div className="flex flex-col">
                 <span className="font-medium txt-medium text-ui-fg-base">
-                  المتجر
+                  {t("checkout.store")}
                 </span>
                 <span className="mb-4 text-ui-fg-muted txt-medium">
-                  اختر أقرب متجر إليك
+                  {t("checkout.choose_store")}
                 </span>
               </div>
               <div data-testid="delivery-options-container">
@@ -354,7 +362,8 @@ const Shipping: React.FC<ShippingProps> = ({
                               <span className="text-base-regular text-ui-fg-muted">
                                 {formatAddress(
                                   (option as unknown as { service_zone?: { fulfillment_set?: { location?: { address: HttpTypes.StoreCartAddress } } } }).service_zone?.fulfillment_set?.location
-                                    ?.address as HttpTypes.StoreCartAddress
+                                    ?.address as HttpTypes.StoreCartAddress,
+                                  t
                                 )}
                               </span>
                             </div>
@@ -363,6 +372,7 @@ const Shipping: React.FC<ShippingProps> = ({
                             {convertToLocale({
                               amount: option.amount!,
                               currency_code: cart?.currency_code,
+                              locale: intlLocale(locale),
                             })}
                           </span>
                         </Radio>
@@ -387,7 +397,7 @@ const Shipping: React.FC<ShippingProps> = ({
               disabled={!cart.shipping_methods?.[0]}
               data-testid="submit-delivery-option-button"
             >
-              متابعة إلى الدفع
+              {t("checkout.continue_to_payment")}
             </Button>
           </div>
         </>
@@ -397,13 +407,14 @@ const Shipping: React.FC<ShippingProps> = ({
             {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
               <div className="flex flex-col w-1/3">
                 <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  طريقة التوصيل
+                  {t("checkout.delivery_method")}
                 </Text>
                 <Text className="txt-medium text-ui-fg-subtle">
                   {cart.shipping_methods!.at(-1)!.name}{" "}
                   {convertToLocale({
                     amount: cart.shipping_methods!.at(-1)!.amount!,
                     currency_code: cart?.currency_code,
+                    locale: intlLocale(locale),
                   })}
                 </Text>
               </div>

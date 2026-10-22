@@ -1,8 +1,9 @@
+import { getT } from "@i18n/server"
 import type { HeroSlide } from "@lib/data/content"
 import { whatsappLink } from "@lib/util/localize"
 import HeroCarousel from "./carousel"
 
-export default function Hero({
+export default async function Hero({
   slides,
   whatsapp,
 }: {
@@ -12,11 +13,12 @@ export default function Hero({
   if (!slides.length) {
     return null
   }
+  const t = await getT()
 
   return (
     <HeroCarousel
       slides={slides}
-      installHref={whatsappLink(whatsapp, "أريد حجز موعد تركيب")}
+      installHref={whatsappLink(whatsapp, t("home.install_whatsapp_message"))}
     />
   )
 }

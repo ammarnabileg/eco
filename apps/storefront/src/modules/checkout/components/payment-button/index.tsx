@@ -1,5 +1,6 @@
 "use client"
 
+import { useT } from "@i18n/client"
 import { isBnpl, isManual, isRedirectGateway, isStripeLike } from "@lib/constants"
 import { placeOrder, startGatewayCheckout } from "@lib/data/cart"
 import { gatewaySessionData } from "@lib/util/gateway-session"
@@ -19,6 +20,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   cart,
   "data-testid": dataTestId,
 }) => {
+  const t = useT()
   const notReady =
     !cart ||
     !cart.shipping_address ||
@@ -51,7 +53,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
       )
     default:
-      return <Button disabled>اختر طريقة الدفع</Button>
+      return <Button disabled>{t("checkout.choose_payment_method")}</Button>
   }
 }
 
@@ -64,6 +66,7 @@ const StripePaymentButton = ({
   notReady: boolean
   "data-testid"?: string
 }) => {
+  const t = useT()
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -156,7 +159,7 @@ const StripePaymentButton = ({
         isLoading={submitting}
         data-testid={dataTestId}
       >
-        تأكيد الطلب
+        {t("checkout.place_order")}
       </Button>
       <ErrorMessage
         error={errorMessage}
@@ -181,6 +184,7 @@ const RedirectGatewayButton = ({
   notReady: boolean
   "data-testid"?: string
 }) => {
+  const t = useT()
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const { countryCode } = useParams() as { countryCode: string }
@@ -203,10 +207,10 @@ const RedirectGatewayButton = ({
   }
 
   const label = providerId.startsWith("pp_taly_")
-    ? "متابعة إلى Taly"
+    ? t("checkout.continue_to_taly")
     : providerId.startsWith("pp_deema_")
-      ? "متابعة إلى Deema"
-      : "ادفع الآن"
+      ? t("checkout.continue_to_deema")
+      : t("checkout.pay_now")
 
   return (
     <>
@@ -221,8 +225,8 @@ const RedirectGatewayButton = ({
       </Button>
       <p className="mt-2 text-xs text-laly-mut">
         {isBnpl(providerId)
-          ? "ستكمل الموافقة والدفعة الأولى في صفحة مزوّد التقسيط ثم تعود للمتجر."
-          : "ستنتقل لصفحة الدفع الآمنة ثم تعود للمتجر لتأكيد طلبك."}
+          ? t("checkout.bnpl_redirect_note")
+          : t("checkout.gateway_redirect_note")}
       </p>
       <ErrorMessage
         error={errorMessage}
@@ -233,6 +237,7 @@ const RedirectGatewayButton = ({
 }
 
 const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
+  const t = useT()
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -261,7 +266,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
         size="large"
         data-testid="submit-order-button"
       >
-        تأكيد الطلب
+        {t("checkout.place_order")}
       </Button>
       <ErrorMessage
         error={errorMessage}

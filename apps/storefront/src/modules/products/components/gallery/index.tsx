@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useRef, useState } from "react"
 
+import { useT } from "@i18n/client"
 import { HttpTypes } from "@medusajs/types"
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
 
@@ -19,6 +20,7 @@ export default function Gallery({
   layout: "mobile" | "desktop"
   badge?: React.ReactNode
 }) {
+  const t = useT()
   const [active, setActive] = useState(0)
   const scroller = useRef<HTMLDivElement>(null)
   const list = images.filter((i) => !!i.url)
@@ -93,7 +95,7 @@ export default function Gallery({
               key={image.id}
               type="button"
               onClick={() => setActive(i)}
-              aria-label={`صورة ${i + 1}`}
+              aria-label={t("product.image_n", { n: i + 1 })}
               aria-current={i === active}
               className={`relative w-20 h-20 rounded-btn bg-white border-2 overflow-hidden ${
                 i === active ? "border-laly-teal" : "border-laly-line"

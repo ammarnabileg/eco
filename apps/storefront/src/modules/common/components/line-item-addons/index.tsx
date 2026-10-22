@@ -1,4 +1,9 @@
+"use client"
+
+import { intlLocale } from "@i18n/config"
+import { useLocale } from "@i18n/client"
 import { lineAddons } from "@lib/util/catalog"
+import { localize } from "@lib/util/localize"
 import { convertToLocale } from "@lib/util/money"
 
 /** The add-ons (RAM, SSD, HDD...) chosen with a line item, under its title. */
@@ -9,6 +14,7 @@ export default function LineItemAddons({
   metadata: unknown
   currencyCode?: string
 }) {
+  const locale = useLocale()
   const addons = lineAddons(metadata)
   if (!addons.length) {
     return null
@@ -21,9 +27,9 @@ export default function LineItemAddons({
     >
       {addons.map((a) => (
         <li key={a.option_id} className="flex flex-wrap items-baseline gap-x-1">
-          <span>{a.group_ar}:</span>
+          <span>{localize(a, "group", locale)}:</span>
           <span dir="auto" className="font-bold text-laly-ink">
-            {a.name_ar}
+            {localize(a, "name", locale)}
           </span>
           {currencyCode && a.price > 0 && (
             <span className="tabular-nums">
@@ -31,6 +37,7 @@ export default function LineItemAddons({
               {convertToLocale({
                 amount: a.price,
                 currency_code: currencyCode,
+                locale: intlLocale(locale),
               })}
               )
             </span>

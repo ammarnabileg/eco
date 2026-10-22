@@ -1,5 +1,6 @@
 "use client"
 
+import { useT } from "@i18n/client"
 import { clx } from "@modules/common/components/ui"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
@@ -12,6 +13,7 @@ export function Pagination({
   totalPages: number
   'data-testid'?: string
 }) {
+  const t = useT()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -42,7 +44,7 @@ export function Pagination({
           : "bg-white border-laly-line text-laly-ink hover:border-laly-teal hover:text-laly-teal"
       )}
       disabled={isCurrent}
-      aria-label={`الصفحة ${p}`}
+      aria-label={t("catalog.page_number", { number: p })}
       aria-current={isCurrent ? "page" : undefined}
       onClick={() => handlePageChange(p)}
     >
@@ -115,7 +117,7 @@ export function Pagination({
     <div className="flex justify-center w-full mt-10">
       <nav
         className="flex flex-wrap justify-center gap-2 items-center"
-        aria-label="التنقل بين الصفحات"
+        aria-label={t("catalog.pagination")}
         data-testid={dataTestid}
       >
         {renderPageButtons()}

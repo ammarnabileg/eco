@@ -1,5 +1,6 @@
 "use client"
 
+import { useT } from "@i18n/client"
 import { acceptTransferRequest, declineTransferRequest } from "@lib/data/orders"
 import { Button, Text } from "@modules/common/components/ui"
 import { useState } from "react"
@@ -7,6 +8,7 @@ import { useState } from "react"
 type TransferStatus = "pending" | "success" | "error"
 
 const TransferActions = ({ id, token }: { id: string; token: string }) => {
+  const t = useT()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [status, setStatus] = useState<{
     accept: TransferStatus | null
@@ -40,12 +42,12 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
     <div className="flex flex-col gap-y-4">
       {status?.accept === "success" && (
         <Text className="text-emerald-500">
-          تم نقل الطلب بنجاح!
+          {t("order.transfer_accepted_success")}
         </Text>
       )}
       {status?.decline === "success" && (
         <Text className="text-emerald-500">
-          تم رفض نقل الطلب بنجاح!
+          {t("order.transfer_declined_success")}
         </Text>
       )}
       {status?.accept !== "success" && status?.decline !== "success" && (
@@ -58,7 +60,7 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
               status?.accept === "pending" || status?.decline === "pending"
             }
           >
-            قبول النقل
+            {t("order.accept_transfer")}
           </Button>
           <Button
             size="large"
@@ -69,7 +71,7 @@ const TransferActions = ({ id, token }: { id: string; token: string }) => {
               status?.accept === "pending" || status?.decline === "pending"
             }
           >
-            رفض النقل
+            {t("order.decline_transfer")}
           </Button>
         </div>
       )}

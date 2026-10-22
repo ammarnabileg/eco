@@ -1,12 +1,13 @@
 import { ReactNode } from "react"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getT } from "@i18n/server"
 
 /**
  * Desktop page header: breadcrumbs and a title on the deep-teal band. Phones
  * skip it (the app bar already shows the title) and get the intro text only.
  */
-export default function PageBanner({
+export default async function PageBanner({
   title,
   intro,
   trail = [],
@@ -17,17 +18,18 @@ export default function PageBanner({
   trail?: { href: string; label: string }[]
   aside?: ReactNode
 }) {
+  const t = await getT()
   return (
     <>
       <section className="hidden small:block bg-[linear-gradient(160deg,#0A2A31_0%,#0B333B_46%,#0E4652_100%)] text-white">
         <div className="content-container py-10 flex items-center gap-8">
           <div className="flex-1 min-w-0">
-            <nav aria-label="مسار الصفحة" className="text-[12.5px] text-[#B9D3D8]">
+            <nav aria-label={t("layout.breadcrumb")} className="text-[12.5px] text-[#B9D3D8]">
               <ol className="flex items-center gap-2">
-                {[{ href: "/", label: "الرئيسية" }, ...trail].map((t) => (
-                  <li key={t.href} className="flex items-center gap-2">
-                    <LocalizedClientLink href={t.href} className="hover:text-white">
-                      {t.label}
+                {[{ href: "/", label: t("layout.home") }, ...trail].map((item) => (
+                  <li key={item.href} className="flex items-center gap-2">
+                    <LocalizedClientLink href={item.href} className="hover:text-white">
+                      {item.label}
                     </LocalizedClientLink>
                     <span aria-hidden>/</span>
                   </li>

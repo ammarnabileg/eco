@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { getT } from "@i18n/server"
 import { getCollectionByHandle } from "@lib/data/collections"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -25,9 +26,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
+  const t = await getT()
   const metadata = {
     title: collection.title,
-    description: `تسوّق مجموعة ${collection.title} من Laly في الكويت.`,
+    description: t("pages.collection_description", { name: collection.title }),
   } as Metadata
 
   return metadata

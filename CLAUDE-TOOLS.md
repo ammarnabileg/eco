@@ -72,6 +72,7 @@ decimals.
 | AI image studio: AI backgrounds, original product photo on a white card, text and store price drawn on a canvas, PNG download, homepage banner slide | `workflows/studio`, `api/admin/studio`, `admin/routes/studio`, `admin/components/studio`, job `studio-stale-slides` | `docs/AI-STUDIO.md` |
 | Information and policy pages (about, FAQ, shipping, returns, warranty, privacy, terms): drafts in the admin, numbered published versions, 404 until published, footer/sitemap links | `modules/store-content` (`content_page`, `content_page_revision`), `admin/routes/content/pages`, storefront `modules/content`, `app/sitemap.ts` | — |
 | Image storage: Cloudflare R2 or server disk, chosen in the admin (Integrations → تخزين الصور); WebP and resize on upload | `modules/file-media` | `docs/MEDIA.md` |
+| Languages: Arabic (default, no prefix) and English (`/kw/en/...`), more can be added; all UI text in `src/i18n/messages` | storefront `src/i18n`, `middleware.ts` | `docs/I18N.md` |
 | WhatsApp via Evolution API (see below) | `modules/whatsapp`, `workflows/whatsapp`, `admin/routes/whatsapp` | `docs/WHATSAPP.md` |
 
 **WhatsApp features:**
@@ -161,6 +162,9 @@ Storefront checks, from `apps/storefront`: `npx tsc --noEmit`, `pnpm lint`, `pnp
   on the account tab). Desktop follows `laly-site3.html`. Don't shrink the desktop design for phones.
 - **Phone screenshots need a phone user-agent.** Some pages (product) pick their layout on the server from the
   user-agent, so a 390px desktop browser shows the desktop layout. Use Playwright `devices["iPhone 13"]`.
+- **No hardcoded text in the storefront.** Every visible string goes through `t()` with a key in both `ar` and `en`
+  message files (see `docs/I18N.md`). Use logical classes (`ms-`, `start-`, `text-start`) so English (LTR) works,
+  and wrap product names in `<bdi>` so English names don't flip inside Arabic text.
 - **Policy text is the owner's.** Never write return periods, delivery fees or warranty terms; the pages stay
   unpublished (404) until the owner publishes them.
 - **Medusa's production build drops any folder named `test`** under `src/api`. A route at `admin/whatsapp/test`

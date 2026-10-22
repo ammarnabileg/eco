@@ -1,11 +1,12 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon from "@modules/laly/components/icon"
+import { getT } from "@i18n/server"
 
-export default function SectionHeading({
+export default async function SectionHeading({
   eyebrow,
   title,
   href,
-  linkLabel = "عرض الكل",
+  linkLabel,
   extra,
 }: {
   eyebrow?: string
@@ -14,6 +15,7 @@ export default function SectionHeading({
   linkLabel?: string
   extra?: React.ReactNode
 }) {
+  const t = await getT()
   return (
     <div className="flex items-end justify-between gap-4 mb-5 small:mb-7">
       <div>
@@ -35,7 +37,7 @@ export default function SectionHeading({
           href={href}
           className="flex items-center gap-1.5 text-[13px] font-bold text-laly-teal hover:text-laly-teal-d shrink-0"
         >
-          {linkLabel}
+          {linkLabel ?? t("layout.view_all")}
           <Icon name="arrowr" size={15} className="rtl:-scale-x-100" />
         </LocalizedClientLink>
       )}

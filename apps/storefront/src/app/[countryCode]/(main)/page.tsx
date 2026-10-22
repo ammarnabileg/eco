@@ -5,6 +5,7 @@ import { getCollectionByHandle } from "@lib/data/collections"
 import { getStoreContent } from "@lib/data/content"
 import { getActiveOffers, offerEndsByProduct } from "@lib/data/offers"
 import { getRegion } from "@lib/data/regions"
+import { getT } from "@i18n/server"
 import Brands from "@modules/home/components/brands"
 import CategoryTiles from "@modules/home/components/category-tiles"
 import ForYou from "@modules/home/components/for-you"
@@ -14,8 +15,9 @@ import ProductSection from "@modules/home/components/product-section"
 import TrustStrip from "@modules/home/components/trust-strip"
 import Countdown from "@modules/laly/components/countdown"
 
-export const metadata: Metadata = {
-  title: { absolute: "Laly — شريكك التقني في الكويت" },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT()
+  return { title: { absolute: t("pages.home_title") } }
 }
 
 export default async function Home(props: {
@@ -35,7 +37,7 @@ export default async function Home(props: {
     getCollectionByHandle("best-sellers").catch(() => null),
   ])
 
-  const offerEnds = await offerEndsByProduct(offers)
+  const [offerEnds, t] = await Promise.all([offerEndsByProduct(offers), getT()])
   const offerProductIds = Array.from(new Set(offers.flatMap((o) => o.product_ids)))
   const endDates = Array.from(new Set(Object.values(offerEnds))).sort()
   const soonestEnd = endDates[0]
@@ -49,8 +51,8 @@ export default async function Home(props: {
       <ForYou region={region} offerEnds={offerEnds} />
       <CategoryTiles categories={categories} />
       <ProductSection
-        title={offers.length === 1 ? offers[0].title : "عروض الأسبوع"}
-        eyebrow="وفّر أكثر"
+        title={offers.length === 1 ? offers[0].title : t("home.weekly_offers")}
+        eyebrow={t("home.save_more")}
         region={region}
         layout="rail"
         productIds={offerProductIds}
@@ -60,7 +62,7 @@ export default async function Home(props: {
       {bestSellers && (
         <ProductSection
           title={bestSellers.title}
-          eyebrow="مختارات عملائنا"
+          eyebrow={t("home.best_sellers_eyebrow")}
           href={`/collections/${bestSellers.handle}`}
           region={region}
           layout="grid"

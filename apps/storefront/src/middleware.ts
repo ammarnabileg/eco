@@ -1,6 +1,8 @@
 import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
 
+import { DEFAULT_LOCALE, isLocale, LOCALE_COOKIE, LOCALE_HEADER, PATH_HEADER } from "@i18n/config"
+
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "dk"
@@ -117,14 +119,37 @@ export async function middleware(request: NextRequest) {
   const urlHasCountry = firstPathSegment === country.toLowerCase()
 
   if (urlHasCountry) {
+    // "/kw/en/..." is the English page: serve the route without the language
+    // segment and pass the language on. Arabic has no prefix, so "/kw/ar/..."
+    // redirects to the plain address.
+    const [, , maybeLocale, ...rest] = request.nextUrl.pathname.split("/")
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set(PATH_HEADER, isLocale(maybeLocale) ? `/${rest.join("/")}` : `/${[maybeLocale, ...rest].filter(Boolean).join("/")}`)
+    let response: NextResponse
+    if (isLocale(maybeLocale) && maybeLocale === DEFAULT_LOCALE) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/${country}${rest.length ? `/${rest.join("/")}` : ""}`
+      return NextResponse.redirect(url, 308)
+    } else if (isLocale(maybeLocale)) {
+      requestHeaders.set(LOCALE_HEADER, maybeLocale)
+      const url = request.nextUrl.clone()
+      url.pathname = `/${country}${rest.length ? `/${rest.join("/")}` : ""}`
+      response = NextResponse.rewrite(url, { request: { headers: requestHeaders } })
+    } else {
+      requestHeaders.set(LOCALE_HEADER, DEFAULT_LOCALE)
+      response = NextResponse.next({ request: { headers: requestHeaders } })
+    }
     if (!cacheIdCookie) {
-      const response = NextResponse.next()
       response.cookies.set("_medusa_cache_id", cacheId, {
         maxAge: 60 * 60 * 24,
       })
-      return response
     }
-    return NextResponse.next()
+    // Remembered for addresses without a language, e.g. a payment gateway's return.
+    const current = requestHeaders.get(LOCALE_HEADER)!
+    if (request.cookies.get(LOCALE_COOKIE)?.value !== current) {
+      response.cookies.set(LOCALE_COOKIE, current, { maxAge: 60 * 60 * 24 * 365, sameSite: "lax" })
+    }
+    return response
   }
 
   // if the url doesn't have the country, redirect to it

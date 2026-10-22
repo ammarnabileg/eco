@@ -1,3 +1,4 @@
+import { useT } from "@i18n/client"
 import { HttpTypes } from "@medusajs/types"
 import { Container } from "@modules/common/components/ui"
 import Checkbox from "@modules/common/components/checkbox"
@@ -20,6 +21,7 @@ const ShippingAddress = ({
   checked: boolean
   onChange: () => void
 }) => {
+  const t = useT()
   const [formData, setFormData] = useState<Record<string, string>>({
     "shipping_address.first_name": cart?.shipping_address?.first_name || "",
     "shipping_address.last_name": cart?.shipping_address?.last_name || "",
@@ -108,7 +110,7 @@ const ShippingAddress = ({
       {customer && (addressesInRegion?.length || 0) > 0 && (
         <Container className="mb-6 flex flex-col gap-y-4 p-5">
           <p className="text-small-regular">
-            {`أهلاً ${customer.first_name}، هل تريد استخدام أحد عناوينك المحفوظة؟`}
+            {t("checkout.saved_addresses_prompt", { name: customer.first_name ?? "" })}
           </p>
           <AddressSelect
             addresses={customer.addresses}
@@ -123,7 +125,7 @@ const ShippingAddress = ({
       )}
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="الاسم الأول"
+          label={t("checkout.first_name")}
           name="shipping_address.first_name"
           autoComplete="given-name"
           value={formData["shipping_address.first_name"]}
@@ -132,7 +134,7 @@ const ShippingAddress = ({
           data-testid="shipping-first-name-input"
         />
         <Input
-          label="اسم العائلة"
+          label={t("checkout.last_name")}
           name="shipping_address.last_name"
           autoComplete="family-name"
           value={formData["shipping_address.last_name"]}
@@ -158,7 +160,7 @@ const ShippingAddress = ({
           data-testid="shipping-province-input"
         />
         <Input
-          label="المنطقة"
+          label={t("checkout.area")}
           name="shipping_address.city"
           autoComplete="address-level2"
           value={formData["shipping_address.city"]}
@@ -167,7 +169,7 @@ const ShippingAddress = ({
           data-testid="shipping-city-input"
         />
         <Input
-          label="القطعة، الشارع، الجادة"
+          label={t("checkout.address_1")}
           name="shipping_address.address_1"
           autoComplete="address-line1"
           value={formData["shipping_address.address_1"]}
@@ -176,7 +178,7 @@ const ShippingAddress = ({
           data-testid="shipping-address-input"
         />
         <Input
-          label="المبنى، الدور، الشقة (اختياري)"
+          label={t("checkout.address_2")}
           name="shipping_address.address_2"
           autoComplete="address-line2"
           value={formData["shipping_address.address_2"]}
@@ -200,7 +202,7 @@ const ShippingAddress = ({
       </div>
       <div className="my-8">
         <Checkbox
-          label="عنوان الفاتورة هو نفسه عنوان التوصيل"
+          label={t("checkout.billing_same_checkbox")}
           name="same_as_billing"
           checked={checked}
           onChange={onChange}
@@ -209,11 +211,11 @@ const ShippingAddress = ({
       </div>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Input
-          label="البريد الإلكتروني"
+          label={t("checkout.email")}
           name="email"
           type="email"
           dir="ltr"
-          title="أدخل بريداً إلكترونياً صحيحاً."
+          title={t("checkout.email_hint")}
           autoComplete="email"
           value={formData.email}
           onChange={handleChange}

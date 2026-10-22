@@ -5,10 +5,14 @@ import AddressBook from "@modules/account/components/address-book"
 
 import { getRegion } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
+import { getT } from "@i18n/server"
 
-export const metadata: Metadata = {
-  title: "العناوين",
-  description: "اعرض عناوين التوصيل وعدّلها.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT()
+  return {
+    title: t("account.addresses"),
+    description: t("account.meta_addresses_description"),
+  }
 }
 
 export default async function Addresses(props: {
@@ -18,6 +22,7 @@ export default async function Addresses(props: {
   const { countryCode } = params
   const customer = await retrieveCustomer()
   const region = await getRegion(countryCode)
+  const t = await getT()
 
   if (!customer || !region) {
     notFound()
@@ -26,10 +31,9 @@ export default async function Addresses(props: {
   return (
     <div className="w-full" data-testid="addresses-page-wrapper">
       <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl font-bold text-laly-ink">عناوين التوصيل</h1>
+        <h1 className="text-2xl font-bold text-laly-ink">{t("account.addresses_heading")}</h1>
         <p className="text-base-regular text-laly-mut">
-          اعرض عناوين التوصيل وحدّثها، ويمكنك إضافة أي عدد من العناوين. ستظهر
-          عناوينك المحفوظة عند إتمام الطلب.
+          {t("account.addresses_intro")}
         </p>
       </div>
       <AddressBook customer={customer} region={region} />

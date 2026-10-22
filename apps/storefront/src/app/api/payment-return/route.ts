@@ -1,3 +1,5 @@
+import { localePath, LOCALE_COOKIE } from "@i18n/config"
+import { localeFromCookie } from "@i18n/server"
 import { sdk } from "@lib/config"
 import { placeOrder } from "@lib/data/cart"
 import { getAuthHeaders, setCartId } from "@lib/data/cookies"
@@ -18,7 +20,9 @@ export async function GET(req: NextRequest) {
 
   // Without a country code the middleware resolves the customer's region and
   // prefixes it; either way every redirect below stays on this origin.
-  const prefix = countryCode ? `/${countryCode}` : ""
+  const prefix = countryCode
+    ? localePath(countryCode, localeFromCookie(req.cookies.get(LOCALE_COOKIE)?.value))
+    : ""
   const rejected = () =>
     NextResponse.redirect(`${origin}${prefix}/cart?error=payment_failed`)
 

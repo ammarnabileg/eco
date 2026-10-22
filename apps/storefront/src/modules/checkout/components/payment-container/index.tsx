@@ -1,10 +1,11 @@
 import { Radio as RadioGroupOption } from "@headlessui/react"
 import { Text, clx } from "@modules/common/components/ui"
-import React, { useContext, type JSX } from "react"
+import React, { useContext } from "react"
 
 import Radio from "@modules/common/components/radio"
 
-import { isManual } from "@lib/constants"
+import { useT } from "@i18n/client"
+import { isManual, PaymentInfo } from "@lib/constants"
 import SkeletonCardDetails from "@modules/skeletons/components/skeleton-card-details"
 import { PaymentElement } from "@stripe/react-stripe-js"
 import PaymentTest from "../payment-test"
@@ -14,7 +15,7 @@ type PaymentContainerProps = {
   paymentProviderId: string
   selectedPaymentOptionId: string | null
   disabled?: boolean
-  paymentInfoMap: Record<string, { title: string; icon: JSX.Element }>
+  paymentInfoMap: Record<string, PaymentInfo>
   children?: React.ReactNode
 }
 
@@ -25,6 +26,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   disabled = false,
   children,
 }) => {
+  const t = useT()
   const isDevelopment = process.env.NODE_ENV === "development"
 
   return (
@@ -44,7 +46,9 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
         <div className="flex items-center gap-x-4">
           <Radio checked={selectedPaymentOptionId === paymentProviderId} />
           <Text className="text-base-regular">
-            {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
+            {paymentInfoMap[paymentProviderId]
+              ? t(paymentInfoMap[paymentProviderId].titleKey)
+              : paymentProviderId}
           </Text>
           {isManual(paymentProviderId) && isDevelopment && (
             <PaymentTest className="hidden small:block" />
@@ -75,6 +79,7 @@ export const StripePaymentContainer = ({
   setError: (error: string | null) => void
   setPaymentComplete: (complete: boolean) => void
 }) => {
+  const t = useT()
   const stripeReady = useContext(StripeContext)
 
   return (
@@ -88,7 +93,7 @@ export const StripePaymentContainer = ({
         (stripeReady ? (
           <div className="my-4 transition-all duration-150 ease-in-out">
             <Text className="txt-medium-plus text-ui-fg-base mb-1">
-              أدخل بيانات الدفع:
+              {t("checkout.enter_payment_details_colon")}
             </Text>
             <PaymentElement
               options={{ layout: "accordion" }}
@@ -103,7 +108,7 @@ export const StripePaymentContainer = ({
               onLoadError={(e) => {
                 setPaymentComplete(false)
                 setError(
-                  e.error?.message ?? "تعذّر تحميل طرق الدفع."
+                  e.error?.message ?? t("checkout.payment_methods_load_failed")
                 )
               }}
             />

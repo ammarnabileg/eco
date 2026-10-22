@@ -1,3 +1,4 @@
+import { getT } from "@i18n/server"
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { OptionValueIds } from "@lib/util/product-option-filters"
@@ -75,16 +76,17 @@ export default async function PaginatedProducts({
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
   if (!products.length) {
+    const t = await getT()
     return (
       <div
         className="py-16 px-4 text-center bg-white border border-laly-line rounded-card"
         data-testid="no-products"
       >
         <p className="text-base font-extrabold text-laly-ink">
-          لا توجد منتجات هنا حالياً.
+          {t("catalog.empty")}
         </p>
         <p className="mt-1 text-sm text-laly-mut">
-          تصفّح باقي الفئات أو عُد لاحقاً.
+          {t("catalog.empty_hint")}
         </p>
       </div>
     )

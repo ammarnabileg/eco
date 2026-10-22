@@ -1,4 +1,5 @@
 import { Listbox, Transition } from "@headlessui/react"
+import { useT } from "@i18n/client"
 import { ChevronUpDown } from "@medusajs/icons"
 import { clx } from "@modules/common/components/ui"
 import { Fragment, useMemo } from "react"
@@ -21,6 +22,8 @@ const AddressSelect = ({
   addressInput,
   onSelect,
 }: AddressSelectProps) => {
+  const t = useT()
+  const sep = t("checkout.list_separator")
   const handleSelect = (id: string) => {
     const savedAddress = addresses.find((a) => a.id === id)
     if (savedAddress) {
@@ -44,7 +47,7 @@ const AddressSelect = ({
               <span className="block truncate">
                 {selectedAddress
                   ? selectedAddress.address_1
-                  : "اختر عنواناً"}
+                  : t("checkout.choose_address")}
               </span>
               <ChevronUpDown
                 className={clx("transition-rotate duration-200", {
@@ -90,14 +93,14 @@ const AddressSelect = ({
                         <span>
                           {address.address_1}
                           {address.address_2 && (
-                            <span>، {address.address_2}</span>
+                            <span>{sep}{address.address_2}</span>
                           )}
                         </span>
                         <span>{address.city}</span>
                         <span>
-                          {address.province && `${address.province}، `}
+                          {address.province && `${address.province}${sep}`}
                           {address.country_code === "kw"
-                            ? "الكويت"
+                            ? t("checkout.country_kw")
                             : address.country_code?.toUpperCase()}
                         </span>
                       </div>

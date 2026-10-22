@@ -10,6 +10,8 @@ import {
   ThHTMLAttributes,
 } from "react"
 
+import LoadingLabel from "./loading-label"
+
 // TODO: Add Toaster component back when needed for notifications
 
 // Re-export clsx as clx for compatibility
@@ -94,7 +96,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {...props}
       >
-        {isLoading ? "جاري التحميل…" : children}
+        {isLoading ? <LoadingLabel /> : children}
       </button>
     )
   }
@@ -312,7 +314,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
       <th
         ref={ref}
         className={clsx(
-          "h-12 px-4 text-left align-middle font-medium text-gray-500 [&:has([role=checkbox])]:pr-0",
+          "h-12 px-4 text-start align-middle font-medium text-gray-500 [&:has([role=checkbox])]:pe-0",
           className
         )}
         {...props}
@@ -332,7 +334,7 @@ const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
       <td
         ref={ref}
         className={clsx(
-          "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+          "p-4 align-middle [&:has([role=checkbox])]:pe-0",
           className
         )}
         {...props}

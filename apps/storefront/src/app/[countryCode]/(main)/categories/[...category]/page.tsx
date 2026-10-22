@@ -5,6 +5,8 @@ import { getCatalogFilters } from "@lib/data/catalog"
 import { getCategoryByHandle } from "@lib/data/categories"
 import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getLocale, getT, languageAlternates } from "@i18n/server"
+import { categoryDescription, categoryName } from "@lib/util/category-name"
 import { categoryTreeIds } from "@lib/util/categories"
 import CategoryTemplate from "@modules/categories/templates"
 
@@ -31,9 +33,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  const title = productCategory.name
+  const [t, locale] = await Promise.all([getT(), getLocale()])
+  const title = categoryName(productCategory, locale)
   const description =
-    productCategory.description || `تسوّق منتجات ${title} من Laly في الكويت.`
+    categoryDescription(productCategory, locale) || t("pages.category_description", { name: title })
   const indexable = await hasProducts(
     categoryTreeIds(productCategory),
     params.countryCode
@@ -42,11 +45,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: {
-      canonical: `/${params.countryCode}/categories/${params.category.join(
-        "/"
-      )}`,
-    },
+    alternates: await languageAlternates(params.countryCode),
     // An empty category is a thin page: keep it out of search results.
     ...(indexable ? {} : { robots: { index: false, follow: true } }),
   }

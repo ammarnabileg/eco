@@ -1,4 +1,7 @@
+import { DEFAULT_LOCALE, Locale } from "@i18n/config"
 import { HttpTypes } from "@medusajs/types"
+
+import { localize } from "./localize"
 
 // Catalog data the backend links to products (brand, details, add-ons) and
 // the spec templates behind the storefront filters.
@@ -42,6 +45,7 @@ export type Brand = {
   handle?: string
   logo_url?: string | null
   description_ar?: string | null
+  description_en?: string | null
   /** Published products of the brand (brands list only). */
   product_count?: number
 }
@@ -142,9 +146,19 @@ export const lineAddons = (metadata: unknown): LineAddon[] => {
 
 /**
  * Splits a "key:value" spec facet and labels both sides from the template:
- * the option's Arabic label, or the raw value plus unit.
+ * the option's label in the visitor's language, or the raw value plus unit.
+ * `labels` gives the language and the translated yes/no for boolean specs
+ * (without it: Arabic, as before).
  */
-export const labelSpecFacet = (facet: string, attributes: SpecAttribute[]) => {
+export const labelSpecFacet = (
+  facet: string,
+  attributes: SpecAttribute[],
+  labels: { locale: Locale; yes: string; no: string } = {
+    locale: DEFAULT_LOCALE,
+    yes: "نعم",
+    no: "لا",
+  }
+) => {
   const separator = facet.indexOf(":")
   if (separator < 1) {
     return null
@@ -159,10 +173,10 @@ export const labelSpecFacet = (facet: string, attributes: SpecAttribute[]) => {
   const label =
     attr.type === "boolean"
       ? value === "true"
-        ? "نعم"
-        : "لا"
+        ? labels.yes
+        : labels.no
       : option
-      ? option.label_ar
+      ? localize(option, "label", labels.locale)
       : `${value}${attr.unit ? ` ${attr.unit}` : ""}`
   return { key, attr, label }
 }

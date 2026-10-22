@@ -1,3 +1,6 @@
+import { getLocale, getT } from "@i18n/server"
+import { categoryName } from "@lib/util/category-name"
+
 import { nonEmptyCategories } from "@lib/util/categories"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -5,7 +8,7 @@ import Icon from "@modules/laly/components/icon"
 import SectionHeading from "@modules/laly/components/section-heading"
 import { CATEGORY_ICONS } from "@modules/laly/lib/content"
 
-export default function CategoryTiles({
+export default async function CategoryTiles({
   categories,
 }: {
   categories: HttpTypes.StoreProductCategory[]
@@ -14,12 +17,13 @@ export default function CategoryTiles({
   if (!topLevel.length) {
     return null
   }
+  const [t, locale] = await Promise.all([getT(), getLocale()])
 
   return (
     <section className="content-container mt-10 small:mt-14">
       <SectionHeading
-        eyebrow="تصفح المتجر"
-        title="تسوّق حسب القسم"
+        eyebrow={t("home.categories_eyebrow")}
+        title={t("home.categories_title")}
         href="/categories"
       />
       <ul className="flex small:grid small:grid-cols-8 gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 small:mx-0 small:px-0">
@@ -33,7 +37,7 @@ export default function CategoryTiles({
                 <Icon name={CATEGORY_ICONS[c.handle] ?? "grid"} size={24} />
               </span>
               <span className="text-[11.5px] small:text-[13px] font-bold leading-tight">
-                {c.name}
+                {categoryName(c, locale)}
               </span>
             </LocalizedClientLink>
           </li>
@@ -46,7 +50,7 @@ export default function CategoryTiles({
             <span className="w-12 h-12 rounded-[13px] bg-laly-teal-soft text-laly-teal flex items-center justify-center group-hover:-translate-y-1 transition-transform">
               <Icon name="grid" size={24} />
             </span>
-            <span className="text-[13px] font-bold">عرض الكل</span>
+            <span className="text-[13px] font-bold">{t("home.view_all")}</span>
           </LocalizedClientLink>
         </li>
       </ul>

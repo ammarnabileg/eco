@@ -1,3 +1,4 @@
+import { useT } from "@i18n/client"
 import { HttpTypes } from "@medusajs/types"
 import Input from "@modules/common/components/input"
 import React, { useState } from "react"
@@ -6,6 +7,7 @@ import GovernorateSelect from "../governorate-select"
 import PhoneInput from "../phone-input"
 
 const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
+  const t = useT()
   const [formData, setFormData] = useState<Record<string, string>>({
     "billing_address.first_name": cart?.billing_address?.first_name || "",
     "billing_address.last_name": cart?.billing_address?.last_name || "",
@@ -39,7 +41,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
     <>
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="الاسم الأول"
+          label={t("checkout.first_name")}
           name="billing_address.first_name"
           autoComplete="given-name"
           value={formData["billing_address.first_name"]}
@@ -48,7 +50,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-first-name-input"
         />
         <Input
-          label="اسم العائلة"
+          label={t("checkout.last_name")}
           name="billing_address.last_name"
           autoComplete="family-name"
           value={formData["billing_address.last_name"]}
@@ -74,7 +76,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-province-input"
         />
         <Input
-          label="المنطقة"
+          label={t("checkout.area")}
           name="billing_address.city"
           autoComplete="address-level2"
           value={formData["billing_address.city"]}
@@ -82,7 +84,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           required
         />
         <Input
-          label="القطعة، الشارع، الجادة"
+          label={t("checkout.address_1")}
           name="billing_address.address_1"
           autoComplete="address-line1"
           value={formData["billing_address.address_1"]}
@@ -91,7 +93,7 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           data-testid="billing-address-input"
         />
         <Input
-          label="المبنى، الدور، الشقة (اختياري)"
+          label={t("checkout.address_2")}
           name="billing_address.address_2"
           autoComplete="address-line2"
           value={formData["billing_address.address_2"]}

@@ -1,6 +1,9 @@
 "use client"
 
+import { intlLocale } from "@i18n/config"
+import { useLocale, useT } from "@i18n/client"
 import { convertToLocale } from "@lib/util/money"
+import { richText } from "@lib/util/rich-text"
 import { CheckCircleSolid, XMark } from "@medusajs/icons"
 import {
   HttpTypes,
@@ -141,6 +144,8 @@ function FreeShippingInline({
     remaining_percentage: number
   }
 }) {
+  const t = useT()
+  const locale = useLocale()
   return (
     <div className="bg-laly-teal-soft p-2 rounded-card border border-laly-line">
       <div className="space-y-1.5">
@@ -150,10 +155,10 @@ function FreeShippingInline({
               <div className="flex items-center gap-1.5">
                 {" "}
                 <CheckCircleSolid className="text-green-500 inline-block" />{" "}
-                حصلت على توصيل مجاني!
+                {t("cart.free_shipping_reached")}
               </div>
             ) : (
-              `احصل على توصيل مجاني`
+              t("cart.free_shipping_get")
             )}
           </div>
 
@@ -162,19 +167,23 @@ function FreeShippingInline({
               "opacity-0 invisible": price.target_reached,
             })}
           >
-            باقي{" "}
-            <span className="text-laly-ink font-semibold">
-              {convertToLocale({
-                amount: price.target_remaining,
-                currency_code: cart.currency_code,
-              })}
-            </span>
+            {richText(t("cart.free_shipping_remaining"), {
+              amount: (
+                <span className="text-laly-ink font-semibold">
+                  {convertToLocale({
+                    amount: price.target_remaining,
+                    currency_code: cart.currency_code,
+                    locale: intlLocale(locale),
+                  })}
+                </span>
+              ),
+            })}
           </div>
         </div>
         <div className="flex justify-between gap-1">
           <div
             className={clx(
-              "bg-gradient-to-l from-laly-teal to-laly-teal-d h-1 rounded-full max-w-full duration-500 ease-in-out",
+              "bg-gradient-to-r rtl:bg-gradient-to-l from-laly-teal to-laly-teal-d h-1 rounded-full max-w-full duration-500 ease-in-out",
               {
                 "from-green-400 to-green-500": price.target_reached,
               }
@@ -195,6 +204,8 @@ function FreeShippingPopup({
   cart: StoreCart
   price: StoreFreeShippingPrice
 }) {
+  const t = useT()
+  const locale = useLocale()
   const [isClosed, setIsClosed] = useState(false)
 
   return (
@@ -210,7 +221,7 @@ function FreeShippingPopup({
     >
       <div>
         <Button
-          aria-label="إغلاق"
+          aria-label={t("cart.close")}
           className="rounded-full bg-laly-ink shadow-none outline-none border-none text-[15px] p-2"
           onClick={() => setIsClosed(true)}
         >
@@ -226,10 +237,10 @@ function FreeShippingPopup({
                 {price.target_reached ? (
                   <div className="flex items-center gap-1.5">
                     <CheckCircleSolid className="text-green-500 inline-block" />{" "}
-                    حصلت على توصيل مجاني!
+                    {t("cart.free_shipping_reached")}
                   </div>
                 ) : (
-                  `احصل على توصيل مجاني`
+                  t("cart.free_shipping_get")
                 )}
               </div>
 
@@ -238,19 +249,23 @@ function FreeShippingPopup({
                   "opacity-0 invisible": price.target_reached,
                 })}
               >
-                باقي{" "}
-                <span className="text-white font-semibold">
-                  {convertToLocale({
-                    amount: price.target_remaining,
-                    currency_code: cart.currency_code,
-                  })}
-                </span>
+                {richText(t("cart.free_shipping_remaining"), {
+                  amount: (
+                    <span className="text-white font-semibold">
+                      {convertToLocale({
+                        amount: price.target_remaining,
+                        currency_code: cart.currency_code,
+                        locale: intlLocale(locale),
+                      })}
+                    </span>
+                  ),
+                })}
               </div>
             </div>
             <div className="flex justify-between gap-1">
               <div
                 className={clx(
-                  "bg-gradient-to-l from-laly-teal to-laly-teal-d h-1.5 rounded-full max-w-full duration-500 ease-in-out",
+                  "bg-gradient-to-r rtl:bg-gradient-to-l from-laly-teal to-laly-teal-d h-1.5 rounded-full max-w-full duration-500 ease-in-out",
                   {
                     "from-green-400 to-green-500": price.target_reached,
                   }
@@ -267,14 +282,14 @@ function FreeShippingPopup({
             className="rounded-btn bg-transparent shadow-none outline-none border-[1px] border-white text-[15px] py-2.5 px-4"
             href="/cart"
           >
-            عرض السلة
+            {t("cart.view_cart")}
           </LocalizedClientLink>
 
           <LocalizedClientLink
             className="flex-grow rounded-btn bg-white text-laly-ink shadow-none outline-none border-[1px] border-white text-[15px] py-2.5 px-4 text-center"
             href="/store"
           >
-            تصفّح المنتجات
+            {t("cart.nudge_browse_products")}
           </LocalizedClientLink>
         </div>
       </div>

@@ -14,7 +14,9 @@ import Modal from "@modules/common/components/modal"
 import {
   GovernorateSelect,
   KuwaitPhoneInput,
+  governorateLabel,
 } from "@modules/account/components/kuwait-address-fields"
+import { useT } from "@i18n/client"
 import { Button, Heading, Text, clx } from "@modules/common/components/ui"
 import Spinner from "@modules/common/icons/spinner"
 import React, { useActionState, useEffect, useState } from "react"
@@ -30,6 +32,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
   address,
   isActive = false,
 }) => {
+  const t = useT()
   const [removing, setRemoving] = useState(false)
   const [successState, setSuccessState] = useState(false)
   const { state, open, close: closeModal } = useToggleState(false)
@@ -98,17 +101,17 @@ const EditAddress: React.FC<EditAddressProps> = ({
           <Text className="flex flex-col text-start text-base-regular text-laly-mut mt-2 gap-y-0.5">
             <span data-testid="address-address">
               {address.address_1}
-              {address.address_2 && <span>، {address.address_2}</span>}
+              {address.address_2 && <span>{t("account.list_separator")}{address.address_2}</span>}
             </span>
             <span data-testid="address-postal-city">
-              {[address.city, address.postal_code].filter(Boolean).join("، ")}
+              {[address.city, address.postal_code].filter(Boolean).join(t("account.list_separator"))}
             </span>
             <span data-testid="address-province-country">
-              {address.province && `${address.province}، `}
+              {address.province && `${governorateLabel(t, address.province)}${t("account.list_separator")}`}
               {countryName}
             </span>
             {address.phone && (
-              <span dir="ltr" className="text-end">
+              <span dir="ltr" className="self-start">
                 {address.phone}
               </span>
             )}
@@ -121,7 +124,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
             data-testid="address-edit-button"
           >
             <Edit />
-            تعديل
+            {t("account.edit")}
           </button>
           <button
             className="text-small-regular text-laly-mut hover:text-laly-red flex items-center gap-x-2"
@@ -129,14 +132,14 @@ const EditAddress: React.FC<EditAddressProps> = ({
             data-testid="address-delete-button"
           >
             {removing ? <Spinner /> : <Trash />}
-            حذف
+            {t("account.delete")}
           </button>
         </div>
       </div>
 
       <Modal isOpen={state} close={close} data-testid="edit-address-modal">
         <Modal.Title>
-          <Heading className="mb-2 text-laly-ink">تعديل العنوان</Heading>
+          <Heading className="mb-2 text-laly-ink">{t("account.edit_address")}</Heading>
         </Modal.Title>
         <form action={formAction}>
           <input type="hidden" name="addressId" value={address.id} />
@@ -159,7 +162,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
             <div className="grid grid-cols-1 gap-y-3">
               <div className="grid grid-cols-2 gap-x-2">
                 <Input
-                  label="الاسم الأول"
+                  label={t("account.first_name")}
                   name="first_name"
                   required
                   autoComplete="given-name"
@@ -167,7 +170,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                   data-testid="first-name-input"
                 />
                 <Input
-                  label="اسم العائلة"
+                  label={t("account.last_name")}
                   name="last_name"
                   required
                   autoComplete="family-name"
@@ -180,7 +183,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 data-testid="state-input"
               />
               <Input
-                label="المنطقة"
+                label={t("account.area")}
                 name="city"
                 required
                 autoComplete="address-level2"
@@ -188,7 +191,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 data-testid="city-input"
               />
               <Input
-                label="القطعة، الشارع، الجادة"
+                label={t("account.address_1")}
                 name="address_1"
                 required
                 autoComplete="address-line1"
@@ -196,7 +199,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 data-testid="address-1-input"
               />
               <Input
-                label="المبنى، الدور، الشقة (اختياري)"
+                label={t("account.address_2")}
                 name="address_2"
                 autoComplete="address-line2"
                 defaultValue={address.address_2 || undefined}
@@ -206,7 +209,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 <CountrySelect
                   name="country_code"
                   region={region}
-                  placeholder="الدولة"
+                  placeholder={t("account.country")}
                   required
                   autoComplete="country"
                   defaultValue={address.country_code || undefined}
@@ -233,9 +236,9 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 className="h-10"
                 data-testid="cancel-button"
               >
-                إلغاء
+                {t("account.cancel")}
               </Button>
-              <SubmitButton data-testid="save-button">حفظ</SubmitButton>
+              <SubmitButton data-testid="save-button">{t("account.save")}</SubmitButton>
             </div>
           </Modal.Footer>
         </form>

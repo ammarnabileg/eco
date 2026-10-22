@@ -1,4 +1,6 @@
 import { declineTransferRequest } from "@lib/data/orders"
+import { getT } from "@i18n/server"
+import { richText } from "@lib/util/rich-text"
 import { Heading, Text } from "@modules/common/components/ui"
 import TransferImage from "@modules/order/components/transfer-image"
 
@@ -10,6 +12,7 @@ export default async function TransferPage({
   const { id, token } = params
 
   const { success, error } = await declineTransferRequest(id, token)
+  const t = await getT()
 
   return (
     <div className="flex flex-col gap-y-4 items-start w-full max-w-xl px-4 mx-auto mt-10 mb-20">
@@ -18,20 +21,24 @@ export default async function TransferPage({
         {success && (
           <>
             <Heading level="h1" className="text-xl text-zinc-900">
-              تم رفض نقل الطلب!
+              {t("order.transfer_declined_title")}
             </Heading>
             <Text className="text-zinc-600">
-              تم رفض نقل الطلب <span dir="ltr">{id}</span> بنجاح.
+              {richText(t("order.transfer_declined_body"), {
+                id: <span dir="ltr">{id}</span>,
+              })}
             </Text>
           </>
         )}
         {!success && (
           <>
             <Text className="text-zinc-600">
-              حدث خطأ أثناء رفض النقل. يرجى المحاولة مرة أخرى.
+              {t("order.transfer_decline_failed")}
             </Text>
             {error && (
-              <Text className="text-red-500">رسالة الخطأ: {error}</Text>
+              <Text className="text-red-500">
+                {t("order.error_message", { error })}
+              </Text>
             )}
           </>
         )}

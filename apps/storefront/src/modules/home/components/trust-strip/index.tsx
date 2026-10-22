@@ -1,11 +1,13 @@
+import { getLocale } from "@i18n/server"
 import type { TrustBadge } from "@lib/data/content"
 import { localize } from "@lib/util/localize"
 import Icon, { isIconName } from "@modules/laly/components/icon"
 
-export default function TrustStrip({ badges }: { badges: TrustBadge[] }) {
+export default async function TrustStrip({ badges }: { badges: TrustBadge[] }) {
   if (!badges.length) {
     return null
   }
+  const locale = await getLocale()
 
   return (
     <section className="content-container small:-mt-14 relative z-10 mt-4">
@@ -25,10 +27,10 @@ export default function TrustStrip({ badges }: { badges: TrustBadge[] }) {
             </span>
             <span>
               <span className="block text-xs small:text-[13.5px] font-extrabold whitespace-nowrap">
-                {localize(badge, "title")}
+                {localize(badge, "title", locale)}
               </span>
               <span className="hidden small:block text-xs text-laly-mut">
-                {localize(badge, "subtitle")}
+                {localize(badge, "subtitle", locale)}
               </span>
             </span>
           </li>

@@ -48,7 +48,7 @@ const SearchHit = ({ hit, onNavigate }: SearchHitProps) => {
           )}
         </div>
         <Text className="text-sm font-bold text-laly-ink line-clamp-2">
-          {hit.title}
+          <bdi>{hit.title}</bdi>
         </Text>
       </LocalizedClientLink>
     </li>

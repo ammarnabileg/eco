@@ -1,3 +1,4 @@
+import { useT } from "@i18n/client"
 import Input from "@modules/common/components/input"
 import React, { useState } from "react"
 
@@ -12,23 +13,24 @@ const PHONE_PLACEHOLDER = "+965 XXXXXXXX"
  * an empty (" ") placeholder, so the format hint is only shown while focused.
  */
 const PhoneInput = ({
-  label = "رقم الهاتف",
+  label,
   onFocus,
   onBlur,
   ...props
 }: PhoneInputProps) => {
+  const t = useT()
   const [focused, setFocused] = useState(false)
   const placeholderProps = { placeholder: focused ? PHONE_PLACEHOLDER : " " }
 
   return (
     <Input
-      label={label}
+      label={label ?? t("checkout.phone")}
       type="tel"
       dir="ltr"
       inputMode="tel"
       autoComplete="tel"
       pattern="(\+?965)?\s?[0-9]{8}"
-      title="أدخل رقم هاتف كويتي من 8 أرقام، مثل +965 XXXXXXXX"
+      title={t("checkout.phone_hint")}
       required
       onFocus={(e) => {
         setFocused(true)

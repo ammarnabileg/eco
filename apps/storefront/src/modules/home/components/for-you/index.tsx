@@ -1,3 +1,5 @@
+import { getT } from "@i18n/server"
+import type { Translate } from "@i18n/translate"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 import { getRecommendations } from "@lib/data/recommendations"
@@ -7,12 +9,14 @@ import ProductSection from "@modules/home/components/product-section"
 import { formatFulfillmentStatus } from "@modules/order/util/format"
 
 const PICKS_TITLE = {
-  orders: { title: "مختار لك", eyebrow: "على حسب مشترياتك" },
-  views: { title: "ممكن يعجبك كمان", eyebrow: "على حسب اللي شفته" },
+  orders: { title: "home.picks_orders_title", eyebrow: "home.picks_orders_eyebrow" },
+  views: { title: "home.picks_views_title", eyebrow: "home.picks_views_eyebrow" },
 } as const
 
-const orderStatus = (o: HttpTypes.StoreOrder) =>
-  o.status === "canceled" ? "ملغي" : formatFulfillmentStatus(o.fulfillment_status) || "قيد التجهيز"
+const orderStatus = (o: HttpTypes.StoreOrder, t: Translate) =>
+  o.status === "canceled"
+    ? t("home.order_canceled")
+    : formatFulfillmentStatus(o.fulfillment_status, t) || t("home.order_processing")
 
 /**
  * The personal part of the homepage: a greeting with the last order for
@@ -28,7 +32,7 @@ export default async function ForYou({
   offerEnds?: Record<string, string>
   place?: "home" | "account"
 }) {
-  const [customer, recs] = await Promise.all([retrieveCustomer().catch(() => null), getRecommendations(8)])
+  const [customer, recs, t] = await Promise.all([retrieveCustomer().catch(() => null), getRecommendations(8), getT()])
   const lastOrder =
     place === "home" && customer ? ((await listOrders(1).catch(() => null)) ?? [])[0] ?? null : null
   const picks = recs.based_on === "popular" ? null : PICKS_TITLE[recs.based_on]
@@ -42,13 +46,16 @@ export default async function ForYou({
             data-testid="for-you-greeting"
           >
             <div>
-              <p className="text-lg font-extrabold text-laly-ink">أهلاً {customer.first_name || "بيك"}</p>
+              <p className="text-lg font-extrabold text-laly-ink">
+                {customer.first_name ? t("home.greeting", { name: customer.first_name }) : t("home.greeting_no_name")}
+              </p>
               {lastOrder ? (
                 <p className="text-sm text-laly-mut">
-                  آخر طلب #{lastOrder.display_id}: <span className="font-bold text-laly-teal">{orderStatus(lastOrder)}</span>
+                  {t("home.last_order", { number: lastOrder.display_id ?? "" })}{" "}
+                  <span className="font-bold text-laly-teal">{orderStatus(lastOrder, t)}</span>
                 </p>
               ) : (
-                <p className="text-sm text-laly-mut">نورت Laly تاني.</p>
+                <p className="text-sm text-laly-mut">{t("home.welcome_back")}</p>
               )}
             </div>
             <div className="flex gap-2">
@@ -57,14 +64,14 @@ export default async function ForYou({
                   href={`/account/orders/details/${lastOrder.id}`}
                   className="rounded-btn bg-laly-teal px-4 py-2 text-sm font-bold text-white"
                 >
-                  تتبع الطلب
+                  {t("home.track_order")}
                 </LocalizedClientLink>
               )}
               <LocalizedClientLink
                 href="/account"
                 className="rounded-btn border border-laly-line px-4 py-2 text-sm font-bold text-laly-ink"
               >
-                حسابي
+                {t("home.my_account")}
               </LocalizedClientLink>
             </div>
           </div>
@@ -72,8 +79,8 @@ export default async function ForYou({
       )}
       {recs.viewed.length > 0 && (
         <ProductSection
-          title="كمّل من حيث وقفت"
-          eyebrow="شفتها مؤخراً"
+          title={t("home.continue_title")}
+          eyebrow={t("home.continue_eyebrow")}
           region={region}
           layout="rail"
           productIds={recs.viewed}
@@ -83,8 +90,8 @@ export default async function ForYou({
       )}
       {picks && (
         <ProductSection
-          title={picks.title}
-          eyebrow={picks.eyebrow}
+          title={t(picks.title)}
+          eyebrow={t(picks.eyebrow)}
           region={region}
           layout="rail"
           productIds={recs.for_you}
@@ -94,8 +101,8 @@ export default async function ForYou({
       )}
       {recs.buy_again.length > 0 && (
         <ProductSection
-          title="اشتريه تاني"
-          eyebrow="من طلباتك السابقة"
+          title={t("home.buy_again_title")}
+          eyebrow={t("home.buy_again_eyebrow")}
           region={region}
           layout="rail"
           productIds={recs.buy_again}

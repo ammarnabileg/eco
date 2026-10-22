@@ -6,10 +6,14 @@ import { retrieveCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 import { getRegion } from "@lib/data/regions"
 import ForYou from "@modules/home/components/for-you"
+import { getT } from "@i18n/server"
 
-export const metadata: Metadata = {
-  title: "حسابي",
-  description: "نظرة عامة على نشاط حسابك.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT()
+  return {
+    title: t("account.my_account"),
+    description: t("account.meta_overview_description"),
+  }
 }
 
 export default async function OverviewTemplate(props: {

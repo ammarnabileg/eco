@@ -1,8 +1,10 @@
+import { getT } from "@i18n/server"
 import { whatsappLink } from "@lib/util/localize"
 import Icon from "@modules/laly/components/icon"
 
-export default function InstallCta({ whatsapp }: { whatsapp: string | null }) {
-  const href = whatsappLink(whatsapp, "أريد حجز موعد تركيب")
+export default async function InstallCta({ whatsapp }: { whatsapp: string | null }) {
+  const t = await getT()
+  const href = whatsappLink(whatsapp, t("home.install_whatsapp_message"))
   if (!href) {
     return null
   }
@@ -15,10 +17,10 @@ export default function InstallCta({ whatsapp }: { whatsapp: string | null }) {
         </span>
         <div className="flex-1">
           <h2 className="text-lg small:text-2xl font-extrabold">
-            تركيب احترافي على إيد فنيين معتمدين
+            {t("home.install_title")}
           </h2>
           <p className="mt-1 text-[13px] small:text-sm text-[#B9D3D8]">
-            معاينة وتركيب بسرعة وبموعد محدد
+            {t("home.install_subtitle")}
           </p>
         </div>
         <a
@@ -27,7 +29,7 @@ export default function InstallCta({ whatsapp }: { whatsapp: string | null }) {
           rel="noopener noreferrer"
           className="self-start small:self-auto inline-flex items-center rounded-btn bg-laly-sand hover:bg-laly-sand-d text-[#26200D] font-bold text-sm px-5 py-3 transition-colors"
         >
-          احجز موعد التركيب
+          {t("home.install_cta")}
         </a>
       </div>
     </section>

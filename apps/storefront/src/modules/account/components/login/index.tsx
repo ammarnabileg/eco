@@ -4,6 +4,7 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import { useActionState } from "react"
+import { useT } from "@i18n/client"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -11,40 +12,42 @@ type Props = {
 
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
+  const t = useT()
+  const [sentBefore, sentAfter = ""] = t("account.login_verification_sent").split("{email}")
 
   return (
     <div
       className="max-w-sm w-full flex flex-col items-center bg-white border border-laly-line rounded-card shadow-laly p-6 small:p-8"
       data-testid="login-page"
     >
-      <h1 className="text-2xl font-bold text-laly-ink mb-2">أهلاً بعودتك</h1>
+      <h1 className="text-2xl font-bold text-laly-ink mb-2">{t("account.login_title")}</h1>
       <p className="text-center text-base-regular text-laly-mut mb-8">
-        سجّل الدخول لمتابعة طلباتك والتسوق بشكل أسرع.
+        {t("account.login_intro")}
       </p>
       {message?.state === "verification_required" && (
         <div
           className="w-full mb-6 text-center text-base-regular text-laly-ink bg-laly-teal-faint border border-laly-teal-soft rounded-btn p-4"
           data-testid="login-verification-message"
         >
-          أرسلنا رابط التحقق إلى{" "}
-          <strong dir="ltr">{message.email}</strong>. يرجى تأكيد بريدك
-          الإلكتروني ثم تسجيل الدخول.
+          {sentBefore}
+          <strong dir="ltr">{message.email}</strong>
+          {sentAfter}
         </div>
       )}
       <form className="w-full" action={formAction}>
         <div className="flex flex-col w-full gap-y-2">
           <Input
-            label="البريد الإلكتروني"
+            label={t("account.email")}
             name="email"
             type="email"
             dir="ltr"
-            title="أدخل بريدًا إلكترونيًا صحيحًا."
+            title={t("account.email_invalid")}
             autoComplete="email"
             required
             data-testid="email-input"
           />
           <Input
-            label="كلمة المرور"
+            label={t("account.password")}
             name="password"
             type="password"
             autoComplete="current-password"
@@ -57,17 +60,17 @@ const Login = ({ setCurrentView }: Props) => {
           data-testid="login-error-message"
         />
         <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
-          تسجيل الدخول
+          {t("account.sign_in")}
         </SubmitButton>
       </form>
       <span className="text-center text-laly-mut text-small-regular mt-6">
-        ليس لديك حساب؟{" "}
+        {t("account.no_account")}{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
           className="font-semibold text-laly-teal underline hover:text-laly-teal-d"
           data-testid="register-button"
         >
-          إنشاء حساب
+          {t("account.create_account")}
         </button>
       </span>
     </div>

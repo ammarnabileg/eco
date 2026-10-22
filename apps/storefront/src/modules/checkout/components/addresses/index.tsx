@@ -1,4 +1,5 @@
 "use client"
+import { useT } from "@i18n/client"
 import { setAddresses } from "@lib/data/cart"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import compareAddresses from "@lib/util/compare-addresses"
@@ -21,6 +22,7 @@ const Addresses = ({
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
 }) => {
+  const t = useT()
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -46,7 +48,7 @@ const Addresses = ({
           level="h2"
           className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
         >
-          عنوان التوصيل
+          {t("checkout.shipping_address")}
           {!isOpen && <CheckCircleSolid />}
         </Heading>
         {!isOpen && cart?.shipping_address && (
@@ -56,7 +58,7 @@ const Addresses = ({
               className="text-laly-teal hover:text-laly-teal-d"
               data-testid="edit-address-button"
             >
-              تعديل
+              {t("checkout.edit")}
             </button>
           </Text>
         )}
@@ -77,14 +79,14 @@ const Addresses = ({
                   level="h2"
                   className="text-3xl-regular gap-x-4 pb-6 pt-8"
                 >
-                  عنوان الفاتورة
+                  {t("checkout.billing_address")}
                 </Heading>
 
                 <BillingAddress cart={cart} />
               </div>
             )}
             <SubmitButton className="mt-6" data-testid="submit-address-button">
-              متابعة إلى التوصيل
+              {t("checkout.continue_to_delivery")}
             </SubmitButton>
             <ErrorMessage error={message} data-testid="address-error-message" />
           </div>
@@ -100,7 +102,7 @@ const Addresses = ({
                     data-testid="shipping-address-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      عنوان التوصيل
+                      {t("checkout.shipping_address")}
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle">
                       {cart.shipping_address.first_name}{" "}
@@ -116,11 +118,11 @@ const Addresses = ({
                         cart.shipping_address.province,
                       ]
                         .filter(Boolean)
-                        .join("، ")}
+                        .join(t("checkout.list_separator"))}
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle">
                       {cart.shipping_address.country_code === "kw"
-                        ? "الكويت"
+                        ? t("checkout.country_kw")
                         : cart.shipping_address.country_code?.toUpperCase()}
                     </Text>
                   </div>
@@ -130,7 +132,7 @@ const Addresses = ({
                     data-testid="shipping-contact-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      بيانات التواصل
+                      {t("checkout.contact_details")}
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle" dir="ltr">
                       {cart.shipping_address.phone}
@@ -145,12 +147,12 @@ const Addresses = ({
                     data-testid="billing-address-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      عنوان الفاتورة
+                      {t("checkout.billing_address")}
                     </Text>
 
                     {sameAsBilling ? (
                       <Text className="txt-medium text-ui-fg-subtle">
-                        عنوان الفاتورة هو نفسه عنوان التوصيل.
+                        {t("checkout.billing_same_as_shipping")}
                       </Text>
                     ) : (
                       <>
@@ -168,11 +170,11 @@ const Addresses = ({
                             cart.billing_address?.province,
                           ]
                             .filter(Boolean)
-                            .join("، ")}
+                            .join(t("checkout.list_separator"))}
                         </Text>
                         <Text className="txt-medium text-ui-fg-subtle">
                           {cart.billing_address?.country_code === "kw"
-                            ? "الكويت"
+                            ? t("checkout.country_kw")
                             : cart.billing_address?.country_code?.toUpperCase()}
                         </Text>
                       </>

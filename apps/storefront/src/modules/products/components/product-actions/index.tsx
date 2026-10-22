@@ -9,6 +9,8 @@ import {
 } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 
+import { useLocale, useT } from "@i18n/client"
+import { intlLocale } from "@i18n/config"
 import { addConfiguredToCart, addToCart } from "@lib/data/cart"
 import { isPriceOnRequest, productAddonGroups } from "@lib/util/catalog"
 import { getProductPrice } from "@lib/util/get-product-price"
@@ -24,6 +26,7 @@ import AddonSelector, {
 } from "@modules/products/components/addon-selector"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import QuoteRequest from "@modules/products/components/quote-request"
+import { productText } from "@modules/products/lib/product-text"
 import ProductPrice from "../product-price"
 
 type ProductActionsProps = {
@@ -61,6 +64,9 @@ export default function ProductActions({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const countryCode = useParams().countryCode as string
+  const t = useT()
+  const lang = useLocale()
+  const locale = intlLocale(lang)
 
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [quantity, setQuantity] = useState(1)
@@ -117,6 +123,7 @@ export default function ProductActions({
   const { variantPrice } = getProductPrice({
     product,
     variantId: selectedVariant?.id,
+    locale,
   })
   const currencyCode = variantPrice?.currency_code ?? region.currency_code
 
@@ -152,18 +159,18 @@ export default function ProductActions({
     status === "adding" ||
     needsChoice
   const label = !selectedVariant
-    ? "اختر المواصفات"
+    ? t("product.choose_options")
     : needsChoice
-    ? "اختر الإضافات المطلوبة"
+    ? t("product.choose_required_addons")
     : !inStock
-    ? "نفدت الكمية"
+    ? t("product.sold_out")
     : status === "adding"
-    ? "جاري الإضافة…"
+    ? t("product.adding")
     : status === "added"
-    ? "تمت الإضافة للسلة"
+    ? t("product.added_to_cart")
     : status === "error"
-    ? "حاول مرة أخرى"
-    : "أضف للسلة"
+    ? t("product.try_again")
+    : t("product.add_to_cart")
 
   const addButton = (extra: string) => (
     <button
@@ -203,7 +210,7 @@ export default function ProductActions({
         <QuoteRequest
           productId={product.id}
           variantId={selectedVariant?.id}
-          productTitle={product.title}
+          productTitle={productText(product, lang).title}
           whatsapp={whatsapp}
           layout={layout}
         />
@@ -219,6 +226,7 @@ export default function ProductActions({
               Math.round(extra * 1000)) /
             1000,
           currency_code: currencyCode,
+          locale,
         })
       : null
 
@@ -227,7 +235,7 @@ export default function ProductActions({
       <ProductPrice product={product} variant={selectedVariant} />
       {talyAvailable && variantPrice && (
         <p className="-mt-3 text-xs text-laly-mut" data-testid="taly-instalments">
-          أو 4 دفعات بقيمة{" "}
+          {t("product.taly_before")}{" "}
           <span className="font-bold text-laly-ink tabular-nums">
             {convertToLocale({
               amount:
@@ -235,9 +243,10 @@ export default function ProductActions({
                   ((variantPrice.calculated_price_number + extra) / 4) * 1000
                 ) / 1000,
               currency_code: currencyCode,
+              locale,
             })}
           </span>{" "}
-          بدون فوائد مع Taly
+          {t("product.taly_after")}
         </p>
       )}
       {deemaAvailable && variantPrice && (
@@ -276,7 +285,7 @@ export default function ProductActions({
           className="flex items-baseline justify-between gap-3 rounded-btn bg-laly-teal-soft px-4 py-3 text-sm font-bold"
           aria-live="polite"
         >
-          <span>السعر مع الإضافات</span>
+          <span>{t("product.price_with_addons")}</span>
           <span
             className="text-lg font-extrabold text-laly-teal tabular-nums"
             data-testid="price-with-addons"
@@ -300,17 +309,20 @@ export default function ProductActions({
           {inStock
             ? selectedVariant.manage_inventory &&
               (selectedVariant.inventory_quantity ?? 0) <= 5
-              ? `متوفر — باقي ${selectedVariant.inventory_quantity} فقط`
-              : "متوفر في المخزون"
-            : "غير متوفر حالياً"}
+              ? t("product.in_stock_few_left", {
+                  count: selectedVariant.inventory_quantity ?? 0,
+                })
+              : t("product.in_stock")
+            : t("product.out_of_stock")}
         </p>
       )}
 
       <div className="flex items-stretch gap-3">
-        <div className="flex items-center rounded-btn border-[1.6px] border-laly-line bg-white">
+        {/* "+" sits at the start in Arabic (right) and at the end in English (right): − 1 + */}
+        <div className="flex items-center rounded-btn border-[1.6px] border-laly-line bg-white ltr:flex-row-reverse">
           <button
             type="button"
-            aria-label="زيادة الكمية"
+            aria-label={t("product.increase_quantity")}
             className="w-10 h-12 text-xl font-bold text-laly-teal disabled:text-laly-faint"
             disabled={quantity >= available}
             onClick={() => setQuantity((q) => Math.min(q + 1, available))}
@@ -325,7 +337,7 @@ export default function ProductActions({
           </span>
           <button
             type="button"
-            aria-label="تقليل الكمية"
+            aria-label={t("product.decrease_quantity")}
             className="w-10 h-12 text-xl font-bold text-laly-teal disabled:text-laly-faint"
             disabled={quantity <= 1}
             onClick={() => setQuantity((q) => Math.max(q - 1, 1))}

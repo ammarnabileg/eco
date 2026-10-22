@@ -4,6 +4,7 @@ import type { Hit } from "instantsearch.js"
 import { useEffect, useRef } from "react"
 import { useHits, useInstantSearch } from "react-instantsearch"
 
+import { useT } from "@i18n/client"
 import useSearchSettled from "@lib/hooks/use-search-settled"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
@@ -36,6 +37,7 @@ const HitCard = ({
   currencyCode: string
   priority: boolean
 }) => {
+  const t = useT()
   const href = `/products/${hit.handle}`
   const discount = hit.price_on_request
     ? null
@@ -91,7 +93,7 @@ const HitCard = ({
             className="hover:text-laly-teal"
             data-testid="product-title"
           >
-            {hit.title}
+            <bdi>{hit.title}</bdi>
           </LocalizedClientLink>
         </h3>
         <div className="mt-auto pt-2">
@@ -100,7 +102,7 @@ const HitCard = ({
               className="text-sm font-extrabold text-laly-teal"
               data-testid="price-on-request"
             >
-              السعر عند الطلب
+              {t("catalog.price_on_request")}
             </p>
           ) : (
             <HitPrice hit={hit} currencyCode={currencyCode} />
@@ -112,6 +114,7 @@ const HitCard = ({
 }
 
 const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
+  const t = useT()
   const { items } = useHits<ProductHit>()
   const { status, error, indexUiState } = useInstantSearch()
   const { isSearching, hasNoResultsYet } = useSearchSettled()
@@ -140,7 +143,7 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
         className="py-16 text-center text-sm font-bold text-laly-red"
         data-testid="products-error"
       >
-        تعذّر تحميل المنتجات
+        {t("catalog.load_error")}
         {error?.message ? (
           <>
             {": "}
@@ -163,10 +166,10 @@ const StoreHits = ({ hitsPerPage, currencyCode }: StoreHitsProps) => {
           data-testid="no-products"
         >
           <p className="text-base font-extrabold text-laly-ink">
-            لا توجد منتجات مطابقة لهذه الفلاتر.
+            {t("catalog.no_matches")}
           </p>
           <p className="mt-1 text-sm text-laly-mut">
-            جرّب تعديل البحث أو إزالة بعض الفلاتر.
+            {t("catalog.no_matches_hint")}
           </p>
         </div>
       ) : (

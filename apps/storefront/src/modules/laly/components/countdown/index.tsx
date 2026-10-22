@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import Icon from "@modules/laly/components/icon"
+import { useLocale, useT } from "@i18n/client"
 
 const pad = (n: number) => String(n).padStart(2, "0")
 
@@ -30,6 +31,8 @@ export default function Countdown({
   variant?: "dark" | "chip"
   label?: string
 }) {
+  const t = useT()
+  const locale = useLocale()
   const router = useRouter()
   const end = new Date(endsAt).getTime()
   const [left, setLeft] = useState<ReturnType<typeof remaining> | null>(null)
@@ -55,7 +58,10 @@ export default function Countdown({
   const time = `${pad(left.hours)}:${pad(left.minutes)}:${pad(left.seconds)}`
   const days =
     left.days > 0 ? (
-      <span>{left.days === 1 ? "يوم" : left.days === 2 ? "يومين" : `${left.days} أيام`}</span>
+      <span>
+        {/* Plural form by the language's rules (Arabic: 3–10 أيام, 11–99 يوماً, 100+ يوم). */}
+        {t(`layout.days_${new Intl.PluralRules(locale).select(left.days)}`, { count: left.days })}
+      </span>
     ) : null
 
   if (variant === "chip") {
@@ -72,7 +78,7 @@ export default function Countdown({
     <span
       className="inline-flex items-center gap-1.5 rounded-full bg-laly-deep text-laly-sand text-xs small:text-[13px] font-extrabold px-3 py-1.5"
       role="timer"
-      aria-label={label ?? "ينتهي العرض خلال"}
+      aria-label={label ?? t("layout.offer_ends_in")}
     >
       <Icon name="clock" size={14} />
       {label && <span className="text-white/80 font-bold">{label}</span>}

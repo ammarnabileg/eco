@@ -19,11 +19,16 @@ import Icon from "@modules/laly/components/icon"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
 
+import { useLocale, useT } from "@i18n/client"
+import { intlLocale } from "@i18n/config"
+
 const CartDropdown = ({
   cart: cartState,
 }: {
   cart?: HttpTypes.StoreCart | null
 }) => {
+  const t = useT()
+  const locale = useLocale()
   const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
     undefined
   )
@@ -86,7 +91,7 @@ const CartDropdown = ({
           <LocalizedClientLink
             className="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-laly-teal-soft hover:text-laly-teal"
             href="/cart"
-            aria-label={`السلة (${totalItems})`}
+            aria-label={t("layout.cart_with_count", { count: totalItems })}
             data-testid="nav-cart-link"
           >
             <Icon name="cart" size={22} />
@@ -113,7 +118,7 @@ const CartDropdown = ({
             data-testid="nav-cart-dropdown"
           >
             <div className="p-4 flex items-center justify-center">
-              <h3 className="text-large-semi">السلة</h3>
+              <h3 className="text-large-semi">{t("layout.cart")}</h3>
             </div>
             {cartState && cartState.items?.length ? (
               <>
@@ -149,7 +154,7 @@ const CartDropdown = ({
                                     href={`/products/${item.product_handle}`}
                                     data-testid="product-link"
                                   >
-                                    {item.title}
+                                    <bdi>{item.title}</bdi>
                                   </LocalizedClientLink>
                                 </h3>
                                 <LineItemOptions
@@ -162,7 +167,7 @@ const CartDropdown = ({
                                   data-testid="cart-item-quantity"
                                   data-value={item.quantity}
                                 >
-                                  الكمية: {item.quantity}
+                                  {t("layout.quantity", { quantity: item.quantity })}
                                 </span>
                               </div>
                               <div className="flex justify-end">
@@ -179,7 +184,7 @@ const CartDropdown = ({
                             className="mt-1"
                             data-testid="cart-item-remove-button"
                           >
-                            حذف
+                            {t("layout.remove")}
                           </DeleteButton>
                         </div>
                       </div>
@@ -188,7 +193,7 @@ const CartDropdown = ({
                 <div className="p-4 flex flex-col gap-y-4 text-small-regular">
                   <div className="flex items-center justify-between">
                     <span className="text-ui-fg-base font-semibold">
-                      المجموع
+                      {t("layout.subtotal")}
                     </span>
                     <span
                       className="text-large-semi"
@@ -198,6 +203,7 @@ const CartDropdown = ({
                       {convertToLocale({
                         amount: subtotal,
                         currency_code: cartState.currency_code,
+                        locale: intlLocale(locale),
                       })}
                     </span>
                   </div>
@@ -207,7 +213,7 @@ const CartDropdown = ({
                       size="large"
                       data-testid="go-to-cart-button"
                     >
-                      اذهب للسلة
+                      {t("layout.go_to_cart")}
                     </Button>
                   </LocalizedClientLink>
                 </div>
@@ -218,12 +224,12 @@ const CartDropdown = ({
                   <div className="bg-gray-900 text-small-regular flex items-center justify-center w-6 h-6 rounded-full text-white">
                     <span>0</span>
                   </div>
-                  <span>سلتك فاضية.</span>
+                  <span>{t("layout.cart_empty")}</span>
                   <div>
                     <LocalizedClientLink href="/store">
                       <>
-                        <span className="sr-only">اذهب لصفحة المنتجات</span>
-                        <Button onClick={close}>تصفح المنتجات</Button>
+                        <span className="sr-only">{t("layout.go_to_products")}</span>
+                        <Button onClick={close}>{t("layout.browse_products")}</Button>
                       </>
                     </LocalizedClientLink>
                   </div>

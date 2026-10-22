@@ -5,10 +5,12 @@ import { useSearchParams } from "next/navigation"
 import { Button } from "@modules/common/components/ui"
 import { confirmEmailVerification } from "@lib/data/customer"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { useT } from "@i18n/client"
 
 type VerificationState = "verifying" | "success" | "error"
 
 const VerifyAccount = () => {
+  const t = useT()
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
   const [state, setState] = useState<VerificationState>("verifying")
@@ -38,22 +40,22 @@ const VerifyAccount = () => {
       data-testid="verify-account-page"
     >
       <h1 className="text-2xl font-bold text-laly-ink">
-        تأكيد البريد الإلكتروني
+        {t("account.verify_title")}
       </h1>
 
       {state === "verifying" && (
         <p className="text-base-regular text-laly-mut">
-          جاري التحقق من بريدك الإلكتروني…
+          {t("account.verifying")}
         </p>
       )}
 
       {state === "success" && (
         <>
           <p className="text-base-regular text-laly-mut">
-            تم تأكيد بريدك الإلكتروني. يمكنك الآن تسجيل الدخول إلى حسابك.
+            {t("account.verify_success")}
           </p>
           <LocalizedClientLink href="/account">
-            <Button variant="primary">الذهاب لتسجيل الدخول</Button>
+            <Button variant="primary">{t("account.go_to_sign_in")}</Button>
           </LocalizedClientLink>
         </>
       )}
@@ -61,11 +63,10 @@ const VerifyAccount = () => {
       {state === "error" && (
         <>
           <p className="text-base-regular text-laly-mut">
-            رابط التحقق غير صالح أو انتهت صلاحيته. سجّل الدخول لنرسل لك رسالة
-            تحقق جديدة.
+            {t("account.verify_error")}
           </p>
           <LocalizedClientLink href="/account">
-            <Button variant="secondary">الذهاب لتسجيل الدخول</Button>
+            <Button variant="secondary">{t("account.go_to_sign_in")}</Button>
           </LocalizedClientLink>
         </>
       )}

@@ -1,17 +1,19 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getT } from "@i18n/server"
 
-export default function Logo({
+export default async function Logo({
   inverted = false,
   withTagline = true,
 }: {
   inverted?: boolean
   withTagline?: boolean
 }) {
+  const t = await getT()
   return (
     <LocalizedClientLink
       href="/"
       className="flex items-center gap-x-2.5"
-      aria-label="Laly — الصفحة الرئيسية"
+      aria-label={t("layout.logo_home_label")}
       data-testid="nav-store-link"
     >
       {/* The wordmark stays LTR inside the RTL layout. */}
@@ -44,7 +46,7 @@ export default function Logo({
             inverted ? "text-white/70" : "text-laly-mut"
           }`}
         >
-          شريكك التقني
+          {t("layout.tagline")}
         </span>
       )}
     </LocalizedClientLink>

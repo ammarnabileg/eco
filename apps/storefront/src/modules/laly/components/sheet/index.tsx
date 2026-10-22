@@ -3,6 +3,8 @@
 import { Dialog, Transition } from "@headlessui/react"
 import { Fragment, ReactNode } from "react"
 
+import { useT } from "@i18n/client"
+
 /**
  * A dialog that is a centred card on desktop and a bottom sheet on phones.
  */
@@ -19,6 +21,7 @@ export default function Sheet({
   layout?: "mobile" | "desktop"
   children: ReactNode
 }) {
+  const t = useT()
   const mobile = layout === "mobile"
 
   return (
@@ -70,7 +73,7 @@ export default function Sheet({
                 <button
                   type="button"
                   onClick={onClose}
-                  aria-label="إغلاق"
+                  aria-label={t("layout.close")}
                   className="w-9 h-9 rounded-full flex items-center justify-center text-laly-mut hover:bg-laly-bg"
                 >
                   <svg

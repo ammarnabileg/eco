@@ -15,6 +15,7 @@ import {
   GovernorateSelect,
   KuwaitPhoneInput,
 } from "@modules/account/components/kuwait-address-fields"
+import { useT } from "@i18n/client"
 
 const AddAddress = ({
   region,
@@ -22,6 +23,7 @@ const AddAddress = ({
   region: HttpTypes.StoreRegion
   addresses: HttpTypes.StoreCustomerAddress[]
 }) => {
+  const t = useT()
   const [successState, setSuccessState] = useState(false)
   const { state, open, close: closeModal } = useToggleState(false)
 
@@ -58,7 +60,7 @@ const AddAddress = ({
         onClick={open}
         data-testid="add-address-button"
       >
-        <span className="text-base-semi text-laly-ink">إضافة عنوان جديد</span>
+        <span className="text-base-semi text-laly-ink">{t("account.add_new_address")}</span>
         <span className="flex items-center justify-center w-10 h-10 rounded-full bg-laly-teal-soft text-laly-teal group-hover:bg-laly-teal group-hover:text-white transition-colors">
           <Plus />
         </span>
@@ -66,7 +68,7 @@ const AddAddress = ({
 
       <Modal isOpen={state} close={close} data-testid="add-address-modal">
         <Modal.Title>
-          <Heading className="mb-2 text-laly-ink">إضافة عنوان</Heading>
+          <Heading className="mb-2 text-laly-ink">{t("account.add_address")}</Heading>
         </Modal.Title>
         <form action={formAction}>
           {/* Kuwait has no postal codes and the company field is not used. */}
@@ -83,14 +85,14 @@ const AddAddress = ({
             <div className="flex flex-col gap-y-3">
               <div className="grid grid-cols-2 gap-x-2">
                 <Input
-                  label="الاسم الأول"
+                  label={t("account.first_name")}
                   name="first_name"
                   required
                   autoComplete="given-name"
                   data-testid="first-name-input"
                 />
                 <Input
-                  label="اسم العائلة"
+                  label={t("account.last_name")}
                   name="last_name"
                   required
                   autoComplete="family-name"
@@ -99,21 +101,21 @@ const AddAddress = ({
               </div>
               <GovernorateSelect data-testid="state-input" />
               <Input
-                label="المنطقة"
+                label={t("account.area")}
                 name="city"
                 required
                 autoComplete="address-level2"
                 data-testid="city-input"
               />
               <Input
-                label="القطعة، الشارع، الجادة"
+                label={t("account.address_1")}
                 name="address_1"
                 required
                 autoComplete="address-line1"
                 data-testid="address-1-input"
               />
               <Input
-                label="المبنى، الدور، الشقة (اختياري)"
+                label={t("account.address_2")}
                 name="address_2"
                 autoComplete="address-line2"
                 data-testid="address-2-input"
@@ -122,7 +124,7 @@ const AddAddress = ({
                 <CountrySelect
                   region={region}
                   name="country_code"
-                  placeholder="الدولة"
+                  placeholder={t("account.country")}
                   required
                   autoComplete="country"
                   data-testid="country-select"
@@ -148,9 +150,9 @@ const AddAddress = ({
                 className="h-10"
                 data-testid="cancel-button"
               >
-                إلغاء
+                {t("account.cancel")}
               </Button>
-              <SubmitButton data-testid="save-button">حفظ</SubmitButton>
+              <SubmitButton data-testid="save-button">{t("account.save")}</SubmitButton>
             </div>
           </Modal.Footer>
         </form>

@@ -1,6 +1,9 @@
 "use client"
 
+import { useLocale, useT } from "@i18n/client"
+import { intlLocale } from "@i18n/config"
 import type { AddonGroup } from "@lib/util/catalog"
+import { localize } from "@lib/util/localize"
 import { convertToLocale } from "@lib/util/money"
 
 const toNumber = (v: number | string) => Number(v) || 0
@@ -46,12 +49,19 @@ export default function AddonSelector({
   currencyCode: string
   disabled?: boolean
 }) {
+  const t = useT()
+  const locale = useLocale()
+
   if (!groups.length) {
     return null
   }
 
   const price = (v: number | string) =>
-    `+ ${convertToLocale({ amount: toNumber(v), currency_code: currencyCode })}`
+    `+ ${convertToLocale({
+      amount: toNumber(v),
+      currency_code: currencyCode,
+      locale: intlLocale(locale),
+    })}`
 
   const optionClass = (checked: boolean) =>
     `flex items-center gap-3 rounded-btn border-[1.6px] px-3 py-2.5 cursor-pointer transition-colors ${
@@ -75,12 +85,12 @@ export default function AddonSelector({
             className="flex flex-col gap-2"
           >
             <legend className="mb-2 text-sm font-extrabold">
-              {group.name_ar}
+              {localize(group, "name", locale)}
               {group.is_required ? (
                 <span className="text-laly-red"> *</span>
               ) : (
                 <span className="ms-1.5 text-xs font-bold text-laly-faint">
-                  (اختياري)
+                  {t("product.optional_parenthesized")}
                 </span>
               )}
             </legend>
@@ -93,7 +103,7 @@ export default function AddonSelector({
                   onChange={() => set([])}
                   className="w-4 h-4 accent-laly-teal"
                 />
-                <span className="flex-1 text-sm">بدون</span>
+                <span className="flex-1 text-sm">{t("product.addon_none")}</span>
               </label>
             )}
             {(group.options ?? []).map((option) => {
@@ -117,7 +127,7 @@ export default function AddonSelector({
                     data-testid="addon-option"
                   />
                   <span className="flex-1 text-sm" dir="auto">
-                    {option.name_ar}
+                    {localize(option, "name", locale)}
                   </span>
                   <span className="text-sm font-bold text-laly-teal tabular-nums">
                     {price(option.price)}

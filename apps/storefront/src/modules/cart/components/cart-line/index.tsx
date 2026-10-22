@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 
+import { useT } from "@i18n/client"
 import { deleteLineItem, updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -21,6 +22,7 @@ export default function CartLine({
   item: HttpTypes.StoreCartLineItem
   currencyCode: string
 }) {
+  const t = useT()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -52,7 +54,7 @@ export default function CartLine({
               className="text-sm small:text-[15px] font-bold leading-snug line-clamp-2 hover:text-laly-teal"
               data-testid="product-title"
             >
-              {item.product_title}
+              <bdi>{item.product_title}</bdi>
             </LocalizedClientLink>
             {item.variant?.title !== "Default" && (
               <LineItemOptions variant={item.variant} data-testid="product-variant" />
@@ -63,7 +65,7 @@ export default function CartLine({
             type="button"
             onClick={() => run(() => deleteLineItem(item.id))}
             disabled={busy}
-            aria-label={`حذف ${item.product_title} من السلة`}
+            aria-label={t("cart.remove_item_aria", { title: item.product_title ?? "" })}
             className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-laly-faint hover:text-laly-red hover:bg-red-50"
             data-testid="product-delete-button"
           >
@@ -77,7 +79,7 @@ export default function CartLine({
           <div className="flex items-center rounded-btn border border-laly-line" data-testid="product-select-button">
             <button
               type="button"
-              aria-label="زيادة الكمية"
+              aria-label={t("cart.increase_quantity")}
               disabled={busy || item.quantity >= MAX_QTY}
               onClick={() => setQuantity(item.quantity + 1)}
               className="w-8 h-9 font-bold text-laly-teal disabled:text-laly-faint"
@@ -89,7 +91,7 @@ export default function CartLine({
             </span>
             <button
               type="button"
-              aria-label="تقليل الكمية"
+              aria-label={t("cart.decrease_quantity")}
               disabled={busy || item.quantity <= 1}
               onClick={() => setQuantity(item.quantity - 1)}
               className="w-8 h-9 font-bold text-laly-teal disabled:text-laly-faint"
@@ -101,7 +103,7 @@ export default function CartLine({
             {item.quantity > 1 && (
               <div className="text-xs text-laly-mut flex items-center gap-1 justify-end">
                 <LineItemUnitPrice item={item} style="tight" currencyCode={currencyCode} />
-                <span>للقطعة</span>
+                <span>{t("cart.per_item")}</span>
               </div>
             )}
             <div className="font-extrabold">

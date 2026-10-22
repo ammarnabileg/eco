@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 
+import { useLocale, useT } from "@i18n/client"
 import type { HeroSlide } from "@lib/data/content"
 import { localize } from "@lib/util/localize"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -16,6 +17,8 @@ export default function HeroCarousel({
   slides: HeroSlide[]
   installHref: string | null
 }) {
+  const t = useT()
+  const locale = useLocale()
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
 
@@ -32,10 +35,10 @@ export default function HeroCarousel({
   }, [paused, slides.length])
 
   const slide = slides[index] ?? slides[0]
-  const eyebrow = localize(slide, "eyebrow")
-  const highlight = localize(slide, "highlight")
-  const subtitle = localize(slide, "subtitle")
-  const ctaLabel = localize(slide, "cta_label") || "تسوّق الآن"
+  const eyebrow = localize(slide, "eyebrow", locale)
+  const highlight = localize(slide, "highlight", locale)
+  const subtitle = localize(slide, "subtitle", locale)
+  const ctaLabel = localize(slide, "cta_label", locale) || t("home.hero_cta_default")
   const ctaUrl = slide.cta_url || "/store"
   const ctaClass =
     "inline-flex items-center gap-2 rounded-btn bg-laly-sand hover:bg-laly-sand-d text-[#26200D] font-bold text-sm px-5 py-3 transition-colors"
@@ -49,7 +52,7 @@ export default function HeroCarousel({
             key={s.id}
             type="button"
             onClick={() => setIndex(i)}
-            aria-label={`الشريحة ${i + 1}`}
+            aria-label={t("home.hero_slide", { number: i + 1 })}
             aria-current={i === index}
             className={`h-[9px] rounded-full transition-all ${
               i === index
@@ -74,7 +77,7 @@ export default function HeroCarousel({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={slide.banner_url}
-          alt={localize(slide, "title")}
+          alt={localize(slide, "title", locale)}
           width={1920}
           height={600}
           className="w-full h-auto rounded-[18px] small:rounded-[22px]"
@@ -84,7 +87,7 @@ export default function HeroCarousel({
     return (
       <section
         aria-roledescription="carousel"
-        aria-label="العروض الرئيسية"
+        aria-label={t("home.hero_label")}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onFocus={() => setPaused(true)}
@@ -110,7 +113,7 @@ export default function HeroCarousel({
   return (
     <section
       aria-roledescription="carousel"
-      aria-label="العروض الرئيسية"
+      aria-label={t("home.hero_label")}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -126,7 +129,7 @@ export default function HeroCarousel({
             </span>
           )}
           <h1 className="mt-4 text-[26px] small:text-[clamp(32px,4.4vw,54px)] font-extrabold leading-[1.18]">
-            {localize(slide, "title")} <br className="hidden small:block" />
+            {localize(slide, "title", locale)} <br className="hidden small:block" />
             {highlight && <span className="text-laly-sand">{highlight}</span>}
           </h1>
           {subtitle && (
@@ -153,7 +156,7 @@ export default function HeroCarousel({
                 rel="noopener noreferrer"
                 className="inline-flex items-center rounded-btn border-[1.6px] border-white/55 hover:border-white hover:bg-white/10 font-bold text-sm px-5 py-3 transition-colors"
               >
-                احجز تركيب
+                {t("home.hero_install")}
               </a>
             )}
           </div>

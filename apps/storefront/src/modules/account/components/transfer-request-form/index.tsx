@@ -6,9 +6,13 @@ import { useActionState } from "react"
 // TODO: Re-add Toaster component when needed
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import { useEffect, useState } from "react"
+import { useT } from "@i18n/client"
 
 export default function TransferRequestForm() {
+  const t = useT()
   const [showSuccess, setShowSuccess] = useState(false)
+  const [requestedBefore, requestedAfter = ""] = t("account.transfer_requested").split("{id}")
+  const [sentBefore, sentAfter = ""] = t("account.transfer_email_sent").split("{email}")
 
   const [state, formAction] = useActionState(createTransferRequest, {
     success: false,
@@ -27,11 +31,11 @@ export default function TransferRequestForm() {
       <div className="grid sm:grid-cols-2 items-center gap-x-8 gap-y-4 w-full">
         <div className="flex flex-col gap-y-1">
           <Heading level="h3" className="!text-sm font-semibold text-laly-ink">
-            نقل الطلبات
+            {t("account.transfer_title")}
           </Heading>
           <p className="text-small-regular text-laly-mut">
-            لم تجد الطلب الذي تبحث عنه؟
-            <br /> اربط طلبًا بحسابك.
+            {t("account.transfer_question")}
+            <br /> {t("account.transfer_hint")}
           </p>
         </div>
         <form
@@ -42,15 +46,15 @@ export default function TransferRequestForm() {
             <Input
               className="w-full"
               name="order_id"
-              placeholder="رقم الطلب"
-              aria-label="رقم الطلب"
+              placeholder={t("account.transfer_order_id")}
+              aria-label={t("account.transfer_order_id")}
             />
             <SubmitButton
               variant="secondary"
               size="small"
               className="w-fit whitespace-nowrap self-end"
             >
-              طلب نقل الطلب
+              {t("account.transfer_submit")}
             </SubmitButton>
           </div>
         </form>
@@ -66,19 +70,21 @@ export default function TransferRequestForm() {
             <CheckCircleMiniSolid className="w-4 h-4 text-emerald-500" />
             <div className="flex flex-col gap-y-1">
               <Text className="text-medim-pl text-laly-ink">
-                تم طلب نقل الطلب{" "}
+                {requestedBefore}
                 <span dir="ltr">{state.order?.id}</span>
+                {requestedAfter}
               </Text>
               <Text className="text-base-regular text-laly-mut">
-                أرسلنا رسالة طلب النقل إلى{" "}
+                {sentBefore}
                 <span dir="ltr">{state.order?.email}</span>
+                {sentAfter}
               </Text>
             </div>
           </div>
           <IconButton
             className="h-fit"
             onClick={() => setShowSuccess(false)}
-            aria-label="إغلاق"
+            aria-label={t("account.close")}
           >
             <XCircleSolid className="w-4 h-4 text-neutral-500" />
           </IconButton>

@@ -3,6 +3,8 @@
 import { Badge, Heading, Input, Label, Text } from "@modules/common/components/ui"
 import React from "react"
 
+import { intlLocale } from "@i18n/config"
+import { useLocale, useT } from "@i18n/client"
 import { applyPromotions } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
@@ -15,6 +17,8 @@ type DiscountCodeProps = {
 }
 
 const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
+  const t = useT()
+  const locale = useLocale()
   const [isOpen, setIsOpen] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState("")
 
@@ -64,7 +68,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
               className="txt-medium text-laly-teal hover:text-laly-teal-d"
               data-testid="add-discount-button"
             >
-              إضافة كود خصم
+              {t("checkout.add_discount")}
             </button>
 
             {/* <Tooltip content="You can add multiple promotion codes">
@@ -82,15 +86,15 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                   type="text"
                   autoFocus={false}
                   dir="ltr"
-                  aria-label="كود الخصم"
-                  placeholder="كود الخصم"
+                  aria-label={t("checkout.discount_code")}
+                  placeholder={t("checkout.discount_code")}
                   data-testid="discount-input"
                 />
                 <SubmitButton
                   variant="secondary"
                   data-testid="discount-apply-button"
                 >
-                  تطبيق
+                  {t("checkout.apply")}
                 </SubmitButton>
               </div>
 
@@ -106,7 +110,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
           <div className="w-full flex items-center">
             <div className="flex flex-col w-full">
               <Heading className="txt-medium mb-2">
-                أكواد الخصم المطبّقة:
+                {t("checkout.applied_discounts")}
               </Heading>
 
               {promotions.map((promotion) => {
@@ -136,6 +140,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                                     currency_code:
                                       promotion.application_method
                                         .currency_code,
+                                        locale: intlLocale(locale),
                                   })}
                             </>
                           )}
@@ -161,7 +166,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                       >
                         <Trash size={14} />
                         <span className="sr-only">
-                          حذف كود الخصم من الطلب
+                          {t("checkout.remove_discount")}
                         </span>
                       </button>
                     )}

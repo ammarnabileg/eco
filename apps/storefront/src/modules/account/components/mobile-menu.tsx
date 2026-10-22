@@ -1,4 +1,9 @@
+import { Suspense } from "react"
+
+import { getLocale, getT } from "@i18n/server"
 import { getStoreContent } from "@lib/data/content"
+import { localize } from "@lib/util/localize"
+import LocaleSwitch from "@modules/layout/components/locale-switch"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon, { type IconName } from "@modules/laly/components/icon"
 
@@ -30,24 +35,32 @@ function Row({ href, icon, label }: { href: string; icon: IconName; label: strin
 // On phones the footer is hidden; its help and policy links live here.
 export default async function MobileMenu({ signedIn }: { signedIn: boolean }) {
   const { pages = [] } = await getStoreContent()
+  const t = await getT()
+  const locale = await getLocale()
   const published = ORDER.flatMap((slug) => pages.filter((p) => p.slug === slug))
   return (
-    <nav aria-label="المساعدة والمعلومات" className="small:hidden grid gap-2.5 mt-6">
+    <nav aria-label={t("account.mobile_menu_label")} className="small:hidden grid gap-2.5 mt-6">
       <ul className="grid gap-2.5">
-        {signedIn && <Row href="/account/orders" icon="truck" label="طلباتي" />}
-        <Row href="/contact" icon="headset" label="تواصل معنا" />
+        {signedIn && <Row href="/account/orders" icon="truck" label={t("account.my_orders")} />}
+        <Row href="/contact" icon="headset" label={t("account.contact_us")} />
       </ul>
       {published.length > 0 && (
         <>
-          <p className="mt-3 text-xs font-bold text-laly-mut">معلومات وسياسات</p>
+          <p className="mt-3 text-xs font-bold text-laly-mut">{t("account.info_policies")}</p>
           <ul className="grid gap-2.5">
             {published.map((p) => (
-              <Row key={p.slug} href={`/${p.slug}`} icon={PAGE_ICONS[p.slug] ?? "check"} label={p.title_ar} />
+              <Row key={p.slug} href={`/${p.slug}`} icon={PAGE_ICONS[p.slug] ?? "check"} label={localize(p, "title", locale)} />
             ))}
           </ul>
         </>
       )}
-      <p className="mt-4 text-center text-[11.5px] text-laly-mut">© {new Date().getFullYear()} Laly — جميع الحقوق محفوظة</p>
+      <div className="mt-3 flex items-center justify-between gap-3 bg-white border border-laly-line rounded-card p-3.5">
+        <span className="font-bold text-[14.5px] text-laly-ink">{t("account.language")}</span>
+        <Suspense>
+          <LocaleSwitch variant="segmented" />
+        </Suspense>
+      </div>
+      <p className="mt-4 text-center text-[11.5px] text-laly-mut">{t("account.copyright", { year: new Date().getFullYear() })}</p>
     </nav>
   )
 }

@@ -1,3 +1,4 @@
+import { getT } from "@i18n/server"
 import { listProducts } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
 import ProductCard, { PRODUCT_CARD_FIELDS } from "@modules/laly/components/product-card"
@@ -30,9 +31,14 @@ export default async function RelatedProducts({
     return null
   }
 
+  const t = await getT()
+
   return (
     <section>
-      <SectionHeading title="منتجات قد تعجبك" eyebrow="من نفس القسم" />
+      <SectionHeading
+        title={t("product.related_title")}
+        eyebrow={t("product.related_eyebrow")}
+      />
       <ul className="flex gap-3 small:gap-4 overflow-x-auto no-scrollbar snap-x -mx-4 px-4 small:mx-0 small:px-0 small:grid small:grid-cols-4">
         {products.map((p) => (
           <li key={p.id} className="snap-start shrink-0 w-[46%] small:w-auto">

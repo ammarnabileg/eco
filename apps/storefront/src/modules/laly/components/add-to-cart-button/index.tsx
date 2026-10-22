@@ -5,6 +5,7 @@ import { useState, useTransition } from "react"
 
 import { addToCart } from "@lib/data/cart"
 import Icon from "@modules/laly/components/icon"
+import { useT } from "@i18n/client"
 
 export default function AddToCartButton({
   variantId,
@@ -13,6 +14,7 @@ export default function AddToCartButton({
   variantId?: string
   disabled?: boolean
 }) {
+  const t = useT()
   const { countryCode } = useParams() as { countryCode: string }
   const [isPending, startTransition] = useTransition()
   const [state, setState] = useState<"idle" | "added" | "error">("idle")
@@ -33,14 +35,14 @@ export default function AddToCartButton({
   }
 
   const label = disabled
-    ? "نفدت الكمية"
+    ? t("layout.out_of_stock")
     : isPending
-      ? "جاري الإضافة…"
+      ? t("layout.adding")
       : state === "added"
-        ? "تمت الإضافة"
+        ? t("layout.added")
         : state === "error"
-          ? "حاول مرة أخرى"
-          : "أضف للسلة"
+          ? t("layout.try_again")
+          : t("layout.add_to_cart")
 
   return (
     <button

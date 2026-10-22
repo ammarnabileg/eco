@@ -1,5 +1,6 @@
 "use client"
 
+import { useT } from "@i18n/client"
 import { Heading, Text, clx } from "@modules/common/components/ui"
 
 import PaymentButton from "../payment-button"
@@ -7,6 +8,7 @@ import { useSearchParams } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 
 const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
+  const t = useT()
   const searchParams = useSearchParams()
 
   const isOpen = searchParams.get("step") === "review"
@@ -32,7 +34,7 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
             }
           )}
         >
-          مراجعة الطلب
+          {t("checkout.review_title")}
         </Heading>
       </div>
       {isOpen && previousStepsCompleted && (
@@ -40,9 +42,7 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
           <div className="flex items-start gap-x-1 w-full mb-6">
             <div className="w-full">
               <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                بالضغط على زر &quot;تأكيد الطلب&quot;، فإنك تؤكد أنك قرأت
-                وفهمت ووافقت على شروط الاستخدام وشروط البيع وسياسة الإرجاع،
-                وأنك اطّلعت على سياسة الخصوصية الخاصة بمتجر لالي.
+                {t("checkout.review_terms")}
               </Text>
             </div>
           </div>

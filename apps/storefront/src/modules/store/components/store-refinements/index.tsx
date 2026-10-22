@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useCurrentRefinements, useSortBy } from "react-instantsearch"
 
+import { useT } from "@i18n/client"
 import type { SpecAttribute } from "@lib/util/catalog"
 import Icon from "@modules/laly/components/icon"
 import Sheet from "@modules/laly/components/sheet"
@@ -22,12 +23,13 @@ import SpecRefinements from "./spec-refinements"
 import SortRadioGroup from "@modules/store/components/sort-radio-group"
 
 const SortProducts = ({ currencyCode }: { currencyCode: string }) => {
-  const items = getSortOptions(currencyCode)
+  const t = useT()
+  const items = getSortOptions(currencyCode, t)
   const { currentRefinement, refine } = useSortBy({ items })
 
   return (
     <SortRadioGroup
-      title="ترتيب حسب"
+      title={t("catalog.sort_by")}
       items={items}
       value={currentRefinement}
       handleChange={refine}
@@ -46,20 +48,23 @@ const Filters = ({
   attributes: SpecAttribute[]
   showCategories: boolean
   showBrands: boolean
-}) => (
-  <>
-    <CurrentRefinements currencyCode={currencyCode} />
-    {showBrands && <RefinementGroup attribute={BRAND_ATTRIBUTE} title="الماركة" />}
-    <SpecRefinements attributes={attributes} />
-    <OptionRefinements />
-    <PriceRange currencyCode={currencyCode} />
-    <OnSaleToggle currencyCode={currencyCode} />
-    {showCategories && (
-      <RefinementGroup attribute={CATEGORY_ATTRIBUTE} title="الفئة" />
-    )}
-    <RefinementGroup attribute={LABELS_ATTRIBUTE} title="الوسوم" />
-  </>
-)
+}) => {
+  const t = useT()
+  return (
+    <>
+      <CurrentRefinements currencyCode={currencyCode} />
+      {showBrands && <RefinementGroup attribute={BRAND_ATTRIBUTE} title={t("catalog.filter_brand")} />}
+      <SpecRefinements attributes={attributes} />
+      <OptionRefinements />
+      <PriceRange currencyCode={currencyCode} />
+      <OnSaleToggle currencyCode={currencyCode} />
+      {showCategories && (
+        <RefinementGroup attribute={CATEGORY_ATTRIBUTE} title={t("catalog.filter_category")} />
+      )}
+      <RefinementGroup attribute={LABELS_ATTRIBUTE} title={t("catalog.filter_tags")} />
+    </>
+  )
+}
 
 /**
  * Sidebar on desktop; on phones a "filters" button opens the same filters
@@ -76,6 +81,7 @@ const StoreRefinements = ({
   showCategories?: boolean
   showBrands?: boolean
 }) => {
+  const t = useT()
   const [open, setOpen] = useState(false)
   const { items } = useCurrentRefinements()
   const active = items.reduce((n, i) => n + i.refinements.length, 0)
@@ -90,7 +96,7 @@ const StoreRefinements = ({
           data-testid="mobile-filters-button"
         >
           <Icon name="grid" size={17} />
-          الفلاتر والترتيب
+          {t("catalog.filters_and_sort")}
           {active > 0 && (
             <span className="min-w-5 h-5 px-1.5 rounded-full bg-laly-teal text-white text-[11px] flex items-center justify-center">
               {active}
@@ -101,7 +107,7 @@ const StoreRefinements = ({
       <Sheet
         open={open}
         onClose={() => setOpen(false)}
-        title="الفلاتر والترتيب"
+        title={t("catalog.filters_and_sort")}
         layout="mobile"
       >
         <div className="flex flex-col gap-4">
@@ -117,7 +123,7 @@ const StoreRefinements = ({
             onClick={() => setOpen(false)}
             className="sticky bottom-0 h-12 rounded-btn bg-laly-teal text-white font-bold"
           >
-            عرض النتائج
+            {t("catalog.show_results")}
           </button>
         </div>
       </Sheet>

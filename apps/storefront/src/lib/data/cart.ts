@@ -5,6 +5,7 @@ import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
+import { getT, localizedPath } from "@i18n/server"
 import {
   getAuthHeaders,
   getCacheOptions,
@@ -324,10 +325,8 @@ export async function startGatewayCheckout(
   } catch (error) {
     console.error(`Gateway checkout ${providerId} failed:`, error)
   }
-  return {
-    error:
-      "تعذّر بدء الدفع بهذه الطريقة الآن. حاول مرة أخرى أو اختر طريقة دفع أخرى.",
-  }
+  const t = await getT()
+  return { error: t("checkout.gateway_start_failed") }
 }
 
 export async function applyPromotions(codes: string[]) {
@@ -414,7 +413,10 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
   }
 
   redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=delivery`
+    await localizedPath(
+      String(formData.get("shipping_address.country_code")),
+      "/checkout?step=delivery"
+    )
   )
 }
 
@@ -451,7 +453,12 @@ export async function placeOrder(cartId?: string) {
     revalidateTag(orderCacheTag)
 
     removeCartId()
-    redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
+    redirect(
+      await localizedPath(
+        countryCode ?? process.env.NEXT_PUBLIC_DEFAULT_REGION ?? "kw",
+        `/order/${cartRes?.order.id}/confirmed`
+      )
+    )
   }
 
   return cartRes.cart
@@ -482,7 +489,7 @@ export async function updateRegion(countryCode: string, currentPath: string) {
   const productsCacheTag = await getCacheTag("products")
   revalidateTag(productsCacheTag)
 
-  redirect(`/${countryCode}${currentPath}`)
+  redirect(await localizedPath(countryCode, currentPath))
 }
 
 export async function listCartOptions() {

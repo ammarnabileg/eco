@@ -1,13 +1,15 @@
+import { getLocale, getT } from "@i18n/server"
 import type { TrustBadge } from "@lib/data/content"
 import { productBrand, productDetail, SpecGroup } from "@lib/util/catalog"
 import { localize } from "@lib/util/localize"
 import { HttpTypes } from "@medusajs/types"
 import Icon, { isIconName } from "@modules/laly/components/icon"
 import ProductSpecs from "@modules/products/components/product-specs"
+import { productText } from "@modules/products/lib/product-text"
 
 // Description, specifications, and the store's commitments (warranty,
 // returns, delivery) taken from the admin-managed trust badges.
-export default function ProductDetails({
+export default async function ProductDetails({
   product,
   badges,
   specGroups = [],
@@ -16,6 +18,8 @@ export default function ProductDetails({
   badges: TrustBadge[]
   specGroups?: SpecGroup[]
 }) {
+  const [t, locale] = await Promise.all([getT(), getLocale()])
+  const description = productText(product, locale).description
   const metadata = (product.metadata ?? {}) as Record<string, unknown>
   const detail = productDetail(product)
   const variant =
@@ -23,22 +27,40 @@ export default function ProductDetails({
   const warranty = detail?.warranty_months
   // Basics every product has, shown under the template specs.
   const specs = [
-    { label: "الماركة", value: productBrand(product)?.name ?? metadata.brand },
-    { label: "رقم الموديل", value: detail?.mpn },
-    { label: "السلسلة", value: detail?.series },
-    { label: "رقم المنتج (SKU)", value: variant?.sku },
-    { label: "النوع", value: product.type?.value },
-    { label: "بلد المنشأ", value: product.origin_country?.toUpperCase() },
     {
-      label: "الوزن",
-      value: product.weight ? `${product.weight} جم` : undefined,
+      label: t("product.spec_brand"),
+      value: productBrand(product)?.name ?? metadata.brand,
+    },
+    { label: t("product.spec_model_number"), value: detail?.mpn },
+    { label: t("product.spec_series"), value: detail?.series },
+    { label: t("product.spec_sku"), value: variant?.sku },
+    { label: t("product.spec_type"), value: product.type?.value },
+    {
+      label: t("product.spec_origin_country"),
+      value: product.origin_country?.toUpperCase(),
     },
     {
-      label: "الضمان",
+      label: t("product.spec_weight"),
+      value: product.weight
+        ? t("product.weight_grams", { weight: product.weight })
+        : undefined,
+    },
+    {
+      label: t("product.spec_warranty"),
       value: warranty
         ? warranty % 12 === 0
-          ? `${warranty / 12} سنة`
-          : `${warranty} شهر`
+          ? t(
+              warranty === 12
+                ? "product.warranty_year_one"
+                : "product.warranty_years",
+              { count: warranty / 12 }
+            )
+          : t(
+              warranty === 1
+                ? "product.warranty_month_one"
+                : "product.warranty_months",
+              { count: warranty }
+            )
         : undefined,
     },
   ].filter(
@@ -47,24 +69,24 @@ export default function ProductDetails({
   )
 
   const sections = [
-    product.description && {
+    description && {
       id: "description",
-      title: "الوصف",
+      title: t("product.section_description"),
       body: (
         <p
           className="whitespace-pre-line leading-8 text-laly-mut"
           data-testid="product-description"
         >
-          {product.description}
+          {description}
         </p>
       ),
     },
     (specGroups.length > 0 || specs.length > 0) && {
       id: "specs",
-      title: "المواصفات",
+      title: t("product.section_specs"),
       body: (
         <div className="flex flex-col gap-5">
-          {specGroups.length > 0 && <ProductSpecs groups={specGroups} />}
+          {specGroups.length > 0 && <ProductSpecs groups={specGroups} locale={locale} />}
           {specs.length > 0 && (
             <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 text-sm">
               {specs.map((s) => (
@@ -82,7 +104,7 @@ export default function ProductDetails({
     },
     !!detail?.faq?.length && {
       id: "faq",
-      title: "أسئلة شائعة",
+      title: t("product.section_faq"),
       body: (
         <div
           className="flex flex-col divide-y divide-laly-line"
@@ -91,7 +113,7 @@ export default function ProductDetails({
           {detail.faq.map((f, i) => (
             <details key={i} className="group/faq py-3">
               <summary className="flex items-start justify-between gap-3 cursor-pointer list-none text-sm font-bold">
-                {f.question_ar}
+                {localize(f, "question", locale)}
                 <span
                   aria-hidden="true"
                   className="shrink-0 text-laly-teal text-lg leading-none group-open/faq:rotate-45 transition-transform"
@@ -100,7 +122,7 @@ export default function ProductDetails({
                 </span>
               </summary>
               <p className="mt-2 text-sm leading-7 text-laly-mut whitespace-pre-line">
-                {f.answer_ar}
+                {localize(f, "answer", locale)}
               </p>
             </details>
           ))}
@@ -109,7 +131,7 @@ export default function ProductDetails({
     },
     badges.length > 0 && {
       id: "service",
-      title: "الضمان والتوصيل والإرجاع",
+      title: t("product.section_service"),
       body: (
         <ul className="grid gap-3">
           {badges.map((b) => (
@@ -119,10 +141,10 @@ export default function ProductDetails({
               </span>
               <span>
                 <span className="block text-sm font-bold">
-                  {localize(b, "title")}
+                  {localize(b, "title", locale)}
                 </span>
                 <span className="block text-xs text-laly-mut">
-                  {localize(b, "subtitle")}
+                  {localize(b, "subtitle", locale)}
                 </span>
               </span>
             </li>

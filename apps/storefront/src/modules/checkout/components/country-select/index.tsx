@@ -1,5 +1,7 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from "react"
 
+import { useT } from "@i18n/client"
+
 import NativeSelect, {
   NativeSelectProps,
 } from "@modules/common/components/native-select"
@@ -10,7 +12,8 @@ const CountrySelect = forwardRef<
   NativeSelectProps & {
     region?: HttpTypes.StoreRegion
   }
->(({ placeholder = "الدولة", region, defaultValue, ...props }, ref) => {
+>(({ placeholder, region, defaultValue, ...props }, ref) => {
+  const t = useT()
   const innerRef = useRef<HTMLSelectElement>(null)
 
   useImperativeHandle<HTMLSelectElement | null, HTMLSelectElement | null>(
@@ -25,15 +28,15 @@ const CountrySelect = forwardRef<
 
     return region.countries?.map((country) => ({
       value: country.iso_2,
-      label: country.iso_2 === "kw" ? "الكويت" : country.display_name,
+      label: country.iso_2 === "kw" ? t("checkout.country_kw") : country.display_name,
     }))
-  }, [region])
+  }, [region, t])
 
   return (
     <NativeSelect
       ref={innerRef}
-      placeholder={placeholder}
-      aria-label="الدولة"
+      placeholder={placeholder ?? t("checkout.country")}
+      aria-label={t("checkout.country")}
       defaultValue={defaultValue}
       {...props}
     >

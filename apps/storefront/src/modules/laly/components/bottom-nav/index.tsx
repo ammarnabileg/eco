@@ -4,16 +4,18 @@ import { useParams, usePathname } from "next/navigation"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon, { type IconName } from "@modules/laly/components/icon"
+import { useT } from "@i18n/client"
 
 const ITEMS: { href: string; label: string; icon: IconName }[] = [
-  { href: "/", label: "الرئيسية", icon: "smarthome" },
-  { href: "/categories", label: "الأقسام", icon: "grid" },
-  { href: "/cart", label: "السلة", icon: "cart" },
-  { href: "/account", label: "حسابي", icon: "user" },
+  { href: "/", label: "layout.home", icon: "smarthome" },
+  { href: "/categories", label: "layout.nav_categories", icon: "grid" },
+  { href: "/cart", label: "layout.cart", icon: "cart" },
+  { href: "/account", label: "layout.my_account", icon: "user" },
 ]
 
 // App-style navigation for phones; hidden from the `small` breakpoint up.
 export default function BottomNav({ cartCount }: { cartCount: number }) {
+  const t = useT()
   const pathname = usePathname()
   const { countryCode } = useParams()
 
@@ -29,7 +31,7 @@ export default function BottomNav({ cartCount }: { cartCount: number }) {
 
   return (
     <nav
-      aria-label="التنقل الرئيسي"
+      aria-label={t("layout.main_navigation")}
       className="small:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-laly-line pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="grid grid-cols-4">
@@ -55,7 +57,7 @@ export default function BottomNav({ cartCount }: { cartCount: number }) {
                     </span>
                   )}
                 </span>
-                {item.label}
+                {t(item.label)}
               </LocalizedClientLink>
             </li>
           )

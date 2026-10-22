@@ -4,6 +4,8 @@ import { Dialog, Transition } from "@headlessui/react"
 import { XMark } from "@medusajs/icons"
 import React, { Fragment } from "react"
 
+import { useT } from "@i18n/client"
+
 type SearchDrawerProps = {
   isOpen: boolean
   close: () => void
@@ -11,6 +13,7 @@ type SearchDrawerProps = {
 }
 
 const SearchDrawer = ({ isOpen, close, children }: SearchDrawerProps) => {
+  const t = useT()
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-[75]" onClose={close}>
@@ -44,12 +47,12 @@ const SearchDrawer = ({ isOpen, close, children }: SearchDrawerProps) => {
                 <div className="flex h-full flex-col border-s border-ui-border-base bg-ui-bg-base shadow-elevation-modal">
                   <div className="flex items-center justify-between border-b border-ui-border-base px-4 py-3">
                     <Dialog.Title className="text-large-semi text-ui-fg-base">
-                      البحث
+                      {t("layout.search")}
                     </Dialog.Title>
                     <button
                       type="button"
                       onClick={close}
-                      aria-label="إغلاق البحث"
+                      aria-label={t("layout.close_search")}
                       className="text-ui-fg-muted hover:text-ui-fg-base"
                       data-testid="close-search-drawer"
                     >

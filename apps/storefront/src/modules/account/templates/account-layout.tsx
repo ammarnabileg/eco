@@ -5,16 +5,15 @@ import UnderlineLink from "@modules/common/components/interactive-link"
 import AccountNav from "../components/account-nav"
 import MobileMenu from "../components/mobile-menu"
 import { HttpTypes } from "@medusajs/types"
+import { getT } from "@i18n/server"
 
 interface AccountLayoutProps {
   customer: HttpTypes.StoreCustomer | null
   children: React.ReactNode
 }
 
-const AccountLayout: React.FC<AccountLayoutProps> = ({
-  customer,
-  children,
-}) => {
+const AccountLayout = async ({ customer, children }: AccountLayoutProps) => {
+  const t = await getT()
   return (
     <div className="flex-1 bg-laly-bg small:py-12" data-testid="account-page">
       <div className="flex-1 content-container h-full max-w-5xl mx-auto flex flex-col">
@@ -26,14 +25,14 @@ const AccountLayout: React.FC<AccountLayoutProps> = ({
         <div className="hidden small:flex flex-row items-center justify-between gap-6 mt-12 bg-white border border-laly-line rounded-card p-6">
           <div>
             <h3 className="text-xl font-bold text-laly-ink mb-2">
-              هل لديك أسئلة؟
+              {t("account.help_title")}
             </h3>
             <span className="txt-medium text-laly-mut">
-              تجد الأسئلة الشائعة وإجاباتها في صفحة خدمة العملاء.
+              {t("account.help_text")}
             </span>
           </div>
           <div>
-            <UnderlineLink href="/contact">خدمة العملاء</UnderlineLink>
+            <UnderlineLink href="/contact">{t("account.customer_service")}</UnderlineLink>
           </div>
         </div>
       </div>

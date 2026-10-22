@@ -5,14 +5,17 @@ import User from "@modules/common/icons/user"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
-import { formatOrderDate } from "@modules/order/util/format"
+import { intlLocale } from "@i18n/config"
+import { getLocale, getT } from "@i18n/server"
 
 type OverviewProps = {
   customer: HttpTypes.StoreCustomer | null
   orders: HttpTypes.StoreOrder[] | null
 }
 
-const Overview = ({ customer, orders }: OverviewProps) => {
+const Overview = async ({ customer, orders }: OverviewProps) => {
+  const t = await getT()
+  const locale = await getLocale()
   const completion = getProfileCompletion(customer)
   const addressesCount = customer?.addresses?.length || 0
 
@@ -25,10 +28,10 @@ const Overview = ({ customer, orders }: OverviewProps) => {
           data-testid="welcome-message"
           data-value={customer?.first_name}
         >
-          أهلاً {customer?.first_name}
+          {t("account.greeting", { name: customer?.first_name ?? "" })}
         </span>
         <span className="text-small-regular text-white/80">
-          مسجّل الدخول بالبريد:{" "}
+          {t("account.signed_in_as")}{" "}
           <span
             className="font-semibold text-white"
             dir="ltr"
@@ -49,7 +52,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             <span className="flex items-center justify-center w-9 h-9 rounded-btn bg-laly-teal-soft text-laly-teal">
               <User size={18} />
             </span>
-            <h3 className="text-base-semi">الملف الشخصي</h3>
+            <h3 className="text-base-semi">{t("account.profile")}</h3>
           </div>
           <div className="flex items-end gap-x-2">
             <span
@@ -59,12 +62,12 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             >
               {completion}%
             </span>
-            <span className="text-small-regular text-laly-mut">مكتمل</span>
+            <span className="text-small-regular text-laly-mut">{t("account.complete")}</span>
           </div>
           <div
             className="h-2 w-full rounded-full bg-laly-teal-soft overflow-hidden"
             role="progressbar"
-            aria-label="نسبة اكتمال الملف الشخصي"
+            aria-label={t("account.profile_completion")}
             aria-valuenow={completion}
             aria-valuemin={0}
             aria-valuemax={100}
@@ -84,7 +87,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             <span className="flex items-center justify-center w-9 h-9 rounded-btn bg-laly-teal-soft text-laly-teal">
               <MapPin size={18} />
             </span>
-            <h3 className="text-base-semi">العناوين</h3>
+            <h3 className="text-base-semi">{t("account.addresses")}</h3>
           </div>
           <div className="flex items-end gap-x-2">
             <span
@@ -95,11 +98,11 @@ const Overview = ({ customer, orders }: OverviewProps) => {
               {addressesCount}
             </span>
             <span className="text-small-regular text-laly-mut">
-              {addressesCount === 1 ? "عنوان محفوظ" : "عناوين محفوظة"}
+              {addressesCount === 1 ? t("account.saved_address_one") : t("account.saved_address_other")}
             </span>
           </div>
           <span className="text-small-regular font-semibold text-laly-teal group-hover:text-laly-teal-d">
-            إدارة العناوين
+            {t("account.manage_addresses")}
           </span>
         </LocalizedClientLink>
       </div>
@@ -110,14 +113,14 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             <span className="flex items-center justify-center w-9 h-9 rounded-btn bg-laly-teal-soft text-laly-teal">
               <Package size={18} />
             </span>
-            <h3 className="text-base-semi">أحدث الطلبات</h3>
+            <h3 className="text-base-semi">{t("account.recent_orders")}</h3>
           </div>
           {orders && orders.length > 0 && (
             <LocalizedClientLink
               href="/account/orders"
               className="text-small-regular font-semibold text-laly-teal hover:text-laly-teal-d"
             >
-              عرض كل الطلبات
+              {t("account.view_all_orders")}
             </LocalizedClientLink>
           )}
         </div>
@@ -136,16 +139,21 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                   >
                     <div className="grid grid-cols-1 xsmall:grid-cols-3 text-small-regular gap-x-4 gap-y-1 flex-1">
                       <div className="flex xsmall:flex-col gap-x-2">
-                        <span className="text-laly-mut">تاريخ الطلب</span>
+                        <span className="text-laly-mut">{t("account.order_date")}</span>
                         <span
                           className="text-laly-ink font-semibold"
                           data-testid="order-created-date"
                         >
-                          {formatOrderDate(order.created_at)}
+                          {new Date(order.created_at).toLocaleDateString(intlLocale(locale), {
+                            timeZone: "Asia/Kuwait",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
                         </span>
                       </div>
                       <div className="flex xsmall:flex-col gap-x-2">
-                        <span className="text-laly-mut">رقم الطلب</span>
+                        <span className="text-laly-mut">{t("account.order_number")}</span>
                         <span
                           className="text-laly-ink font-semibold"
                           data-testid="order-id"
@@ -155,7 +163,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                         </span>
                       </div>
                       <div className="flex xsmall:flex-col gap-x-2">
-                        <span className="text-laly-mut">الإجمالي</span>
+                        <span className="text-laly-mut">{t("account.total")}</span>
                         <span
                           className="text-laly-ink font-semibold"
                           data-testid="order-amount"
@@ -163,6 +171,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                           {convertToLocale({
                             amount: order.total,
                             currency_code: order.currency_code,
+                            locale: intlLocale(locale),
                           })}
                         </span>
                       </div>
@@ -172,7 +181,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                       data-testid="open-order-button"
                     >
                       <span className="sr-only">
-                        عرض الطلب #{order.display_id}
+                        {t("account.view_order", { id: order.display_id ?? "" })}
                       </span>
                       <ChevronDown
                         aria-hidden="true"
@@ -189,13 +198,13 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                 className="text-base-regular text-laly-mut"
                 data-testid="no-orders-message"
               >
-                لا توجد طلبات حديثة
+                {t("account.no_recent_orders")}
               </span>
               <LocalizedClientLink
                 href="/store"
                 className="inline-flex items-center h-10 px-4 rounded-btn bg-laly-teal text-white font-bold hover:bg-laly-teal-d transition-colors"
               >
-                ابدأ التسوق
+                {t("account.start_shopping")}
               </LocalizedClientLink>
             </li>
           )}

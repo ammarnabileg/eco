@@ -1,5 +1,7 @@
 "use client"
 
+import { intlLocale } from "@i18n/config"
+import { useLocale } from "@i18n/client"
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
 import { getPercentageDiff } from "@lib/util/get-percentage-diff"
 import { convertToLocale } from "@lib/util/money"
@@ -51,6 +53,7 @@ type HitPriceProps = {
 }
 
 const HitPrice = ({ hit, currencyCode }: HitPriceProps) => {
+  const locale = intlLocale(useLocale())
   const pricing = getHitPricing(hit, currencyCode)
 
   if (!pricing) {
@@ -58,7 +61,7 @@ const HitPrice = ({ hit, currencyCode }: HitPriceProps) => {
   }
 
   const format = (value: number) =>
-    convertToLocale({ amount: value, currency_code: pricing.currency_code })
+    convertToLocale({ amount: value, currency_code: pricing.currency_code, locale })
 
   return (
     <div

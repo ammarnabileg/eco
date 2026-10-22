@@ -1,25 +1,29 @@
 import { Metadata } from "next"
 
+import { getT } from "@i18n/server"
 import { listBrands } from "@lib/data/catalog"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon from "@modules/laly/components/icon"
 import PageBanner from "@modules/laly/components/page-banner"
 
-export const metadata: Metadata = {
-  title: "الماركات",
-  description: "الماركات المتوفرة في Laly: Hikvision و TP-Link و Tapo وغيرها، بضمان الوكيل.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT()
+  return {
+    title: t("pages.brands_title"),
+    description: t("pages.brands_description"),
+  }
 }
 
 // Only brands the store actually sells, with how many products each has.
 export default async function BrandsPage() {
-  const brands = await listBrands()
+  const [brands, t] = await Promise.all([listBrands(), getT()])
 
   return (
     <>
-      <PageBanner title="الماركات" intro="كل الماركات المتوفرة عندنا. اختار الماركة وشوف منتجاتها." />
+      <PageBanner title={t("catalog.brands")} intro={t("catalog.brands_intro")} />
       <div className="content-container !px-3.5 small:!px-6 py-4 small:py-12">
         {brands.length === 0 ? (
-          <p className="py-16 text-center text-laly-mut">لا توجد ماركات حالياً.</p>
+          <p className="py-16 text-center text-laly-mut">{t("catalog.no_brands")}</p>
         ) : (
           <ul className="grid grid-cols-2 xsmall:grid-cols-3 medium:grid-cols-5 gap-3 small:gap-4">
             {brands.map((b) => (
@@ -36,9 +40,9 @@ export default async function BrandsPage() {
                       {b.name}
                     </span>
                   )}
-                  <span className="text-[12.5px] text-laly-mut">{b.product_count} منتج</span>
+                  <span className="text-[12.5px] text-laly-mut">{t("catalog.product_count", { count: b.product_count ?? 0 })}</span>
                   <span className="mt-1 inline-flex items-center gap-1 text-[12.5px] font-bold text-laly-teal">
-                    تسوّق الماركة
+                    {t("catalog.shop_brand")}
                     <Icon name="arrowr" size={14} className="rtl:-scale-x-100" />
                   </span>
                 </LocalizedClientLink>

@@ -14,61 +14,64 @@ const Mark = ({ label, className }: { label: string; className?: string }) => (
   </span>
 )
 
+/**
+ * A payment provider's label (a message key, e.g. "checkout.pay_method_knet",
+ * shown with t(info.titleKey)) and icon.
+ */
+export type PaymentInfo = { titleKey: string; icon: React.JSX.Element }
+
 /* Map of payment provider_id to their title and icon. Add in any payment providers you want to use. */
-export const paymentInfoMap: Record<
-  string,
-  { title: string; icon: React.JSX.Element }
-> = {
+export const paymentInfoMap: Record<string, PaymentInfo> = {
   pp_stripe_stripe: {
-    title: "بطاقة ائتمان",
+    titleKey: "checkout.pay_method_credit_card",
     icon: <CreditCard />,
   },
   "pp_medusa-payments_default": {
-    title: "بطاقة ائتمان",
+    titleKey: "checkout.pay_method_credit_card",
     icon: <CreditCard />,
   },
   "pp_stripe-ideal_stripe": {
-    title: "iDeal",
+    titleKey: "checkout.pay_method_ideal",
     icon: <Ideal />,
   },
   "pp_stripe-bancontact_stripe": {
-    title: "Bancontact",
+    titleKey: "checkout.pay_method_bancontact",
     icon: <Bancontact />,
   },
   pp_paypal_paypal: {
-    title: "PayPal",
+    titleKey: "checkout.pay_method_paypal",
     icon: <PayPal />,
   },
   pp_klickpay_knet: {
-    title: "كي نت (KNET)",
+    titleKey: "checkout.pay_method_knet",
     icon: <Mark label="KNET" className="border-[#1b5faa] text-[#1b5faa]" />,
   },
   pp_klickpay_card: {
-    title: "بطاقة فيزا أو ماستركارد",
+    titleKey: "checkout.pay_method_card",
     icon: <Mark label="VISA · MC" />,
   },
   pp_klickpay_apple_pay: {
-    title: "Apple Pay",
+    titleKey: "checkout.pay_method_apple_pay",
     icon: <Mark label="Apple Pay" className="border-black text-black" />,
   },
   pp_klickpay_google_pay: {
-    title: "Google Pay",
+    titleKey: "checkout.pay_method_google_pay",
     icon: <Mark label="G Pay" />,
   },
   pp_klickpay_samsung_pay: {
-    title: "Samsung Pay",
+    titleKey: "checkout.pay_method_samsung_pay",
     icon: <Mark label="Samsung Pay" />,
   },
   pp_taly_taly: {
-    title: "تالي Taly — قسّمها بدون فوائد",
+    titleKey: "checkout.pay_method_taly",
     icon: <Mark label="taly" className="border-[#5b2be0] text-[#5b2be0]" />,
   },
   pp_deema_deema: {
-    title: "ديما Deema — قسّط مشترياتك",
+    titleKey: "checkout.pay_method_deema",
     icon: <Mark label="deema" className="border-[#0b8f6a] text-[#0b8f6a]" />,
   },
   pp_system_default: {
-    title: "دفع يدوي (للتجربة فقط)",
+    titleKey: "checkout.pay_method_manual",
     icon: <CreditCard />,
   },
   // Add more payment providers here

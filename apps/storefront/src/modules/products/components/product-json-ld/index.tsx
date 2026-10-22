@@ -1,5 +1,8 @@
 import { HttpTypes } from "@medusajs/types"
 
+import { DEFAULT_LOCALE, intlLocale, localePath } from "@i18n/config"
+import { getLocale, getT } from "@i18n/server"
+import { categoryName } from "@lib/util/category-name"
 import {
   isPriceOnRequest,
   productBrand,
@@ -7,6 +10,8 @@ import {
 } from "@lib/util/catalog"
 import { getBaseURL } from "@lib/util/env"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { localize } from "@lib/util/localize"
+import { productText } from "@modules/products/lib/product-text"
 
 const isInStock = (v: HttpTypes.StoreProductVariant) =>
   !v.manage_inventory || v.allow_backorder || (v.inventory_quantity ?? 0) > 0
@@ -15,26 +20,39 @@ const isInStock = (v: HttpTypes.StoreProductVariant) =>
  * Product, FAQPage and BreadcrumbList structured data for search engines and
  * AI answer engines. Price-on-request products carry no offer.
  */
-export default function ProductJsonLd({
+export default async function ProductJsonLd({
   product,
   countryCode,
 }: {
   product: HttpTypes.StoreProduct
   countryCode: string
 }) {
-  const base = `${getBaseURL()}/${countryCode}`
+  const [t, locale] = await Promise.all([getT(), getLocale()])
+  const text = productText(product, locale)
+  const english = locale !== DEFAULT_LOCALE
+  // Addresses and text in the page's language.
+  const base = `${getBaseURL()}${localePath(countryCode, locale)}`
   const url = `${base}/products/${product.handle}`
   const detail = productDetail(product)
   const brand = productBrand(product)
-  const { cheapestPrice } = getProductPrice({ product })
+  const { cheapestPrice } = getProductPrice({
+    product,
+    locale: intlLocale(locale),
+  })
   const variants = product.variants ?? []
   const sku = variants.length === 1 ? variants[0].sku : undefined
 
   const productLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: product.title,
-    description: detail?.seo_description_ar || product.description || undefined,
+    name: text.title,
+    description:
+      (english &&
+        (detail?.seo_description_en?.trim() ||
+          detail?.description_en?.trim())) ||
+      detail?.seo_description_ar ||
+      product.description ||
+      undefined,
     image: [
       product.thumbnail,
       ...(product.images ?? []).map((i) => i.url),
@@ -67,8 +85,11 @@ export default function ProductJsonLd({
       "@type": "FAQPage",
       mainEntity: detail.faq.map((f) => ({
         "@type": "Question",
-        name: f.question_ar,
-        acceptedAnswer: { "@type": "Answer", text: f.answer_ar },
+        name: localize(f, "question", locale),
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: localize(f, "answer", locale),
+        },
       })),
     })
   }
@@ -83,18 +104,18 @@ export default function ProductJsonLd({
     c && trail.length < 5;
     c = c.parent_category
   ) {
-    trail.unshift({ name: c.name, handle: c.handle })
+    trail.unshift({ name: categoryName(c, locale), handle: c.handle })
   }
   blocks.push({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { name: "الرئيسية", item: base },
+      { name: t("product.home"), item: base },
       ...trail.map((c) => ({
         name: c.name,
         item: `${base}/categories/${c.handle}`,
       })),
-      { name: product.title, item: url },
+      { name: text.title, item: url },
     ].map((entry, i) => ({ "@type": "ListItem", position: i + 1, ...entry })),
   })
 

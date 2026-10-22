@@ -3,17 +3,21 @@
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { ReactNode, useEffect, useState } from "react"
 
+import { LOCALES } from "@i18n/config"
 import Icon from "@modules/laly/components/icon"
+import { useT } from "@i18n/client"
 
 // The tabs of the bottom navigation show the logo; every other screen shows
 // a back arrow and its own title, like the phone design.
 const ROOTS = ["/", "/categories", "/cart", "/account"]
 
 export default function MobileBar({ logo, search }: { logo: ReactNode; search: ReactNode }) {
+  const t = useT()
   const pathname = usePathname()
   const router = useRouter()
   const { countryCode } = useParams()
-  const path = pathname.replace(new RegExp(`^/${countryCode}`), "") || "/"
+  // Without the country and the language ("/kw/en/cart" → "/cart").
+  const path = pathname.replace(new RegExp(`^/${countryCode}(/(${Object.keys(LOCALES).join("|")}))?(?=/|$)`), "") || "/"
   const root = ROOTS.includes(path)
   const [title, setTitle] = useState("")
 
@@ -39,13 +43,13 @@ export default function MobileBar({ logo, search }: { logo: ReactNode; search: R
     <>
       <button
         type="button"
-        aria-label="رجوع"
+        aria-label={t("layout.back")}
         onClick={() => (window.history.length > 1 ? router.back() : router.push(`/${countryCode}`))}
         className="w-10 h-10 -ms-2 rounded-full flex items-center justify-center shrink-0 hover:bg-white/10"
       >
         <Icon name="arrowr" size={22} className="ltr:-scale-x-100" />
       </button>
-      <p className="flex-1 min-w-0 truncate text-[16px] font-extrabold">{title}</p>
+      <p className="flex-1 min-w-0 truncate text-[16px] font-extrabold"><bdi>{title}</bdi></p>
     </>
   )
 }

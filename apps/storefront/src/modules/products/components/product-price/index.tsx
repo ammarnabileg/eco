@@ -1,3 +1,7 @@
+"use client"
+
+import { useLocale, useT } from "@i18n/client"
+import { intlLocale } from "@i18n/config"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 
@@ -10,9 +14,12 @@ export default function ProductPrice({
   variant?: HttpTypes.StoreProductVariant
   size?: "large" | "compact"
 }) {
+  const t = useT()
+  const locale = intlLocale(useLocale())
   const { cheapestPrice, variantPrice } = getProductPrice({
     product,
     variantId: variant?.id,
+    locale,
   })
 
   const price = variant ? variantPrice : cheapestPrice
@@ -26,7 +33,7 @@ export default function ProductPrice({
   return (
     <div className="flex items-baseline flex-wrap gap-x-2.5 gap-y-1">
       {!variant && (product.variants?.length ?? 0) > 1 && (
-        <span className="text-sm text-laly-mut">يبدأ من</span>
+        <span className="text-sm text-laly-mut">{t("product.price_from")}</span>
       )}
       <span
         className={size === "large" ? "text-[28px] font-extrabold" : "text-lg font-extrabold"}

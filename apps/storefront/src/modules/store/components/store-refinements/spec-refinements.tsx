@@ -3,7 +3,9 @@
 import { useRefinementList } from "react-instantsearch"
 import clsx from "clsx"
 
+import { useLocale, useT } from "@i18n/client"
 import { labelSpecFacet, SpecAttribute } from "@lib/util/catalog"
+import { localize } from "@lib/util/localize"
 import FilterCard from "@modules/store/components/filter-card"
 
 import { SPECS_ATTRIBUTE } from "./attributes"
@@ -24,6 +26,8 @@ export default function SpecRefinements({
 }: {
   attributes: SpecAttribute[]
 }) {
+  const t = useT()
+  const locale = useLocale()
   const { items, refine } = useRefinementList({
     attribute: SPECS_ATTRIBUTE,
     limit: 300,
@@ -32,6 +36,17 @@ export default function SpecRefinements({
 
   if (!attributes.length || !items.length) {
     return null
+  }
+
+  // labelSpecFacet labels in Arabic; booleans and template options are
+  // relabelled in the visitor's language, free values (2 MP) stay as they are.
+  const specLabel = (facet: string, labelled: NonNullable<ReturnType<typeof labelSpecFacet>>) => {
+    const value = facet.slice(facet.indexOf(":") + 1)
+    if (labelled.attr.type === "boolean") {
+      return value === "true" ? t("catalog.spec_yes") : t("catalog.spec_no")
+    }
+    const option = labelled.attr.options?.find((o) => o.value === value)
+    return option ? localize(option, "label", locale) : labelled.label
   }
 
   const groups = new Map<string, SpecGroupView>()
@@ -45,7 +60,7 @@ export default function SpecRefinements({
     }
     groups.get(labelled.key)!.values.push({
       value: item.value,
-      label: labelled.label,
+      label: specLabel(item.value, labelled),
       count: item.count,
       isRefined: item.isRefined,
     })
@@ -69,7 +84,7 @@ export default function SpecRefinements({
   return (
     <>
       {ordered.map((group) => (
-        <FilterCard key={group.attr.key} title={group.attr.label_ar}>
+        <FilterCard key={group.attr.key} title={localize(group.attr, "label", locale)}>
           <div className="flex flex-wrap gap-2">
             {group.values.map((v) => (
               <button

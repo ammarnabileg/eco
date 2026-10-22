@@ -4,17 +4,20 @@ import * as Slider from "@radix-ui/react-slider"
 import { useEffect, useState } from "react"
 import { useRange } from "react-instantsearch"
 
+import { intlLocale } from "@i18n/config"
+import { useLocale, useT } from "@i18n/client"
 import { indexedCurrency, priceAttribute } from "@lib/search-client"
 import { convertToLocale } from "@lib/util/money"
 import FilterCard from "@modules/store/components/filter-card"
 
-function formatAmount(amount: number, currency: string) {
+function formatAmount(amount: number, currency: string, locale: string) {
   try {
     return convertToLocale({
       amount,
       currency_code: currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
+      locale,
     })
   } catch {
     // An unrecognised currency code shouldn't take the sidebar down.
@@ -28,11 +31,13 @@ function formatAmount(amount: number, currency: string) {
  * supplies the slider's bounds. Refines on release rather than per pixel.
  */
 const PriceRange = ({ currencyCode }: { currencyCode: string }) => {
+  const t = useT()
+  const locale = intlLocale(useLocale())
   const { start, range, canRefine, refine } = useRange({
     attribute: priceAttribute("min_price", currencyCode),
   })
   const currency = indexedCurrency(currencyCode)
-  const format = (amount: number) => formatAmount(amount, currency)
+  const format = (amount: number) => formatAmount(amount, currency, locale)
 
   const min = Math.floor(range.min ?? 0)
   const max = Math.ceil(range.max ?? 0)
@@ -61,7 +66,7 @@ const PriceRange = ({ currencyCode }: { currencyCode: string }) => {
   }
 
   return (
-    <FilterCard title="السعر">
+    <FilterCard title={t("catalog.price")}>
       <div className="flex flex-col gap-y-3">
         <Slider.Root
           className="relative flex h-5 w-full touch-none select-none items-center"
@@ -75,7 +80,7 @@ const PriceRange = ({ currencyCode }: { currencyCode: string }) => {
           // Only refine when the thumb is released, so dragging doesn't fire a
           // search per pixel.
           onValueCommit={(committed) => refine([committed[0], committed[1]])}
-          aria-label="نطاق السعر"
+          aria-label={t("catalog.price_range")}
           data-testid="price-range"
         >
           <Slider.Track className="relative h-1 w-full grow rounded-full bg-laly-line">
@@ -85,7 +90,7 @@ const PriceRange = ({ currencyCode }: { currencyCode: string }) => {
             <Slider.Thumb
               key={index}
               className="block h-4 w-4 rounded-full border-2 border-laly-teal bg-white shadow-laly outline-none focus-visible:ring-2 focus-visible:ring-laly-teal"
-              aria-label={index === 0 ? "أدنى سعر" : "أعلى سعر"}
+              aria-label={index === 0 ? t("catalog.price_min") : t("catalog.price_max")}
             />
           ))}
         </Slider.Root>
