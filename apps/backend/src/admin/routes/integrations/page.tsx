@@ -36,7 +36,7 @@ type Field = {
 type Integration = {
   key: string
   name: string
-  group: "payments" | "accounting" | "messaging" | "marketing" | "ai"
+  group: "payments" | "accounting" | "messaging" | "marketing" | "ai" | "storage"
   description: string
   docs: string | null
   enabled: boolean
@@ -53,6 +53,7 @@ const GROUPS = [
   { key: "messaging", label: "واتساب" },
   { key: "marketing", label: "التسويق والتحليلات" },
   { key: "ai", label: "الذكاء الاصطناعي" },
+  { key: "storage", label: "تخزين الصور" },
 ] as const
 
 // Addresses each provider needs in its own dashboard.

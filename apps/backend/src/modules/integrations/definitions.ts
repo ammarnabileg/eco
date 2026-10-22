@@ -23,7 +23,7 @@ export type FieldDefinition = {
 export type IntegrationDefinition = {
   key: string
   name: string
-  group: "payments" | "accounting" | "messaging" | "marketing" | "ai"
+  group: "payments" | "accounting" | "messaging" | "marketing" | "ai" | "storage"
   description: string
   docs?: string
   fields: FieldDefinition[]
@@ -43,6 +43,71 @@ const ON_OFF = [
 ]
 
 export const INTEGRATIONS: IntegrationDefinition[] = [
+  {
+    key: "media",
+    name: "تخزين الصور (Cloudflare R2)",
+    group: "storage",
+    description:
+      "الصور والملفات اللي بتترفع من الأدمن بتتخزن على Cloudflare R2 بدل هارد السيرفر. لو متوقف، بتتخزن على السيرفر (لازم volume دائم). الصور القديمة بتفضل في مكانها.",
+    docs: "docs/MEDIA.md",
+    fields: [
+      { key: "access_key_id", label: "Access Key ID", type: "text", required: true, env: "S3_ACCESS_KEY_ID" },
+      { key: "secret_access_key", label: "Secret Access Key", type: "secret", required: true, env: "S3_SECRET_ACCESS_KEY" },
+      { key: "bucket", label: "Bucket", type: "text", required: true, env: "S3_BUCKET" },
+      {
+        key: "endpoint",
+        label: "Endpoint",
+        type: "text",
+        required: true,
+        env: "S3_ENDPOINT",
+        placeholder: "https://<account-id>.r2.cloudflarestorage.com",
+      },
+      {
+        key: "public_url",
+        label: "رابط الصور العام",
+        type: "text",
+        required: true,
+        env: "S3_FILE_URL",
+        placeholder: "https://media.lalykw.com",
+        help: "الدومين اللي الـ bucket متوصّل بيه في Cloudflare (Custom domain أو r2.dev).",
+      },
+      {
+        key: "prefix",
+        label: "فولدر داخل الـ bucket",
+        type: "text",
+        env: "S3_PREFIX",
+        default: "laly",
+        help: "كل ملفات Laly بتتحط جوه الفولدر ده، علشان ما تختلطش بملفات تانية في نفس الـ bucket.",
+      },
+      {
+        key: "naming",
+        label: "أسماء الملفات",
+        type: "select",
+        default: "slug",
+        options: [
+          { value: "slug", label: "اسم الملف بحروف إنجليزية (my-photo-xxxx.jpg)" },
+          { value: "uuid", label: "اسم عشوائي (UUID) — أأمن" },
+          { value: "original", label: "الاسم الأصلي + رقم مميز" },
+        ],
+      },
+      {
+        key: "webp",
+        label: "تحويل الصور لـ WebP",
+        type: "select",
+        default: "on",
+        options: ON_OFF,
+        help: "JPG وPNG بيتحولوا لـ WebP: حجم أصغر وتحميل أسرع. الصورة الأصلية ما بتتحفظش.",
+      },
+      {
+        key: "max_dimension",
+        label: "أقصى عرض/طول للصورة (px)",
+        type: "text",
+        default: "2000",
+        help: "الصور الأكبر بتتصغّر للمقاس ده مع الحفاظ على النسبة. فاضي = من غير تصغير.",
+      },
+      { key: "max_upload_mb", label: "أقصى حجم للملف (MB)", type: "text", default: "20" },
+    ],
+  },
   {
     key: "klickpay",
     name: "KlickPay (كي نت والبطاقات والمحافظ)",

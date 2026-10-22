@@ -71,6 +71,7 @@ decimals.
 | Add a product with AI: official page → grounded copy/specs/SEO, add-on and variant questions, official photos + AI edits, optional video (OpenRouter), saved as draft | `workflows/ai-product`, `api/admin/ai-products`, `admin/routes/ai-product` | `docs/AI-PRODUCTS.md` |
 | AI image studio: AI backgrounds, original product photo on a white card, text and store price drawn on a canvas, PNG download, homepage banner slide | `workflows/studio`, `api/admin/studio`, `admin/routes/studio`, `admin/components/studio`, job `studio-stale-slides` | `docs/AI-STUDIO.md` |
 | Information and policy pages (about, FAQ, shipping, returns, warranty, privacy, terms): drafts in the admin, numbered published versions, 404 until published, footer/sitemap links | `modules/store-content` (`content_page`, `content_page_revision`), `admin/routes/content/pages`, storefront `modules/content`, `app/sitemap.ts` | — |
+| Image storage: Cloudflare R2 or server disk, chosen in the admin (Integrations → تخزين الصور); WebP and resize on upload | `modules/file-media` | `docs/MEDIA.md` |
 | WhatsApp via Evolution API (see below) | `modules/whatsapp`, `workflows/whatsapp`, `admin/routes/whatsapp` | `docs/WHATSAPP.md` |
 
 **WhatsApp features:**

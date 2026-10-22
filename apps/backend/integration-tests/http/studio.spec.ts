@@ -129,8 +129,9 @@ medusaIntegrationTestRunner({
       expect(String(call.body.prompt)).toMatch(/no text/i)
 
       const image = await api.get(`/admin/studio/image?url=${encodeURIComponent(data.url)}`, { ...admin, responseType: "arraybuffer" })
-      expect(image.headers["content-type"]).toBe("image/png")
-      expect(Buffer.from(image.data).equals(Buffer.from(PNG, "base64"))).toBe(true)
+      // Stored as WebP by the media settings' default.
+      expect(image.headers["content-type"]).toBe("image/webp")
+      expect(Buffer.from(image.data).subarray(8, 12).toString()).toBe("WEBP")
       await unlink(join(process.cwd(), "static", basename(data.url))).catch(() => undefined)
 
       const usage = await getContainer().resolve<AiModuleService>(AI_MODULE).listAiUsages({ task: "image_generate" })

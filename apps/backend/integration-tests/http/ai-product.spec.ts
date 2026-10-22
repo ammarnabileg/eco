@@ -167,7 +167,7 @@ medusaIntegrationTestRunner({
       expect(enhanced.data.url).toContain("tapo-c200-white")
       const imgCall = calls.find((c) => c.path === "/images")!
       expect(imgCall.body.model).toBe("vendor/img")
-      expect(imgCall.body.input_references[0].image_url.url).toMatch(/^data:image\/png;base64,/)
+      expect(imgCall.body.input_references[0].image_url.url).toMatch(/^data:image\/(png|webp);base64,/)
       expect(imgCall.body.prompt).toContain("Keep the product exactly as it is")
 
       const created = await api.post(
