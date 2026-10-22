@@ -97,6 +97,15 @@ decimals.
   - Header `apikey`.
 - **Last known problem:** the gateway returned 401, which means the API key saved in the admin is wrong.
 
+### After-sales and shopping tools (built)
+
+- Guest order tracking (`/track-order`): WhatsApp code to the order's phone, then a signed 30-min cookie. Responses never reveal whether an order exists.
+- Return/warranty requests (`/returns`, `/account/support`), reviewed in admin "After-sales". No automatic refunds.
+- Staff WhatsApp alerts for new install, quote and after-sales requests.
+- Product tabs and box contents (`product_detail.box_contents_ar/en`).
+- Wishlist and compare are stored in the browser (localStorage); there is a help hub at `/help`.
+- Card instalment line: the Deema count is set in Integrations; an empty count hides the line. Never assume a count.
+
 ### Open items
 
 - WhatsApp needs a working API key in the admin, then "ضبط الـ Webhook" and a real test.
