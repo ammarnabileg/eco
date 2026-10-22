@@ -65,5 +65,11 @@
   "no_results_for": "No results for \"{query}\"",
   "loading": "Loading…",
   "days_few": "{count} days",
-  "days_other": "{count} days"
+  "days_other": "{count} days",
+  "search_categories": "Categories",
+  "search_brands": "Brands",
+  "search_products_title": "Products",
+  "search_clear": "Clear",
+  "search_view_all": "View all results ({count})",
+  "search_failed_retry": "Search isn't available right now. Please try again in a moment."
 }

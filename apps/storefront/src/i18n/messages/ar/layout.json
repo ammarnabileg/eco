@@ -65,5 +65,11 @@
   "no_results_for": "لا توجد نتائج لـ \"{query}\"",
   "loading": "جاري التحميل…",
   "days_few": "{count} أيام",
-  "days_other": "{count} يوم"
+  "days_other": "{count} يوم",
+  "search_categories": "الأقسام",
+  "search_brands": "الماركات",
+  "search_products_title": "المنتجات",
+  "search_clear": "مسح",
+  "search_view_all": "عرض كل النتائج ({count})",
+  "search_failed_retry": "تعذّر البحث الآن. حاول مرة ثانية بعد لحظات."
 }
