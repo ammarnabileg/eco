@@ -14,6 +14,7 @@ import {
   UpdateBrand,
   UpdateProductCatalog,
   UpdateQuoteRequest,
+  UpdateInstallRequest,
   UpdateSpecTemplate,
 } from "./admin/catalog/validators"
 
@@ -34,7 +35,8 @@ import { guardBnplComplete, guardBnplSession } from "./store/carts/bnpl-guard"
 import { guardLineItems } from "./store/carts/guards"
 import { guardOtpComplete, guardOtpSession } from "./store/carts/otp-guard"
 import { SendInboxMessage, SendOtp, SendProducts, TestWhatsapp, VerifyOtp } from "./store/whatsapp/validators"
-import { AddConfiguredItem, CreateQuoteRequest } from "./store/catalog/validators"
+import { AddConfiguredItem, CreateInstallRequest, CreateQuoteRequest } from "./store/catalog/validators"
+import { rateLimit } from "./utils/rate-limit"
 
 // Request them as stars: +brand.*,+product_detail.*,+addon_groups.options.*
 const CATALOG_PRODUCT_FIELDS = ["brand", "product_detail", "addon_groups", "addon_groups.options"]
@@ -114,6 +116,7 @@ export default defineMiddlewares({
     body("/admin/catalog/addon-groups", CreateAddonGroup),
     body("/admin/catalog/addon-groups/:id", UpdateAddonGroup),
     body("/admin/catalog/quote-requests/:id", UpdateQuoteRequest),
+    body("/admin/catalog/install-requests/:id", UpdateInstallRequest),
     body("/admin/catalog/products/:id", UpdateProductCatalog),
     body("/store/carts/:id/configured-items", AddConfiguredItem),
     body("/admin/ai-products/draft", DraftAiProduct),
@@ -141,8 +144,19 @@ export default defineMiddlewares({
       method: ["POST"],
       matcher: "/store/quote-requests",
       middlewares: [
+        rateLimit("quote", 10, 60 * 60 * 1000),
         authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true }),
         validateAndTransformBody(CreateQuoteRequest),
+      ],
+    },
+    {
+      // Public booking form: a few requests per visitor an hour is plenty.
+      method: ["POST"],
+      matcher: "/store/install-requests",
+      middlewares: [
+        rateLimit("install", 5, 60 * 60 * 1000),
+        authenticate("customer", ["session", "bearer"], { allowUnauthenticated: true }),
+        validateAndTransformBody(CreateInstallRequest),
       ],
     },
     {

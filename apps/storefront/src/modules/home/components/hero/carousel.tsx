@@ -150,14 +150,12 @@ export default function HeroCarousel({
               </a>
             )}
             {installHref && (
-              <a
+              <LocalizedClientLink
                 href={installHref}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="inline-flex items-center rounded-btn border-[1.6px] border-white/55 hover:border-white hover:bg-white/10 font-bold text-sm px-5 py-3 transition-colors"
               >
                 {t("home.hero_install")}
-              </a>
+              </LocalizedClientLink>
             )}
           </div>
           {dots()}

@@ -3,6 +3,7 @@ import { Tag } from "@medusajs/icons"
 import { Tabs } from "@medusajs/ui"
 
 import { AddonGroupsTab } from "../../components/catalog/addon-groups-tab"
+import { InstallRequestsTab } from "../../components/catalog/install-requests-tab"
 import { QuoteRequestsTab } from "../../components/catalog/quote-requests-tab"
 import { SpecTemplatesTab } from "../../components/catalog/spec-templates-tab"
 import { EntityListEditor, FieldDef } from "../../components/entity-list-editor"
@@ -25,6 +26,7 @@ const CatalogPage = () => (
         <Tabs.Trigger value="brands">البراندات</Tabs.Trigger>
         <Tabs.Trigger value="addons">القطع الإضافية</Tabs.Trigger>
         <Tabs.Trigger value="quotes">طلبات عرض السعر</Tabs.Trigger>
+        <Tabs.Trigger value="installs">طلبات التركيب</Tabs.Trigger>
       </Tabs.List>
       <div className="mt-4">
         <Tabs.Content value="templates">
@@ -50,6 +52,9 @@ const CatalogPage = () => (
         </Tabs.Content>
         <Tabs.Content value="quotes">
           <QuoteRequestsTab />
+        </Tabs.Content>
+        <Tabs.Content value="installs">
+          <InstallRequestsTab />
         </Tabs.Content>
       </div>
     </Tabs>

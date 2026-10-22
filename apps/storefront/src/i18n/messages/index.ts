@@ -12,6 +12,7 @@ import arCart from "./ar/cart.json"
 import arCheckout from "./ar/checkout.json"
 import arOrder from "./ar/order.json"
 import arAccount from "./ar/account.json"
+import arService from "./ar/service.json"
 import enLayout from "./en/layout.json"
 import enHome from "./en/home.json"
 import enCatalog from "./en/catalog.json"
@@ -21,8 +22,9 @@ import enCart from "./en/cart.json"
 import enCheckout from "./en/checkout.json"
 import enOrder from "./en/order.json"
 import enAccount from "./en/account.json"
+import enService from "./en/service.json"
 
 export const MESSAGES: Record<Locale, Messages> = {
-  ar: { layout: arLayout, home: arHome, catalog: arCatalog, pages: arPages, product: arProduct, cart: arCart, checkout: arCheckout, order: arOrder, account: arAccount },
-  en: { layout: enLayout, home: enHome, catalog: enCatalog, pages: enPages, product: enProduct, cart: enCart, checkout: enCheckout, order: enOrder, account: enAccount },
+  ar: { layout: arLayout, home: arHome, catalog: arCatalog, pages: arPages, product: arProduct, cart: arCart, checkout: arCheckout, order: arOrder, account: arAccount, service: arService },
+  en: { layout: enLayout, home: enHome, catalog: enCatalog, pages: enPages, product: enProduct, cart: enCart, checkout: enCheckout, order: enOrder, account: enAccount, service: enService },
 }

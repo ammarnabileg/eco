@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { href: "/categories", label: "layout.nav_categories" },
   { href: "/brands", label: "layout.nav_brands" },
   { href: "/offers", label: "layout.nav_offers" },
+  { href: "/installation", label: "service.nav" },
   { href: "/collections/best-sellers", label: "layout.nav_best_sellers" },
 ]
 

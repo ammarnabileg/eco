@@ -49,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ])
   const entries: (MetadataRoute.Sitemap[number] & { path: string })[] = [
     { path: "/", url: "", changeFrequency: "daily", priority: 1 },
-    ...["/store", "/categories", "/brands", "/offers", "/contact"].map((p) => ({ path: p, url: "", changeFrequency: "daily" as const, priority: 0.7 })),
+    ...["/store", "/categories", "/brands", "/offers", "/installation", "/contact"].map((p) => ({ path: p, url: "", changeFrequency: "daily" as const, priority: 0.7 })),
     ...pages.map((p) => ({ path: `/${p.slug}`, url: "", changeFrequency: "monthly" as const, priority: 0.4 })),
     ...brands.map((b) => ({ path: `/brands/${b.handle}`, url: "", changeFrequency: "weekly" as const, priority: 0.6 })),
     ...categories.map((c) => ({ path: `/categories/${c.handle}`, url: "", changeFrequency: "weekly" as const, priority: 0.6 })),

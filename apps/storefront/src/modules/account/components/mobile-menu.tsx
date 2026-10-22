@@ -42,6 +42,7 @@ export default async function MobileMenu({ signedIn }: { signedIn: boolean }) {
     <nav aria-label={t("account.mobile_menu_label")} className="small:hidden grid gap-2.5 mt-6">
       <ul className="grid gap-2.5">
         {signedIn && <Row href="/account/orders" icon="truck" label={t("account.my_orders")} />}
+        <Row href="/installation" icon="wrench" label={t("service.nav")} />
         <Row href="/contact" icon="headset" label={t("account.contact_us")} />
       </ul>
       {published.length > 0 && (

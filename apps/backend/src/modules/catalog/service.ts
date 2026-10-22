@@ -4,6 +4,7 @@ import AddonGroup from "./models/addon-group"
 import AddonOption from "./models/addon-option"
 import Brand from "./models/brand"
 import ProductDetail from "./models/product-detail"
+import InstallRequest from "./models/install-request"
 import QuoteRequest from "./models/quote-request"
 import SpecTemplate from "./models/spec-template"
 
@@ -14,6 +15,7 @@ class CatalogModuleService extends MedusaService({
   AddonGroup,
   AddonOption,
   QuoteRequest,
+  InstallRequest,
 }) {}
 
 export default CatalogModuleService

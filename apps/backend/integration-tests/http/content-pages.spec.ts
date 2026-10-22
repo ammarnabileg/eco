@@ -37,7 +37,7 @@ medusaIntegrationTestRunner({
 
     it("keeps drafts private, publishes numbered versions and hides on request", async () => {
       const { data: list } = await api.get("/admin/content/pages", admin)
-      expect(list.pages.map((p: { slug: string }) => p.slug)).toEqual(["about", "faq", "shipping-policy", "return-policy", "warranty", "privacy-policy", "terms"])
+      expect(list.pages.map((p: { slug: string }) => p.slug)).toEqual(["about", "faq", "installation", "shipping-policy", "return-policy", "warranty", "privacy-policy", "terms"])
 
       await api.post("/admin/content/pages/return-policy", { title_ar: "سياسة الإرجاع", body_ar: "## المدة\nنص تجريبي." }, admin)
       expect((await fail(api.get("/store/content/pages/return-policy", store))).status).toBe(404)

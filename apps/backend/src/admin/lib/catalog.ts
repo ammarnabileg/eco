@@ -87,6 +87,38 @@ export const QUOTE_STATUSES: { value: QuoteRequest["status"]; label: string }[] 
   { value: "lost", label: "لم يتم" },
 ]
 
+export type InstallRequest = {
+  id: string
+  customer_name: string
+  phone: string
+  governorate: string
+  area?: string | null
+  service: "cctv" | "networking" | "smart_home" | "intercom" | "other"
+  preferred_date?: string | null
+  message?: string | null
+  product_id?: string | null
+  locale: string
+  status: "new" | "contacted" | "scheduled" | "done" | "cancelled"
+  admin_note?: string | null
+  created_at: string
+}
+
+export const INSTALL_STATUSES: { value: InstallRequest["status"]; label: string }[] = [
+  { value: "new", label: "جديد" },
+  { value: "contacted", label: "تم التواصل" },
+  { value: "scheduled", label: "تم تحديد موعد" },
+  { value: "done", label: "تم التركيب" },
+  { value: "cancelled", label: "ملغي" },
+]
+
+export const INSTALL_SERVICES: Record<InstallRequest["service"], string> = {
+  cctv: "كاميرات مراقبة",
+  networking: "شبكات وواي فاي",
+  smart_home: "بيت ذكي",
+  intercom: "إنتركم وتحكم بالدخول",
+  other: "أخرى",
+}
+
 export const formatKwd = (value: number | string) => `${Number(value).toFixed(3)} د.ك`
 
 // Empty strings become null so the API clears the field.

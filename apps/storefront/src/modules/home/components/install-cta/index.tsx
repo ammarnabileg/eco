@@ -1,13 +1,10 @@
 import { getT } from "@i18n/server"
-import { whatsappLink } from "@lib/util/localize"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon from "@modules/laly/components/icon"
 
-export default async function InstallCta({ whatsapp }: { whatsapp: string | null }) {
+// Leads to the installation page and its booking form.
+export default async function InstallCta(_: { whatsapp?: string | null }) {
   const t = await getT()
-  const href = whatsappLink(whatsapp, t("home.install_whatsapp_message"))
-  if (!href) {
-    return null
-  }
 
   return (
     <section className="content-container mt-10 small:mt-14">
@@ -23,14 +20,12 @@ export default async function InstallCta({ whatsapp }: { whatsapp: string | null
             {t("home.install_subtitle")}
           </p>
         </div>
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
+        <LocalizedClientLink
+          href="/installation"
           className="self-start small:self-auto inline-flex items-center rounded-btn bg-laly-sand hover:bg-laly-sand-d text-[#26200D] font-bold text-sm px-5 py-3 transition-colors"
         >
           {t("home.install_cta")}
-        </a>
+        </LocalizedClientLink>
       </div>
     </section>
   )

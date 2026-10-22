@@ -81,6 +81,14 @@ export const UpdateQuoteRequest = z
   .strict()
 export type UpdateQuoteRequestType = z.infer<typeof UpdateQuoteRequest>
 
+export const UpdateInstallRequest = z
+  .object({
+    status: z.enum(["new", "contacted", "scheduled", "done", "cancelled"]).optional(),
+    admin_note: optionalText(2000),
+  })
+  .strict()
+export type UpdateInstallRequestType = z.infer<typeof UpdateInstallRequest>
+
 const specValue = z.union([
   z.string().max(500),
   z.number(),

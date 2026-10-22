@@ -6,6 +6,7 @@ import { MedusaError } from "@medusajs/framework/utils"
 export const CONTENT_PAGES = [
   { slug: "about", label: "من نحن", group: "company" },
   { slug: "faq", label: "الأسئلة الشائعة", group: "care" },
+  { slug: "installation", label: "خدمة التركيب", group: "service" },
   { slug: "shipping-policy", label: "سياسة التوصيل", group: "care" },
   { slug: "return-policy", label: "سياسة الإرجاع والاستبدال", group: "care" },
   { slug: "warranty", label: "الضمان", group: "care" },
