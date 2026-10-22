@@ -102,7 +102,29 @@ async function getCountryCode(
 /**
  * Middleware to handle region selection and onboarding status.
  */
+/**
+ * The store lives on one address (NEXT_PUBLIC_BASE_URL, e.g. www.lalykw.com).
+ * A visit to the bare domain is sent there permanently: the backend only
+ * accepts the browser's requests (search, cart) from that address, and
+ * search engines should see one site.
+ */
+function canonicalHostRedirect(request: NextRequest) {
+  const base = process.env.NEXT_PUBLIC_BASE_URL
+  if (!base) return null
+  const canonical = new URL(base)
+  if (!canonical.hostname.startsWith("www.")) return null
+  const host = (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").split(":")[0].toLowerCase()
+  if (host !== canonical.hostname.slice(4)) return null
+  const url = new URL(request.nextUrl.pathname + request.nextUrl.search, canonical.origin)
+  return NextResponse.redirect(url, 308)
+}
+
 export async function middleware(request: NextRequest) {
+  const toCanonical = canonicalHostRedirect(request)
+  if (toCanonical) {
+    return toCanonical
+  }
+
   if (request.nextUrl.pathname.includes(".")) {
     return NextResponse.next()
   }
