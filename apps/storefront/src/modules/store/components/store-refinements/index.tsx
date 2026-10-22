@@ -40,14 +40,16 @@ const Filters = ({
   currencyCode,
   attributes,
   showCategories,
+  showBrands,
 }: {
   currencyCode: string
   attributes: SpecAttribute[]
   showCategories: boolean
+  showBrands: boolean
 }) => (
   <>
     <CurrentRefinements currencyCode={currencyCode} />
-    <RefinementGroup attribute={BRAND_ATTRIBUTE} title="الماركة" />
+    {showBrands && <RefinementGroup attribute={BRAND_ATTRIBUTE} title="الماركة" />}
     <SpecRefinements attributes={attributes} />
     <OptionRefinements />
     <PriceRange currencyCode={currencyCode} />
@@ -67,10 +69,12 @@ const StoreRefinements = ({
   currencyCode,
   attributes = [],
   showCategories = true,
+  showBrands = true,
 }: {
   currencyCode: string
   attributes?: SpecAttribute[]
   showCategories?: boolean
+  showBrands?: boolean
 }) => {
   const [open, setOpen] = useState(false)
   const { items } = useCurrentRefinements()
@@ -106,6 +110,7 @@ const StoreRefinements = ({
             currencyCode={currencyCode}
             attributes={attributes}
             showCategories={showCategories}
+            showBrands={showBrands}
           />
           <button
             type="button"
@@ -122,6 +127,7 @@ const StoreRefinements = ({
           currencyCode={currencyCode}
           attributes={attributes}
           showCategories={showCategories}
+            showBrands={showBrands}
         />
       </div>
     </>

@@ -6,6 +6,7 @@ import RichText from "@modules/content/components/rich-text"
 import { parseRichText, sectionsOf } from "@modules/content/lib/rich-text"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Icon from "@modules/laly/components/icon"
+import PageBanner from "@modules/laly/components/page-banner"
 
 type Props = { params: Promise<{ countryCode: string }> }
 
@@ -13,28 +14,7 @@ const updated = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("ar-KW", { year: "numeric", month: "long", day: "numeric", numberingSystem: "latn" }) : null
 
 function Hero({ page }: { page: ContentPage }) {
-  // Desktop banner; on phones the title is already in the app bar.
-  return (
-    <section className="hidden small:block bg-[linear-gradient(160deg,#0A2A31_0%,#0B333B_46%,#0E4652_100%)] text-white">
-      <div className="content-container py-8 small:py-12">
-        <nav aria-label="مسار الصفحة" className="text-[12.5px] text-[#B9D3D8]">
-          <ol className="flex items-center gap-2">
-            <li>
-              <LocalizedClientLink href="/" className="hover:text-white">
-                الرئيسية
-              </LocalizedClientLink>
-            </li>
-            <li aria-hidden>/</li>
-            <li aria-current="page" className="text-white">
-              {page.title_ar}
-            </li>
-          </ol>
-        </nav>
-        <h1 className="mt-3 text-[26px] small:text-[36px] font-extrabold leading-tight">{page.title_ar}</h1>
-        {page.summary_ar && <p className="mt-3 max-w-2xl text-[14px] small:text-[15.5px] leading-7 text-[#B9D3D8]">{page.summary_ar}</p>}
-      </div>
-    </section>
-  )
+  return <PageBanner title={page.title_ar} intro={page.summary_ar} />
 }
 
 function Faq({ items }: { items: FaqItem[] }) {
@@ -104,7 +84,6 @@ export function contentPageRoute(slug: string) {
       <>
         <Hero page={page} />
         <div className="content-container !px-3.5 small:!px-6 py-4 small:py-12">
-          {page.summary_ar && <p className="small:hidden mb-4 text-[14px] leading-7 text-laly-mut">{page.summary_ar}</p>}
           <div className={`grid gap-4 small:gap-8 ${sections.length >= 3 ? "small:grid-cols-[240px_minmax(0,1fr)]" : ""} items-start`}>
             {sections.length >= 3 && (
               <>

@@ -160,6 +160,24 @@ medusaIntegrationTestRunner({
       expect(filters.attributes.map((a) => a.key)).toEqual(["resolution_mp", "night_vision"])
     })
 
+    it("lists only brands with published products, with their counts", async () => {
+      const make = async (name: string, handle: string) =>
+        (await api.post("/admin/catalog/brands", { name, handle }, adminHeaders)).data.brand.id as string
+      const hik = await make("Hikvision", "hikvision")
+      await make("Dahua", "dahua")
+      await api.post(`/admin/catalog/products/${productId}`, { brand_id: hik }, adminHeaders)
+      const { data: draft } = await api.post(
+        "/admin/products",
+        { title: "Draft camera", status: "draft", options: [{ title: "Default", values: ["Default"] }], variants: [{ title: "Default", options: { Default: "Default" }, prices: [{ amount: 5, currency_code: "kwd" }] }] },
+        adminHeaders
+      )
+      await api.post(`/admin/catalog/products/${draft.product.id}`, { brand_id: hik }, adminHeaders)
+
+      const { data } = await api.get("/store/catalog/brands", storeHeaders)
+      expect(data.brands).toEqual([expect.objectContaining({ name: "Hikvision", handle: "hikvision", product_count: 1 })])
+      expect(data.brands[0].products).toBeUndefined()
+    })
+
     it("prices add-ons on the server and merges identical configurations", async () => {
       const group = await addonGroup()
       await api.post(`/admin/catalog/products/${productId}`, { addon_group_ids: [group.id] }, adminHeaders)

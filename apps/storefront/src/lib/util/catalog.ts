@@ -41,6 +41,9 @@ export type Brand = {
   name: string
   handle?: string
   logo_url?: string | null
+  description_ar?: string | null
+  /** Published products of the brand (brands list only). */
+  product_count?: number
 }
 
 export type AddonOption = {

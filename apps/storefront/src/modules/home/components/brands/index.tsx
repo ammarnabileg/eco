@@ -1,19 +1,24 @@
-import { BRANDS } from "@modules/laly/lib/content"
+import { listBrands } from "@lib/data/catalog"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import SectionHeading from "@modules/laly/components/section-heading"
 
-export default function Brands() {
+// The brands the store actually sells (from the catalog), each linked to its page.
+export default async function Brands() {
+  const brands = await listBrands()
+  if (!brands.length) return null
   return (
     <section className="content-container mt-10 small:mt-14">
-      <h2 className="text-sm small:text-base font-extrabold text-laly-mut mb-4">
-        نتعامل مع أفضل الماركات العالمية
-      </h2>
+      <SectionHeading eyebrow="الماركات" title="تسوّق حسب الماركة" href="/brands" />
       <ul className="flex flex-wrap gap-2 small:gap-3">
-        {BRANDS.map((b) => (
-          <li
-            key={b}
-            dir="ltr"
-            className="font-latin text-xs small:text-sm font-bold text-laly-faint bg-white border border-laly-line rounded-full px-4 py-2"
-          >
-            {b}
+        {brands.map((b) => (
+          <li key={b.id}>
+            <LocalizedClientLink
+              href={`/brands/${b.handle}`}
+              dir="ltr"
+              className="block font-latin text-xs small:text-sm font-bold text-laly-ink bg-white border border-laly-line rounded-full px-4 py-2 hover:border-laly-teal hover:text-laly-teal transition-colors"
+            >
+              {b.name}
+            </LocalizedClientLink>
           </li>
         ))}
       </ul>

@@ -24,11 +24,14 @@ const PRODUCT_LIMIT = 12
 const StoreTemplate = ({
   currencyCode,
   categoryIds,
+  brand,
   attributes = [],
   header,
 }: {
   currencyCode: string
   categoryIds?: string[]
+  /** A brand page: only this brand's products (by brand name, as indexed). */
+  brand?: string
   attributes?: SpecAttribute[]
   header?: ReactNode
 }) => {
@@ -37,8 +40,10 @@ const StoreTemplate = ({
     () =>
       scope
         ? makeSearchClient({ category_ids: { $in: scope.split(",") } })
-        : searchClient,
-    [scope]
+        : brand
+          ? makeSearchClient({ brand: { $in: [brand] } })
+          : searchClient,
+    [scope, brand]
   )
 
   return (
@@ -66,6 +71,7 @@ const StoreTemplate = ({
             currencyCode={currencyCode}
             attributes={attributes}
             showCategories={!categoryIds}
+            showBrands={!brand}
           />
           <div className="w-full min-w-0">
             <StoreSearchBox />

@@ -7,7 +7,7 @@ import Icon from "@modules/laly/components/icon"
 
 // The tabs of the bottom navigation show the logo; every other screen shows
 // a back arrow and its own title, like the phone design.
-const ROOTS = ["/", "/store", "/cart", "/account"]
+const ROOTS = ["/", "/categories", "/cart", "/account"]
 
 export default function MobileBar({ logo, search }: { logo: ReactNode; search: ReactNode }) {
   const pathname = usePathname()

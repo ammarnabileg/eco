@@ -18,6 +18,14 @@ export async function getCatalogFilters(
     .catch(() => ({ attributes: [], brands: [] }))
 }
 
+/** Brands that have published products, in the admin's order. */
+export async function listBrands(): Promise<Brand[]> {
+  return sdk.client
+    .fetch<{ brands: Brand[] }>("/store/catalog/brands", { next: { revalidate: 300 } })
+    .then((r) => r.brands)
+    .catch(() => [])
+}
+
 /** A product's full spec table, grouped and already labelled by the backend. */
 export async function getProductSpecs(productId: string): Promise<SpecGroup[]> {
   return sdk.client

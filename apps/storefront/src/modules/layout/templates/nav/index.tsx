@@ -9,7 +9,8 @@ import MobileBar from "@modules/layout/components/mobile-bar"
 import { getStoreContent } from "@lib/data/content"
 
 const NAV_LINKS = [
-  { href: "/store", label: "الأقسام" },
+  { href: "/categories", label: "الأقسام" },
+  { href: "/brands", label: "الماركات" },
   { href: "/offers", label: "العروض" },
   { href: "/collections/best-sellers", label: "الأكثر مبيعاً" },
 ]

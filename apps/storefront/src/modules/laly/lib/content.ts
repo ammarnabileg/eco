@@ -5,6 +5,10 @@ import type { IconName } from "@modules/laly/components/icon"
 
 export const CATEGORY_ICONS: Record<string, IconName> = {
   cctv: "cctv",
+  "security-cameras": "cctv",
+  "access-control-intercom": "user",
+  computers: "laptop",
+  "security-software": "shield",
   networking: "router",
   "smart-home": "smarthome",
   storage: "storage",
@@ -13,15 +17,5 @@ export const CATEGORY_ICONS: Record<string, IconName> = {
   monitors: "projector",
 }
 
-export const BRANDS = [
-  "HIKVISION",
-  "TP-Link",
-  "Dahua",
-  "D-Link",
-  "EZVIZ",
-  "Ubiquiti",
-  "MikroTik",
-  "Western Digital",
-]
 
 export const PAYMENT_METHODS = ["KNET", "Visa", "Mastercard", "Apple Pay"]

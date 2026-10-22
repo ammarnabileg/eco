@@ -20,7 +20,7 @@ export default function CategoryTiles({
       <SectionHeading
         eyebrow="تصفح المتجر"
         title="تسوّق حسب القسم"
-        href="/store"
+        href="/categories"
       />
       <ul className="flex small:grid small:grid-cols-8 gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 small:mx-0 small:px-0">
         {topLevel.map((c) => (
@@ -40,7 +40,7 @@ export default function CategoryTiles({
         ))}
         <li className="hidden small:block">
           <LocalizedClientLink
-            href="/store"
+            href="/categories"
             className="group flex flex-col items-center gap-3 bg-white border border-laly-line rounded-card py-5 px-2 hover:border-laly-teal transition-colors text-center"
           >
             <span className="w-12 h-12 rounded-[13px] bg-laly-teal-soft text-laly-teal flex items-center justify-center group-hover:-translate-y-1 transition-transform">

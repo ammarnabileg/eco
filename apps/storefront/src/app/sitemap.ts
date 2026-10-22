@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 
 import { sdk } from "@lib/config"
+import { listBrands } from "@lib/data/catalog"
 import { getStoreContent } from "@lib/data/content"
 import { getBaseURL } from "@lib/util/env"
 
@@ -25,14 +26,16 @@ async function all<T>(path: string, key: string, fields: string): Promise<T[]> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = `${getBaseURL().replace(/\/$/, "")}/${COUNTRY}`
-  const [{ pages = [] }, categories, products] = await Promise.all([
+  const [{ pages = [] }, brands, categories, products] = await Promise.all([
     getStoreContent(),
+    listBrands(),
     all<{ handle: string }>("/store/product-categories", "product_categories", "handle"),
     all<{ handle: string; updated_at?: string }>("/store/products", "products", "handle,updated_at"),
   ])
   return [
     { url: base, changeFrequency: "daily", priority: 1 },
-    ...["/store", "/offers", "/contact"].map((p) => ({ url: `${base}${p}`, changeFrequency: "daily" as const, priority: 0.7 })),
+    ...["/store", "/categories", "/brands", "/offers", "/contact"].map((p) => ({ url: `${base}${p}`, changeFrequency: "daily" as const, priority: 0.7 })),
+    ...brands.map((b) => ({ url: `${base}/brands/${b.handle}`, changeFrequency: "weekly" as const, priority: 0.6 })),
     ...pages.map((p) => ({ url: `${base}/${p.slug}`, changeFrequency: "monthly" as const, priority: 0.4 })),
     ...categories.map((c) => ({ url: `${base}/categories/${c.handle}`, changeFrequency: "weekly" as const, priority: 0.6 })),
     ...products.map((p) => ({

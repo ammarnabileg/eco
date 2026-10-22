@@ -7,7 +7,7 @@ import Icon, { type IconName } from "@modules/laly/components/icon"
 
 const ITEMS: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "الرئيسية", icon: "smarthome" },
-  { href: "/store", label: "الأقسام", icon: "grid" },
+  { href: "/categories", label: "الأقسام", icon: "grid" },
   { href: "/cart", label: "السلة", icon: "cart" },
   { href: "/account", label: "حسابي", icon: "user" },
 ]
